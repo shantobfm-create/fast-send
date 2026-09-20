@@ -527,23 +527,37 @@ app.get('/api/admin/audit-logs', (req, res) => {
 const hybridDistPath = path.join(__dirname, '../hybrid-app/dist');
 const adminDistPath = path.join(__dirname, '../admin-portal/dist');
 
+// PWA Static routes at root & app paths
+app.get(['/manifest.json', '/app/manifest.json'], (req, res) => {
+  res.setHeader('Content-Type', 'application/manifest+json');
+  res.sendFile(path.join(hybridDistPath, 'manifest.json'));
+});
+app.get(['/sw.js', '/app/sw.js'], (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.sendFile(path.join(hybridDistPath, 'sw.js'));
+});
+app.get(['/icon-192.png', '/app/icon-192.png'], (req, res) => {
+  res.sendFile(path.join(hybridDistPath, 'icon-192.png'));
+});
+app.get(['/icon-512.png', '/app/icon-512.png'], (req, res) => {
+  res.sendFile(path.join(hybridDistPath, 'icon-512.png'));
+});
+app.get(['/maskable-icon-512.png', '/app/maskable-icon-512.png'], (req, res) => {
+  res.sendFile(path.join(hybridDistPath, 'maskable-icon-512.png'));
+});
+app.get(['/logo.svg', '/app/logo.svg'], (req, res) => {
+  res.sendFile(path.join(hybridDistPath, 'logo.svg'));
+});
+
 // Static assets
 app.use('/assets', express.static(path.join(hybridDistPath, 'assets')));
 app.use('/admin/assets', express.static(path.join(adminDistPath, 'assets')));
 app.use('/app/assets', express.static(path.join(hybridDistPath, 'assets')));
+app.use(express.static(hybridDistPath));
 
-// Direct Android APK Download Route
+// Direct Android App Install & Download Route
 app.get(['/download/FastSend.apk', '/FastSend.apk', '/download', '/apk'], (req, res) => {
-  const apkPath = path.join(__dirname, '../hybrid-app/public/FastSend.apk');
-  res.setHeader('Content-Disposition', 'attachment; filename="FastSend.apk"');
-  res.setHeader('Content-Type', 'application/vnd.android.package-archive');
-  if (fs.existsSync(apkPath)) {
-    return res.sendFile(apkPath);
-  } else {
-    // If not yet generated, deliver standalone install manifest / APK bootstrap
-    const fallbackApk = path.join(hybridDistPath, 'manifest.json');
-    return res.sendFile(fallbackApk);
-  }
+  return res.redirect('/app?install=true');
 });
 
 // Mobile App Route
@@ -567,6 +581,9 @@ app.get('/', (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fast Send - Live Control Hub</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/icon-192.png">
+  <meta name="theme-color" content="#00823B">
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', Segoe UI, sans-serif; }

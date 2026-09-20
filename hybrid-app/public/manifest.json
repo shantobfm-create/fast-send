@@ -1,24 +1,43 @@
 {
-  "name": "Fast Send - মোবাইল ওয়ালেট ও রেমিটেন্স",
+  "id": "/app",
+  "name": "Fast Send",
   "short_name": "Fast Send",
-  "description": "দ্রুত ও নিরাপদ মানি ট্রান্সফার, মোবাইল ব্যাংকিং ও প্রবাসী রেমিটেন্স সেবা",
+  "description": "Fast Send - Fast and secure money transfer, mobile banking, and international remittance platform.",
   "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay", "minimal-ui"],
+  "orientation": "portrait",
   "background_color": "#00823B",
   "theme_color": "#00823B",
-  "orientation": "portrait",
+  "categories": ["finance", "utilities"],
+  "lang": "bn",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/app/logo.svg",
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/app/logo.svg",
+      "src": "/icon-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
