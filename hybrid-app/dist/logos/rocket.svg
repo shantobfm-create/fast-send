@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="100%" height="100%">
+  <!-- Rocket Icon -->
+  <g transform="translate(15, 10) scale(0.75)">
+    <rect width="70" height="70" rx="16" fill="#8C3494"/>
+    <path d="M16 48 L46 14 L76 34 L52 60 Z" fill="#FFFFFF"/>
+    <path d="M46 14 L68 44 L52 60 Z" fill="#E1BEE7"/>
+    <polygon points="46,14 76,34 68,44" fill="#FFFFFF"/>
+    <polygon points="16,48 52,60 36,64" fill="#FFFFFF"/>
+  </g>
+  <!-- Rocket Text -->
+  <g transform="translate(80, 20)">
+    <text x="0" y="16" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#6B21A8" letter-spacing="1">ROCKET</text>
+    <text x="0" y="44" font-family="'Hind Siliguri', sans-serif" font-size="34" font-weight="900" fill="#8C3494">রকেট</text>
+  </g>
+</svg>
