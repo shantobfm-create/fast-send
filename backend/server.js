@@ -194,7 +194,18 @@ app.post('/api/auth/register', (req, res) => {
 app.post('/api/auth/login', (req, res) => {
   const { phone, pin, password } = req.body;
   const db = loadDb();
-  const user = db.users.find(u => u.phone === (phone || '').trim());
+  
+  const cleanInput = (phone || '').trim().replace(/[\s\-()]/g, '');
+  const user = db.users.find(u => {
+    const userPhone = (u.phone || '').trim().replace(/[\s\-()]/g, '');
+    if (!userPhone) return false;
+    if (userPhone === cleanInput) return true;
+    if (userPhone.replace(/^\+88/, '') === cleanInput.replace(/^\+88/, '')) return true;
+    if (userPhone.replace(/^\+60/, '') === cleanInput.replace(/^\+60/, '')) return true;
+    if (userPhone.replace(/^0+/, '') === cleanInput.replace(/^0+/, '')) return true;
+    return false;
+  });
+  
   if (!user) return res.status(404).json({ success: false, message: "এই ফোন নাম্বারে কোনো একাউন্ট পাওয়া যায়নি।" });
 
   const credential = pin || password;

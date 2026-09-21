@@ -125,9 +125,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
       return;
     }
 
-    // Combine or format phone number
-    const formattedPhone = loginPhone.startsWith('0') || loginPhone.startsWith('+') ? loginPhone : `${loginCountryCode}${loginPhone}`;
-    const res = await login(formattedPhone, loginPin);
+    const res = await login(loginPhone.trim(), loginPin);
     if (res.success) {
       onNavigate('home');
     }
@@ -279,39 +277,24 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
           <div className="space-y-4 animate-fade-in">
             <div className="text-center pb-1">
               <h2 className="text-lg font-black text-slate-900">অ্যাকাউন্টে প্রবেশ করুন</h2>
-              <p className="text-xs text-slate-500 mt-0.5">বাংলাদেশ 🇧🇩 বা মালয়েশিয়া 🇲🇾 নম্বর ও ৬-সংখ্যার পিন দিন</p>
+              <p className="text-xs text-slate-500 mt-0.5">আপনার মোবাইল নম্বর ও ৬-সংখ্যার পিন দিন</p>
             </div>
 
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  দেশ ও মোবাইল নম্বর
+                  মোবাইল নম্বর
                 </label>
-                <div className="flex gap-2">
-                  {/* Country Selector: ONLY BD (+880) and Malaysia (+60) */}
-                  <select
-                    value={loginCountryCode}
-                    onChange={(e) => setLoginCountryCode(e.target.value)}
-                    className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0"
-                  >
-                    {allowedCountries.map(c => (
-                      <option key={c.code} value={c.code}>
-                        {c.flag} {c.code} ({c.nameBn})
-                      </option>
-                    ))}
-                  </select>
-
-                  <div className="relative flex-1 flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-3" />
-                    <input
-                      type="tel"
-                      required
-                      value={loginPhone}
-                      onChange={(e) => setLoginPhone(e.target.value)}
-                      placeholder={loginCountryCode === '+880' ? '017XXXXXXXX' : '01XXXXXXXX'}
-                      className="w-full bg-transparent py-3.5 pl-9 pr-3 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
-                    />
-                  </div>
+                <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
+                  <Phone className="w-5 h-5 text-slate-400 absolute left-3.5" />
+                  <input
+                    type="tel"
+                    required
+                    value={loginPhone}
+                    onChange={(e) => setLoginPhone(e.target.value)}
+                    placeholder="মোবাইল নম্বর লিখুন"
+                    className="w-full bg-transparent py-3.5 pl-11 pr-3 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
+                  />
                 </div>
               </div>
 
@@ -1099,9 +1082,11 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
         </div>
       )}
 
-      {/* 6. Bottom Security Badge */}
-      <div className="p-3 text-center text-[11px] text-slate-400 border-t border-slate-200 bg-white">
-        © 2026 Fast Send • ২৫৬-বিট এনক্রিপশন ও রেগুলেটেড লাইসেন্সপ্রাপ্ত
+      {/* 6. Clean Copyright Footer */}
+      <div className="mt-6 py-5 border-t border-slate-100 text-center bg-slate-50/60">
+        <p className="text-xs font-semibold text-slate-500">
+          © 2026 Fast Send. All rights reserved.
+        </p>
       </div>
 
     </div>
