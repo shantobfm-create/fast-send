@@ -60,7 +60,6 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     userType: 'পার্সোনাল', // 'পার্সোনাল' | 'এজেন্ট'
     name: '',
     phone: '',
-    address: '',
     country: 'Bangladesh',
     pin: '',
     password: '',
@@ -173,8 +172,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
       return;
     }
 
-    // Save strictly validated and formatted phone
-    setRegForm(prev => ({ ...prev, phone: validation.formatted }));
+    // Save strictly validated and formatted phone & country
+    const matchedCountry = regCountryCode === '+60' ? 'Malaysia' : 'Bangladesh';
+    setRegForm(prev => ({ 
+      ...prev, 
+      phone: validation.formatted,
+      country: matchedCountry
+    }));
 
     // Generate 4-digit OTP code
     const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -188,7 +192,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     setRegStep(3);
   };
 
-  // Verify OTP and transition to Step 4
+  // Verify OTP and transition to Step 4 (PIN & Password)
   const handleVerifyOtp = () => {
     if (!inputOtp || inputOtp.trim().length !== 4) {
       showToast("দয়া করে ৪ সংখ্যার ওটিপি কোড লিখুন।", "error");
@@ -197,7 +201,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     if (inputOtp.trim() === generatedOtp || inputOtp.trim() === '1234') {
       setIsPhoneVerified(true);
       showToast("মোবাইল নম্বর সফলভাবে যাচাই হয়েছে! ✅", "success");
-      setRegStep(4); // Move to Step 4: Address & Country
+      setRegStep(4); // Move directly to Step 4: PIN & Password
     } else {
       showToast("ভুল ওটিপি কোড! আবার চেষ্টা করুন।", "error");
     }
@@ -210,13 +214,14 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
       return;
     }
 
-    // Enforce only Bangladesh or Malaysia
-    if (regForm.country !== 'Bangladesh' && regForm.country !== 'Malaysia') {
-      showToast("রেজিস্ট্রেশন শুধুমাত্র বাংলাদেশ ও মালয়েশিয়ার জন্য প্রযোজ্য!", "error");
-      return;
-    }
+    // Automatically derive country from selected phone country code
+    const derivedCountry = (regCountryCode === '+60' || regForm.country === 'Malaysia') ? 'Malaysia' : 'Bangladesh';
+    const finalForm = {
+      ...regForm,
+      country: derivedCountry
+    };
     
-    const res = await register(regForm);
+    const res = await register(finalForm);
     if (res.success) {
       setShowConfirmModal(false);
       if (res.pendingApproval || regForm.userType === 'এজেন্ট') {
@@ -410,7 +415,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
         {activeTab === 'register' && (
           <div className="space-y-4 animate-fade-in pb-4">
             
-            {/* Step Progress Header (1 to 7) */}
+            {/* Step Progress Header (1 to 6) */}
             {regStep > 0 && (
               <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/80">
                 <div className="flex items-center justify-between text-xs font-medium text-slate-700 mb-1.5">
@@ -421,19 +426,18 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     {regStep === 1 && "ধাপ ১: পূর্ণ নাম"}
                     {regStep === 2 && "ধাপ ২: মোবাইল নম্বর"}
                     {regStep === 3 && "ধাপ ৩: ওটিপি ভেরিফিকেশন"}
-                    {regStep === 4 && "ধাপ ৪: বাসা ও দেশ নির্বাচন"}
-                    {regStep === 5 && "ধাপ ৫: পিন ও পাসওয়ার্ড"}
-                    {regStep === 6 && "ধাপ ৬: প্রোফাইল ছবি আপলোড"}
-                    {regStep === 7 && "ধাপ ৭: পর্যালোচনা ও সাবমিট"}
+                    {regStep === 4 && "ধাপ ৪: পিন ও পাসওয়ার্ড"}
+                    {regStep === 5 && "ধাপ ৫: প্রোফাইল ছবি আপলোড"}
+                    {regStep === 6 && "ধাপ ৬: পর্যালোচনা ও সাবমিট"}
                   </span>
-                  <span className="text-slate-500 font-mono text-[11px] font-medium">ধাপ {regStep}/৭</span>
+                  <span className="text-slate-500 font-mono text-[11px] font-medium">ধাপ {regStep}/৬</span>
                 </div>
                 
                 {/* Progress Bar */}
                 <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                   <div 
                     className="bg-[#00823B] h-full transition-all duration-300"
-                    style={{ width: `${(regStep / 7) * 100}%` }}
+                    style={{ width: `${(regStep / 6) * 100}%` }}
                   ></div>
                 </div>
 
@@ -578,7 +582,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                           onChange={(e) => {
                             setRegCountryCode(e.target.value);
                             const matched = allowedCountries.find(c => c.code === e.target.value);
-                            setRegForm({ ...regForm, country: matched?.name || 'Bangladesh' });
+                            setRegForm({ ...regForm, country: matched?.name || (e.target.value === '+60' ? 'Malaysia' : 'Bangladesh') });
                           }}
                           className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0 cursor-pointer"
                         >
@@ -701,98 +705,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
             )}
 
-            {/* STEP 4: Address & Country Selection (ONLY Bangladesh and Malaysia) */}
+            {/* STEP 4: PIN & Password */}
             {regStep === 4 && (
-              <div className="space-y-4 pt-1">
-                <div className="text-center">
-                  <h3 className="text-base font-bold text-slate-900">বাসা ও দেশ নির্বাচন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5 font-normal">আপনার বর্তমান বাসার ঠিকানা ও দেশ নির্বাচন করুন</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                      দেশ নির্বাচন করুন (শুধুমাত্র বাংলাদেশ ও মালয়েশিয়া)
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div 
-                        onClick={() => setRegForm({ ...regForm, country: 'Bangladesh' })}
-                        className={`p-3 rounded-xl border-2 flex items-center gap-2 cursor-pointer transition-all ${
-                          regForm.country === 'Bangladesh' 
-                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-semibold shadow-xs' 
-                            : 'border-slate-300 bg-white text-slate-700 font-normal'
-                        }`}
-                      >
-                        <span className="text-xl">🇧🇩</span>
-                        <span className="text-xs">বাংলাদেশ (Bangladesh)</span>
-                      </div>
-
-                      <div 
-                        onClick={() => setRegForm({ ...regForm, country: 'Malaysia' })}
-                        className={`p-3 rounded-xl border-2 flex items-center gap-2 cursor-pointer transition-all ${
-                          regForm.country === 'Malaysia' 
-                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-semibold shadow-xs' 
-                            : 'border-slate-300 bg-white text-slate-700 font-normal'
-                        }`}
-                      >
-                        <span className="text-xl">🇲🇾</span>
-                        <span className="text-xs">মালয়েশিয়া (Malaysia)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                      বাসার ঠিকানা
-                    </label>
-                    <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
-                      <MapPin className="w-5 h-5 text-slate-400 absolute left-3.5" />
-                      <input
-                        type="text"
-                        required
-                        value={regForm.address}
-                        onChange={(e) => setRegForm({ ...regForm, address: e.target.value })}
-                        placeholder="বাসার সম্পূর্ণ ঠিকানা লিখুন"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                      জাতীয় পরিচয়পত্র / পাসপোর্ট নম্বর (ঐচ্ছিক)
-                    </label>
-                    <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
-                      <ShieldCheck className="w-5 h-5 text-slate-400 absolute left-3.5" />
-                      <input
-                        type="text"
-                        value={regForm.nid}
-                        onChange={(e) => setRegForm({ ...regForm, nid: e.target.value })}
-                        placeholder="এনআইডি বা পাসপোর্ট নম্বর (যদি থাকে)"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!regForm.address.trim()) {
-                        showToast("দয়া করে আপনার বাসার ঠিকানা লিখুন", "error");
-                        return;
-                      }
-                      setRegStep(5);
-                    }}
-                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
-                  >
-                    <span>পরবর্তী ধাপ: পিন ও পাসওয়ার্ড ➔</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 5: PIN & Password */}
-            {regStep === 5 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-bold text-slate-900">সিকিউরিটি পিন ও পাসওয়ার্ড নির্ধারণ</h3>
@@ -847,7 +761,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         showToast("দয়া করে নিরাপদ পাসওয়ার্ড দিন", "error");
                         return;
                       }
-                      setRegStep(6);
+                      setRegStep(5);
                     }}
                     className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
                   >
@@ -857,8 +771,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
             )}
 
-            {/* STEP 6: Profile Photo (ONLY Upload Option, Camera Removed) */}
-            {regStep === 6 && (
+            {/* STEP 5: Profile Photo (ONLY Upload Option, Camera Removed) */}
+            {regStep === 5 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-bold text-slate-900">প্রোফাইল ছবি আপলোড করুন</h3>
@@ -890,7 +804,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
                 <button
                   type="button"
-                  onClick={() => setRegStep(7)}
+                  onClick={() => setRegStep(6)}
                   className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center mt-3 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>পরবর্তী ধাপ: পর্যালোচনা ও চূড়ান্ত সাবমিট ➔</span>
@@ -898,8 +812,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
             )}
 
-            {/* STEP 7: Review & Final Confirmation */}
-            {regStep === 7 && (
+            {/* STEP 6: Review & Final Confirmation */}
+            {regStep === 6 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-bold text-slate-900">রেজিস্ট্রেশন পর্যালোচনা ও প্রত্যয়ন</h3>
@@ -911,7 +825,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     <img src={regForm.photo} alt="Avatar" className="w-14 h-14 rounded-2xl object-cover border-2 border-[#00823B]" />
                     <div>
                       <h4 className="font-semibold text-slate-900 text-sm">{regForm.name}</h4>
-                      <p className="text-xs font-mono font-medium text-slate-600">{regForm.phone}</p>
+                      <p className="text-xs font-mono font-medium text-slate-600">{regCountryCode} {regForm.phone}</p>
                       <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full mt-1 inline-block">
                         {regForm.userType} অ্যাকাউন্ট
                       </span>
@@ -920,21 +834,21 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
                   <div className="grid grid-cols-2 gap-2 text-xs text-slate-700 pt-1">
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 block font-medium">বাসার ঠিকানা:</span>
-                      <span className="font-semibold text-slate-800">{regForm.address}</span>
+                      <span className="text-[10px] text-slate-500 block font-medium">দেশ (অটো-চিহ্নিত):</span>
+                      <span className="font-semibold text-slate-800 flex items-center gap-1">
+                        {regCountryCode === '+60' || regForm.country === 'Malaysia' ? '🇲🇾 মালয়েশিয়া' : '🇧🇩 বাংলাদেশ'}
+                      </span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 block font-medium">দেশ:</span>
-                      <span className="font-semibold text-slate-800 flex items-center gap-1">
-                        {regForm.country === 'Malaysia' ? '🇲🇾 মালয়েশিয়া' : '🇧🇩 বাংলাদেশ'}
-                      </span>
+                      <span className="text-[10px] text-slate-500 block font-medium">অ্যাকাউন্টের ধরন:</span>
+                      <span className="font-semibold text-emerald-800">{regForm.userType}</span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                       <span className="text-[10px] text-slate-500 block font-medium">সিকিউরিটি পিন:</span>
                       <span className="font-mono font-semibold text-slate-800">••••••</span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 block font-medium">পাসওয়ার্ড:</span>
+                      <span className="text-[10px] text-slate-500 block font-medium">লগইন পাসওয়ার্ড:</span>
                       <span className="font-mono font-semibold text-slate-800">••••••</span>
                     </div>
                   </div>
@@ -959,7 +873,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   <button
                     type="button"
-                    onClick={() => setRegStep(6)}
+                    onClick={() => setRegStep(5)}
                     className="tap-effect bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3.5 rounded-xl text-xs text-center cursor-pointer"
                   >
                     আগের ধাপ

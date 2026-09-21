@@ -178,7 +178,7 @@ app.post('/api/auth/register', (req, res) => {
     id: "u-" + Math.floor(1000 + Math.random() * 9000),
     name: name || "গ্রাহক",
     phone: cleanPhone,
-    country: country || "Bangladesh",
+    country: (isMy || country === 'Malaysia') ? "Malaysia" : "Bangladesh",
     address: address || "",
     userType: isAgent ? "এজেন্ট" : "পার্সোনাল",
     pin: pin.trim(),
