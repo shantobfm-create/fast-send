@@ -128,8 +128,15 @@ export const ReceiptPage = ({ onNavigate, txData }) => {
             )}
 
             <div className="flex justify-between pt-1">
-              <span className="text-slate-500 text-[11px]">তারিখ ও সময়:</span>
-              <span className="font-mono text-slate-700">{new Date(tx.requestedAt || Date.now()).toLocaleString('bn-BD')}</span>
+              <span className="text-slate-500 text-[11px]">টাকা পাঠানোর সময়:</span>
+              <span className="font-mono font-bold text-slate-800">{new Date(tx.requestedAt || Date.now()).toLocaleString('bn-BD')}</span>
+            </div>
+
+            <div className="flex justify-between pt-1">
+              <span className="text-slate-500 text-[11px]">এডমিন অনুমোদনের সময়:</span>
+              <span className="font-mono font-bold text-emerald-800">
+                {tx.adminProcessedAt ? new Date(tx.adminProcessedAt).toLocaleString('bn-BD') : "অপেক্ষমান (Pending)"}
+              </span>
             </div>
           </div>
         </div>

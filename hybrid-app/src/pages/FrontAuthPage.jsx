@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FastSendLogo } from '../components/FastSendLogo';
 import { useApp } from '../context/AppContext';
 import { 
@@ -8,10 +8,8 @@ import {
   EyeOff, 
   User, 
   MapPin, 
-  Camera, 
   CheckSquare, 
   Square, 
-  Sparkles, 
   KeyRound, 
   ShieldCheck, 
   Heart,
@@ -19,32 +17,45 @@ import {
   X,
   Upload,
   CheckCircle2,
-  AlertCircle,
   Clock,
   Briefcase,
-  UserCheck,
   ChevronRight,
   ChevronLeft,
-  RefreshCw
+  Image as ImageIcon,
+  Globe
 } from 'lucide-react';
 
-export const FrontAuthPage = ({ onNavigate }) => {
+export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
   const { login, register, resetPin, settings, loading, showToast } = useApp();
-  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register' | 'calculator'
+  const [activeTab, setActiveTab] = useState(externalTab || 'login'); // 'login' | 'register' | 'calculator'
   
+  useEffect(() => {
+    if (externalTab) {
+      setActiveTab(externalTab);
+    }
+  }, [externalTab]);
+
+  const changeTab = (tab) => {
+    setActiveTab(tab);
+    if (onTabChange) onTabChange(tab);
+  };
+
+  // Country Code Selection: ONLY BD (🇧🇩 +880) and Malaysia (🇲🇾 +60)
+  const allowedCountries = [
+    { code: "+880", name: "Bangladesh", nameBn: "বাংলাদেশ", flag: "🇧🇩", example: "017XXXXXXXX" },
+    { code: "+60", name: "Malaysia", nameBn: "মালয়েশিয়া", flag: "🇲🇾", example: "01XXXXXXXX" }
+  ];
+
   // Login State
+  const [loginCountryCode, setLoginCountryCode] = useState("+880");
   const [loginPhone, setLoginPhone] = useState('');
   const [loginPin, setLoginPin] = useState('');
   const [showLoginPin, setShowLoginPin] = useState(false);
 
   // Multi-step Register State
-  // regStep: 0 = User Type Choice ('পার্সোনাল' / 'এজেন্ট')
-  // 1 = Name
-  // 2 = Phone + OTP
-  // 3 = Address & Security (PIN/Password)
-  // 4 = Photo (Camera vs Gallery)
   const [regStep, setRegStep] = useState(0);
 
+  const [regCountryCode, setRegCountryCode] = useState("+880");
   const [regForm, setRegForm] = useState({
     userType: 'পার্সোনাল', // 'পার্সোনাল' | 'এজেন্ট'
     name: '',
@@ -64,12 +75,6 @@ export const FrontAuthPage = ({ onNavigate }) => {
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [otpTimer, setOtpTimer] = useState(60);
 
-  // Live Camera State
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [cameraError, setCameraError] = useState('');
-  const videoRef = useRef(null);
-  const mediaStreamRef = useRef(null);
-
   // Confirmation Modal State
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [agreed, setAgreed] = useState(true);
@@ -79,6 +84,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
 
   // Reset PIN State & Modal
   const [showResetModal, setShowResetModal] = useState(false);
+  const [resetCountryCode, setResetCountryCode] = useState("+880");
   const [resetPhone, setResetPhone] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmNewPin, setConfirmNewPin] = useState('');
@@ -111,64 +117,17 @@ export const FrontAuthPage = ({ onNavigate }) => {
     return () => clearInterval(interval);
   }, [otpSent, otpTimer, isPhoneVerified]);
 
-  // Clean up Camera on unmount
-  useEffect(() => {
-    return () => {
-      stopCameraStream();
-    };
-  }, []);
-
-  const stopCameraStream = () => {
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach(track => track.stop());
-      mediaStreamRef.current = null;
-    }
-  };
-
-  const startCamera = async () => {
-    setCameraError('');
-    setIsCameraOpen(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }
-      });
-      mediaStreamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      console.error("Camera access error:", err);
-      setCameraError('ক্যামেরা চালু করা সম্ভব হয়নি। অনুমোদন দিন অথবা ফাইল আপলোড অপশনটি ব্যবহার করুন।');
-    }
-  };
-
-  const capturePhoto = () => {
-    if (!videoRef.current) return;
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth || 320;
-    canvas.height = videoRef.current.videoHeight || 320;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    const photoUrl = canvas.toDataURL('image/jpeg', 0.85);
-    setRegForm({ ...regForm, photo: photoUrl });
-    stopCameraStream();
-    setIsCameraOpen(false);
-    showToast("ক্যামেরা দিয়ে ছবি সফলভাবে গ্রহণ করা হয়েছে!", "success");
-  };
-
-  const closeCamera = () => {
-    stopCameraStream();
-    setIsCameraOpen(false);
-  };
-
   // Handle Login Submit
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!loginPhone || !loginPin) {
-      showToast("ফোন নাম্বার ও পিন প্রদান করুন", "error");
+      showToast("মোবাইল নম্বর ও পিন প্রদান করুন", "error");
       return;
     }
-    const res = await login(loginPhone, loginPin);
+
+    // Combine or format phone number
+    const formattedPhone = loginPhone.startsWith('0') || loginPhone.startsWith('+') ? loginPhone : `${loginCountryCode}${loginPhone}`;
+    const res = await login(formattedPhone, loginPin);
     if (res.success) {
       onNavigate('home');
     }
@@ -176,8 +135,8 @@ export const FrontAuthPage = ({ onNavigate }) => {
 
   // Send OTP
   const handleSendOtp = () => {
-    if (!regForm.phone || regForm.phone.length < 11) {
-      showToast("দয়া করে সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।", "error");
+    if (!regForm.phone || regForm.phone.length < 8) {
+      showToast("দয়া করে সঠিক মোবাইল নম্বর দিন।", "error");
       return;
     }
     // Generate 4-digit OTP code
@@ -198,7 +157,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
     if (inputOtp === generatedOtp || inputOtp === '1234') {
       setIsPhoneVerified(true);
       showToast("মোবাইল নম্বর সফলভাবে যাচাই হয়েছে! ✅", "success");
-      setRegStep(3); // Move to Step 3: Address & Security
+      setRegStep(3); // Move to Step 3: Address & Country
     } else {
       showToast("ভুল ওটিপি কোড! আবার চেষ্টা করুন।", "error");
     }
@@ -208,6 +167,12 @@ export const FrontAuthPage = ({ onNavigate }) => {
   const handleFinalRegister = async () => {
     if (!agreed) {
       showToast("দয়া করে তথ্য সঠিক হওয়ার প্রত্যয়ন টিক দিন।", "error");
+      return;
+    }
+
+    // Enforce only Bangladesh or Malaysia
+    if (regForm.country !== 'Bangladesh' && regForm.country !== 'Malaysia') {
+      showToast("রেজিস্ট্রেশন শুধুমাত্র বাংলাদেশ ও মালয়েশিয়ার জন্য প্রযোজ্য!", "error");
       return;
     }
     
@@ -241,20 +206,21 @@ export const FrontAuthPage = ({ onNavigate }) => {
     }
   };
 
+  // Handle Image File Select from Gallery / Files
   const handlePhotoFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setRegForm({ ...regForm, photo: reader.result });
-        showToast("ছবি আপলোড সফল হয়েছে!", "success");
+        showToast("প্রোফাইল ছবি সফলভাবে যুক্ত হয়েছে!", "success");
       };
       reader.readAsDataURL(file);
     }
   };
 
   return (
-    <div className="bg-white flex flex-col w-full relative select-none">
+    <div className="bg-white flex flex-col w-full relative select-none pb-8">
       
       {/* 1. Brand Header */}
       <div className="bg-[#00823B] text-white pt-6 pb-5 px-5 text-center flex flex-col items-center shadow-xs">
@@ -269,7 +235,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
       {/* 2. Top Navigation Tabs */}
       <div className="bg-white px-4 pt-3 border-b border-slate-200 flex justify-around">
         <button
-          onClick={() => setActiveTab('login')}
+          onClick={() => changeTab('login')}
           className={`pb-2.5 text-sm font-black transition-all border-b-2 ${
             activeTab === 'login'
               ? 'border-[#00823B] text-[#00823B]'
@@ -281,7 +247,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
 
         <button
           onClick={() => {
-            setActiveTab('register');
+            changeTab('register');
             setRegStep(0);
           }}
           className={`pb-2.5 text-sm font-black transition-all border-b-2 ${
@@ -294,7 +260,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
         </button>
 
         <button
-          onClick={() => setActiveTab('calculator')}
+          onClick={() => changeTab('calculator')}
           className={`pb-2.5 text-sm font-black transition-all border-b-2 ${
             activeTab === 'calculator'
               ? 'border-[#00823B] text-[#00823B]'
@@ -313,24 +279,39 @@ export const FrontAuthPage = ({ onNavigate }) => {
           <div className="space-y-4 animate-fade-in">
             <div className="text-center pb-1">
               <h2 className="text-lg font-black text-slate-900">অ্যাকাউন্টে প্রবেশ করুন</h2>
-              <p className="text-xs text-slate-500 mt-0.5">আপনার নিবন্ধিত মোবাইল নম্বর ও ৬-সংখ্যার পিন দিন</p>
+              <p className="text-xs text-slate-500 mt-0.5">বাংলাদেশ 🇧🇩 বা মালয়েশিয়া 🇲🇾 নম্বর ও ৬-সংখ্যার পিন দিন</p>
             </div>
 
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  মোবাইল নম্বর
+                  দেশ ও মোবাইল নম্বর
                 </label>
-                <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
-                  <Phone className="w-5 h-5 text-slate-400 absolute left-3.5" />
-                  <input
-                    type="tel"
-                    required
-                    value={loginPhone}
-                    onChange={(e) => setLoginPhone(e.target.value)}
-                    placeholder="017XXXXXXXX"
-                    className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
-                  />
+                <div className="flex gap-2">
+                  {/* Country Selector: ONLY BD (+880) and Malaysia (+60) */}
+                  <select
+                    value={loginCountryCode}
+                    onChange={(e) => setLoginCountryCode(e.target.value)}
+                    className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0"
+                  >
+                    {allowedCountries.map(c => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.code} ({c.nameBn})
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="relative flex-1 flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3" />
+                    <input
+                      type="tel"
+                      required
+                      value={loginPhone}
+                      onChange={(e) => setLoginPhone(e.target.value)}
+                      placeholder={loginCountryCode === '+880' ? '017XXXXXXXX' : '01XXXXXXXX'}
+                      className="w-full bg-transparent py-3.5 pl-9 pr-3 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -388,7 +369,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveTab('register');
+                    changeTab('register');
                     setRegStep(0);
                   }}
                   className="text-[#00823B] font-black hover:underline cursor-pointer"
@@ -414,9 +395,9 @@ export const FrontAuthPage = ({ onNavigate }) => {
                     </span>
                     {regStep === 1 && "ধাপ ১: পূর্ণ নাম"}
                     {regStep === 2 && "ধাপ ২: মোবাইল নম্বর ও ওটিপি"}
-                    {regStep === 3 && "ধাপ ৩: বাসা / বর্তমান ঠিকানা"}
+                    {regStep === 3 && "ধাপ ৩: বাসা ও দেশ নির্বাচন"}
                     {regStep === 4 && "ধাপ ৪: পিন ও পাসওয়ার্ড"}
-                    {regStep === 5 && "ধাপ ৫: প্রোফাইল ছবি"}
+                    {regStep === 5 && "ধাপ ৫: প্রোফাইল ছবি আপলোড"}
                     {regStep === 6 && "ধাপ ৬: পর্যালোচনা ও চূড়ান্ত সাবমিট"}
                   </span>
                   <span className="text-slate-500 font-mono text-[11px] font-bold">ধাপ {regStep}/৬</span>
@@ -450,7 +431,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
               <div className="space-y-4">
                 <div className="text-center">
                   <h2 className="text-lg font-black text-slate-900">অ্যাকাউন্টের ধরন নির্বাচন করুন</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">আপনি কীভাবে Fast Send ব্যবহার করতে চান?</p>
+                  <p className="text-xs text-slate-500 mt-0.5">বাংলাদেশ 🇧🇩 ও মালয়েশিয়া 🇲🇾 প্রবাসী এবং গ্রাহকদের জন্য</p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3.5 pt-2">
@@ -468,7 +449,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900 text-sm">পার্সোনাল অ্যাকাউন্ট</h3>
-                        <p className="text-xs text-slate-500">টাকা পাঠানো, রিচার্জ ও রেমিটেন্স রিসিভ করতে</p>
+                        <p className="text-xs text-slate-500">টাকা পাঠানো, অ্যাড-মানি ও রেমিটেন্স সেবা</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
@@ -501,7 +482,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
                 <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5">
                   <ShieldCheck className="w-5 h-5 text-[#00823B] shrink-0 mt-0.5" />
                   <span>
-                    পার্সোনাল অ্যাকাউন্ট রেজিস্ট্রেশন সাথে সাথে সক্রিয় হবে। এজেন্ট অ্যাকাউন্ট সুপার অ্যাডমিন ভেরিফিকেশন সাপেক্ষে অনুমোদিত হবে।
+                    শুধুমাত্র বাংলাদেশ (🇧🇩) ও মালয়েশিয়া (🇲🇾) নম্বরে রেজিস্ট্রেশন চালু রয়েছে।
                   </span>
                 </div>
               </div>
@@ -550,37 +531,58 @@ export const FrontAuthPage = ({ onNavigate }) => {
               </div>
             )}
 
-            {/* STEP 2: Phone Number + OTP Verification */}
+            {/* STEP 2: Phone Number + OTP Verification (ONLY BD and Malaysia) */}
             {regStep === 2 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-black text-slate-900">মোবাইল নম্বর ও ওটিপি ভেরিফিকেশন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">আপনার ফোনে পাঠানো ওটিপি কোড দিয়ে ভেরিফাই করুন</p>
+                  <p className="text-xs text-slate-500 mt-0.5">বাংলাদেশ 🇧🇩 অথবা মালয়েশিয়া 🇲🇾 নম্বর নির্বাচন করুন</p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      মোবাইল নম্বর
+                      দেশ ও মোবাইল নম্বর
                     </label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1 flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
-                        <Phone className="w-5 h-5 text-slate-400 absolute left-3.5" />
-                        <input
-                          type="tel"
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        {/* Allowed Country Selector */}
+                        <select
                           disabled={otpSent && isPhoneVerified}
-                          value={regForm.phone}
-                          onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
-                          placeholder="017XXXXXXXX"
-                          className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
-                        />
+                          value={regCountryCode}
+                          onChange={(e) => {
+                            setRegCountryCode(e.target.value);
+                            const matched = allowedCountries.find(c => c.code === e.target.value);
+                            setRegForm({ ...regForm, country: matched?.name || 'Bangladesh' });
+                          }}
+                          className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0"
+                        >
+                          {allowedCountries.map(c => (
+                            <option key={c.code} value={c.code}>
+                              {c.flag} {c.code} ({c.nameBn})
+                            </option>
+                          ))}
+                        </select>
+
+                        <div className="relative flex-1 flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
+                          <Phone className="w-4 h-4 text-slate-400 absolute left-3" />
+                          <input
+                            type="tel"
+                            disabled={otpSent && isPhoneVerified}
+                            value={regForm.phone}
+                            onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
+                            placeholder={regCountryCode === '+880' ? '017XXXXXXXX' : '01XXXXXXXX'}
+                            className="w-full bg-transparent py-3.5 pl-9 pr-3 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
+                          />
+                        </div>
                       </div>
+
                       <button
                         type="button"
                         onClick={handleSendOtp}
-                        className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-4 py-3.5 rounded-xl text-xs shrink-0 shadow-sm cursor-pointer"
+                        className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-3 rounded-xl text-xs shadow-sm cursor-pointer"
                       >
-                        {otpSent ? "পুনরায় পাঠান" : "ওটিপি পাঠান"}
+                        {otpSent ? "পুনরায় ওটিপি কোড পাঠান" : "মোবাইলে ওটিপি কোড পাঠান ➔"}
                       </button>
                     </div>
                   </div>
@@ -599,7 +601,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
 
                       <div className="bg-white p-3 rounded-xl border border-emerald-300 flex items-center gap-2 text-xs text-slate-700">
                         <CheckCircle2 className="w-4 h-4 text-[#00823B] shrink-0" />
-                        <span>আপনার প্রদত্ত নম্বরে এসএমএস এসেছে। প্রাপ্ত ৪ সংখ্যার কোড নিচে দিন:</span>
+                        <span>আপনার মোবাইল নম্বরে প্রাপ্ত ৪ সংখ্যার কোড নিচে দিন:</span>
                       </div>
 
                       <div>
@@ -622,32 +624,53 @@ export const FrontAuthPage = ({ onNavigate }) => {
                       </button>
                     </div>
                   )}
-
-                  {!otpSent && (
-                    <button
-                      type="button"
-                      onClick={handleSendOtp}
-                      className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center mt-2 cursor-pointer"
-                    >
-                      ওটিপি কোড গ্রহণ করুন ➔
-                    </button>
-                  )}
                 </div>
               </div>
             )}
 
-            {/* STEP 3: Address & Country & NID (বাসা / ঠিকানা) */}
+            {/* STEP 3: Address & Country Selection (ONLY Bangladesh and Malaysia) */}
             {regStep === 3 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">বাসা ও বর্তমান ঠিকানা</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">আপনার বর্তমান বাসার ঠিকানা ও জাতীয় পরিচয়পত্র দিন</p>
+                  <h3 className="text-base font-black text-slate-900">বাসা ও দেশ নির্বাচন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">আপনার বর্তমান বাসার ঠিকানা ও দেশ নির্বাচন করুন</p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      বাসার ঠিকানা (House / Road / Area)
+                      দেশ নির্বাচন করুন (শুধুমাত্র বাংলাদেশ ও মালয়েশিয়া)
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div 
+                        onClick={() => setRegForm({ ...regForm, country: 'Bangladesh' })}
+                        className={`p-3 rounded-xl border-2 flex items-center gap-2 cursor-pointer transition-all ${
+                          regForm.country === 'Bangladesh' 
+                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-bold shadow-xs' 
+                            : 'border-slate-300 bg-white text-slate-700'
+                        }`}
+                      >
+                        <span className="text-xl">🇧🇩</span>
+                        <span className="text-xs">বাংলাদেশ (Bangladesh)</span>
+                      </div>
+
+                      <div 
+                        onClick={() => setRegForm({ ...regForm, country: 'Malaysia' })}
+                        className={`p-3 rounded-xl border-2 flex items-center gap-2 cursor-pointer transition-all ${
+                          regForm.country === 'Malaysia' 
+                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-bold shadow-xs' 
+                            : 'border-slate-300 bg-white text-slate-700'
+                        }`}
+                      >
+                        <span className="text-xl">🇲🇾</span>
+                        <span className="text-xs">মালয়েশিয়া (Malaysia)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      বাসার ঠিকানা (House / Road / City)
                     </label>
                     <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
                       <MapPin className="w-5 h-5 text-slate-400 absolute left-3.5" />
@@ -656,7 +679,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
                         required
                         value={regForm.address}
                         onChange={(e) => setRegForm({ ...regForm, address: e.target.value })}
-                        placeholder="যেমন: বাড়ি ১২, রোড ৪, সেক্টর ৭, উত্তরা, ঢাকা"
+                        placeholder="যেমন: বাড়ি ১২, রোড ৪, সেক্টর ৭ / Kuala Lumpur, Malaysia"
                         className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
                       />
                     </div>
@@ -664,23 +687,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      দেশ (Country)
-                    </label>
-                    <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
-                      <MapPin className="w-5 h-5 text-slate-400 absolute left-3.5" />
-                      <input
-                        type="text"
-                        value={regForm.country}
-                        onChange={(e) => setRegForm({ ...regForm, country: e.target.value })}
-                        placeholder="Bangladesh"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-bold text-slate-900 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      জাতীয় পরিচয়পত্র / NID নম্বর (ঐচ্ছিক)
+                      জাতীয় পরিচয়পত্র / পাসপোর্ট নম্বর (ঐচ্ছিক)
                     </label>
                     <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
                       <ShieldCheck className="w-5 h-5 text-slate-400 absolute left-3.5" />
@@ -688,7 +695,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
                         type="text"
                         value={regForm.nid}
                         onChange={(e) => setRegForm({ ...regForm, nid: e.target.value })}
-                        placeholder="1995874512458"
+                        placeholder="1995874512458 / A12345678"
                         className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
                       />
                     </div>
@@ -777,40 +784,33 @@ export const FrontAuthPage = ({ onNavigate }) => {
               </div>
             )}
 
-            {/* STEP 5: Profile Photo */}
+            {/* STEP 5: Profile Photo (ONLY Upload Option, Camera Removed) */}
             {regStep === 5 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">প্রোফাইল ছবি যুক্ত করুন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">ক্যামেরা দিয়ে সরাসরি ছবি তুলুন অথবা গ্যালারি থেকে আপলোড করুন</p>
+                  <h3 className="text-base font-black text-slate-900">প্রোফাইল ছবি আপলোড করুন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">আপনার ডিভাইস বা গ্যালারি থেকে পরিষ্কার ছবি নির্বাচন করুন</p>
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full border-4 border-[#00823B] overflow-hidden bg-slate-200 shadow-md">
+                  <div className="w-28 h-28 rounded-full border-4 border-[#00823B] overflow-hidden bg-slate-200 shadow-md">
                     <img src={regForm.photo} alt="User Avatar" className="w-full h-full object-cover" />
                   </div>
-                  <span className="text-xs text-slate-600 mt-1 font-bold">নির্বাচিত ছবি প্রিভিউ</span>
+                  <span className="text-xs text-[#00823B] mt-2 font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4" /> নির্বাচিত ছবির প্রিভিউ
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={startCamera}
-                    className="p-4 bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-500 rounded-2xl flex flex-col items-center justify-center gap-2 text-center transition-all shadow-xs cursor-pointer"
-                  >
-                    <div className="w-11 h-11 rounded-full bg-[#00823B] text-white flex items-center justify-center shadow-xs">
-                      <Camera className="w-6 h-6" />
+                {/* Single Clean Photo Upload Area */}
+                <div className="pt-2">
+                  <label className="p-6 bg-slate-50 hover:bg-emerald-50/60 border-2 border-dashed border-[#00823B] rounded-2xl flex flex-col items-center justify-center gap-2.5 text-center transition-all shadow-xs cursor-pointer group">
+                    <div className="w-14 h-14 rounded-full bg-emerald-100 text-[#00823B] group-hover:scale-105 transition-transform flex items-center justify-center shadow-xs">
+                      <Upload className="w-7 h-7" />
                     </div>
-                    <span className="text-xs font-black text-[#00823B]">ক্যামেরা দিয়ে ছবি তুলুন</span>
-                    <span className="text-[10px] text-slate-500">সরাসরি সেলফি</span>
-                  </button>
-
-                  <label className="p-4 bg-white hover:bg-slate-50 border-2 border-slate-300 hover:border-slate-500 rounded-2xl flex flex-col items-center justify-center gap-2 text-center transition-all shadow-xs cursor-pointer">
-                    <div className="w-11 h-11 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center shadow-xs">
-                      <Upload className="w-6 h-6" />
+                    <div>
+                      <span className="text-sm font-black text-slate-800 block">গ্যালারি / ডিভাইস থেকে ছবি আপলোড করুন</span>
+                      <span className="text-xs text-slate-500 mt-0.5 block">JPG, PNG বা যেকোনো ফরম্যাটের ছবি নির্বাচন করতে এখানে চাপুন</span>
                     </div>
-                    <span className="text-xs font-black text-slate-800">গ্যালারি / ফাইল থেকে</span>
-                    <span className="text-[10px] text-slate-500">ডিভাইস থেকে নির্বাচন</span>
                     <input type="file" accept="image/*" onChange={handlePhotoFileSelect} className="hidden" />
                   </label>
                 </div>
@@ -852,7 +852,9 @@ export const FrontAuthPage = ({ onNavigate }) => {
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                       <span className="text-[10px] text-slate-500 block font-bold">দেশ:</span>
-                      <span className="font-bold">{regForm.country}</span>
+                      <span className="font-bold flex items-center gap-1">
+                        {regForm.country === 'Malaysia' ? '🇲🇾 মালয়েশিয়া' : '🇧🇩 বাংলাদেশ'}
+                      </span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                       <span className="text-[10px] text-slate-500 block font-bold">সিকিউরিটি পিন:</span>
@@ -914,7 +916,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
           <div className="space-y-4 animate-fade-in">
             <div className="text-center">
               <h2 className="text-lg font-black text-slate-900">লাইভ এক্সচেঞ্জ রেট ক্যালকুলেটর</h2>
-              <p className="text-xs text-slate-500 mt-0.5">যেকোনো দেশ থেকে টাকায় রিয়েল-টাইম কনভার্সন</p>
+              <p className="text-xs text-slate-500 mt-0.5">মালয়েশিয়া 🇲🇾 বা যেকোনো দেশ থেকে টাকায় রিয়েল-টাইম কনভার্সন</p>
             </div>
 
             <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
@@ -961,14 +963,14 @@ export const FrontAuthPage = ({ onNavigate }) => {
 
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
-                onClick={() => setActiveTab('login')}
+                onClick={() => changeTab('login')}
                 className="tap-effect bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3 rounded-xl text-xs text-center shadow-sm"
               >
                 টাকা পাঠাতে লগইন করুন
               </button>
               <button
                 onClick={() => {
-                  setActiveTab('register');
+                  changeTab('register');
                   setRegStep(0);
                 }}
                 className="tap-effect bg-white hover:bg-slate-50 text-[#00823B] border-2 border-[#00823B] font-bold py-3 rounded-xl text-xs text-center"
@@ -981,70 +983,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
 
       </div>
 
-      {/* 4. LIVE CAMERA CAPTURE MODAL */}
-      {isCameraOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-5 shadow-2xl space-y-4 text-white">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-              <h3 className="font-bold text-sm flex items-center gap-1.5">
-                <Camera className="w-4 h-4 text-emerald-400" />
-                ক্যামেরা দিয়ে ছবি তুলুন
-              </h3>
-              <button onClick={closeCamera} className="text-slate-400 hover:text-white p-1">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {cameraError ? (
-              <div className="p-4 bg-rose-950/80 border border-rose-800 rounded-2xl text-rose-200 text-xs text-center space-y-2">
-                <AlertCircle className="w-6 h-6 mx-auto text-rose-400" />
-                <p>{cameraError}</p>
-                <button
-                  type="button"
-                  onClick={closeCamera}
-                  className="bg-rose-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs"
-                >
-                  বন্ধ করুন
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="w-full aspect-square bg-black rounded-2xl overflow-hidden border-2 border-emerald-500 relative flex items-center justify-center shadow-inner">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
-                  {/* Viewfinder Circle Overlay */}
-                  <div className="absolute inset-0 border-2 border-dashed border-white/40 rounded-full m-8 pointer-events-none"></div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={closeCamera}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-xs"
-                  >
-                    বাতিল
-                  </button>
-                  <button
-                    type="button"
-                    onClick={capturePhoto}
-                    className="tap-effect bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3 rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5"
-                  >
-                    <Camera className="w-4 h-4" />
-                    <span>ছবি ক্যাপচার</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* 5. PIN RESET MODAL */}
+      {/* 4. PIN RESET MODAL */}
       {showResetModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-4">
@@ -1122,7 +1061,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* 6. AGENT APPLICATION PENDING MODAL */}
+      {/* 5. AGENT APPLICATION PENDING MODAL */}
       {showAgentPendingModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl text-center space-y-4">
@@ -1150,7 +1089,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
             <button
               onClick={() => {
                 setShowAgentPendingModal(false);
-                setActiveTab('login');
+                changeTab('login');
               }}
               className="w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md cursor-pointer"
             >
@@ -1160,7 +1099,7 @@ export const FrontAuthPage = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* 7. Bottom Security Badge */}
+      {/* 6. Bottom Security Badge */}
       <div className="p-3 text-center text-[11px] text-slate-400 border-t border-slate-200 bg-white">
         © 2026 Fast Send • ২৫৬-বিট এনক্রিপশন ও রেগুলেটেড লাইসেন্সপ্রাপ্ত
       </div>

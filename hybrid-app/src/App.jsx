@@ -32,6 +32,7 @@ export default function App() {
   const { user, toast } = useApp();
   const [currentScreen, setCurrentScreen] = useState('home');
   const [pageParams, setPageParams] = useState({});
+  const [authTab, setAuthTab] = useState('login'); // 'login' | 'register' | 'calculator'
 
   const navigate = (screen, params = {}) => {
     setPageParams(params);
@@ -41,7 +42,13 @@ export default function App() {
 
   const renderScreen = () => {
     if (!user) {
-      return <FrontAuthPage onNavigate={navigate} />;
+      return (
+        <FrontAuthPage 
+          onNavigate={navigate} 
+          externalTab={authTab}
+          onTabChange={setAuthTab}
+        />
+      );
     }
 
     switch (currentScreen) {
@@ -101,9 +108,21 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex justify-center items-start sm:py-4">
-      <div className="w-full max-w-md bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-2xl border border-slate-200 relative flex flex-col font-sans pb-28">
+      <div className="w-full max-w-md bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-2xl border border-slate-200 relative flex flex-col font-sans pb-20">
         {renderScreen()}
-        {user && <BottomNav currentScreen={currentScreen} onNavigate={navigate} />}
+        
+        {/* Fixed Global Bottom Navigation for BOTH logged-in & logged-out users */}
+        <BottomNav 
+          currentScreen={currentScreen} 
+          onNavigate={navigate}
+          isLoggedIn={!!user}
+          activeAuthTab={authTab}
+          onSelectAuthTab={(tab) => {
+            setAuthTab(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+        
         <Toast toast={toast} />
       </div>
     </div>
