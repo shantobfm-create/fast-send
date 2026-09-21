@@ -152,8 +152,23 @@ app.post('/api/auth/register', (req, res) => {
   if (!phone || !pin) return res.status(400).json({ success: false, message: "ফোন নাম্বার ও পিন অবশ্যই দিতে হবে।" });
 
   const db = loadDb();
-  const cleanPhone = phone.trim();
-  const existing = db.users.find(u => u.phone === cleanPhone);
+  const cleanPhone = phone.trim().replace(/[\s\-\(\)]/g, '');
+  
+  // Strict phone validation for Bangladesh & Malaysia
+  const isBd = /^(?:\+?880|880)?0?1[3-9]\d{8}$/.test(cleanPhone);
+  const isMy = /^(?:\+?60|60)?0?1[0-9]\d{7,8}$/.test(cleanPhone);
+
+  if (!isBd && !isMy) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "অবৈধ মোবাইল নম্বর! রেজিস্ট্রেশনের জন্য শুধুমাত্র বাংলাদেশ (যেমন: 017xxxxxxxx) বা মালয়েশিয়ার (যেমন: 012xxxxxxx) সঠিক নম্বর দিন।" 
+    });
+  }
+
+  const existing = db.users.find(u => {
+    const up = (u.phone || '').trim().replace(/[\s\-\(\)]/g, '');
+    return up === cleanPhone || up.replace(/^\+?880?/, '') === cleanPhone.replace(/^\+?880?/, '') || up.replace(/^\+?60?/, '') === cleanPhone.replace(/^\+?60?/, '');
+  });
   if (existing) return res.status(400).json({ success: false, message: "এই ফোন নাম্বার দিয়ে ইতিমধ্যে একটি একাউন্ট তৈরি করা আছে।" });
 
   const isAgent = userType === 'এজেন্ট' || userType === 'Agent';

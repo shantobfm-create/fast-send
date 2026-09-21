@@ -131,12 +131,51 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     }
   };
 
-  // Send OTP
+  // Strict Phone Validation for Bangladesh & Malaysia
+  const validatePhone = (rawPhone, countryCode) => {
+    const clean = (rawPhone || '').replace(/[\s\-\(\)]/g, '');
+    if (!clean) {
+      return { valid: false, message: 'দয়া করে আপনার মোবাইল নম্বর লিখুন।' };
+    }
+
+    if (countryCode === '+880' || countryCode === 'Bangladesh') {
+      // BD format: 013 to 019 with 8 digits (11 digits total: 01XXXXXXXXX or +8801XXXXXXXXX)
+      const bdRegex = /^(?:\+?880|880)?0?(1[3-9]\d{8})$/;
+      const match = clean.match(bdRegex);
+      if (!match) {
+        return {
+          valid: false,
+          message: 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017xxxxxxxx, 018xxxxxxxx, 019xxxxxxxx)। মোট ১১ ডিজিট হতে হবে।'
+        };
+      }
+      return { valid: true, formatted: '0' + match[1], fullPhone: '+880' + match[1] };
+    } else if (countryCode === '+60' || countryCode === 'Malaysia') {
+      // MY format: 010 to 019 (011 has 8 digits = 11 digits total; 010, 012-019 have 7-8 digits = 10-11 digits)
+      const myRegex = /^(?:\+?60|60)?0?(1[0-9]\d{7,8})$/;
+      const match = clean.match(myRegex);
+      if (!match) {
+        return {
+          valid: false,
+          message: 'সঠিক মালয়েশিয়ান মোবাইল নম্বর দিন (যেমন: 012xxxxxxx বা 011xxxxxxxx)।'
+        };
+      }
+      return { valid: true, formatted: '0' + match[1], fullPhone: '+60' + match[1] };
+    }
+
+    return { valid: false, message: 'শুধুমাত্র বাংলাদেশ (🇧🇩) ও মালয়েশিয়া (🇲🇾) নম্বর অনুমোদিত।' };
+  };
+
+  // Send OTP and transition to Step 3 (Dedicated OTP Page)
   const handleSendOtp = () => {
-    if (!regForm.phone || regForm.phone.length < 8) {
-      showToast("দয়া করে সঠিক মোবাইল নম্বর দিন।", "error");
+    const validation = validatePhone(regForm.phone, regCountryCode);
+    if (!validation.valid) {
+      showToast(validation.message, "error");
       return;
     }
+
+    // Save strictly validated and formatted phone
+    setRegForm(prev => ({ ...prev, phone: validation.formatted }));
+
     // Generate 4-digit OTP code
     const code = Math.floor(1000 + Math.random() * 9000).toString();
     setGeneratedOtp(code);
@@ -144,18 +183,21 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     setOtpTimer(60);
     setInputOtp('');
     showToast(`আপনার ওটিপি কোড: ${code}`, "info");
+
+    // Move to separate OTP page (Step 3)
+    setRegStep(3);
   };
 
-  // Verify OTP
+  // Verify OTP and transition to Step 4
   const handleVerifyOtp = () => {
-    if (!inputOtp) {
-      showToast("দয়া করে মোবাইলে প্রাপ্ত ওটিপি কোড লিখুন।", "error");
+    if (!inputOtp || inputOtp.trim().length !== 4) {
+      showToast("দয়া করে ৪ সংখ্যার ওটিপি কোড লিখুন।", "error");
       return;
     }
-    if (inputOtp === generatedOtp || inputOtp === '1234') {
+    if (inputOtp.trim() === generatedOtp || inputOtp.trim() === '1234') {
       setIsPhoneVerified(true);
       showToast("মোবাইল নম্বর সফলভাবে যাচাই হয়েছে! ✅", "success");
-      setRegStep(3); // Move to Step 3: Address & Country
+      setRegStep(4); // Move to Step 4: Address & Country
     } else {
       showToast("ভুল ওটিপি কোড! আবার চেষ্টা করুন।", "error");
     }
@@ -368,7 +410,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
         {activeTab === 'register' && (
           <div className="space-y-4 animate-fade-in pb-4">
             
-            {/* Step Progress Header (1 to 6) */}
+            {/* Step Progress Header (1 to 7) */}
             {regStep > 0 && (
               <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/80">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1.5">
@@ -377,20 +419,21 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       {regStep}
                     </span>
                     {regStep === 1 && "ধাপ ১: পূর্ণ নাম"}
-                    {regStep === 2 && "ধাপ ২: মোবাইল নম্বর ও ওটিপি"}
-                    {regStep === 3 && "ধাপ ৩: বাসা ও দেশ নির্বাচন"}
-                    {regStep === 4 && "ধাপ ৪: পিন ও পাসওয়ার্ড"}
-                    {regStep === 5 && "ধাপ ৫: প্রোফাইল ছবি আপলোড"}
-                    {regStep === 6 && "ধাপ ৬: পর্যালোচনা ও চূড়ান্ত সাবমিট"}
+                    {regStep === 2 && "ধাপ ২: মোবাইল নম্বর"}
+                    {regStep === 3 && "ধাপ ৩: ওটিপি ভেরিফিকেশন"}
+                    {regStep === 4 && "ধাপ ৪: বাসা ও দেশ নির্বাচন"}
+                    {regStep === 5 && "ধাপ ৫: পিন ও পাসওয়ার্ড"}
+                    {regStep === 6 && "ধাপ ৬: প্রোফাইল ছবি আপলোড"}
+                    {regStep === 7 && "ধাপ ৭: পর্যালোচনা ও সাবমিট"}
                   </span>
-                  <span className="text-slate-500 font-mono text-[11px] font-bold">ধাপ {regStep}/৬</span>
+                  <span className="text-slate-500 font-mono text-[11px] font-bold">ধাপ {regStep}/৭</span>
                 </div>
                 
                 {/* Progress Bar */}
                 <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                   <div 
                     className="bg-[#00823B] h-full transition-all duration-300"
-                    style={{ width: `${(regStep / 6) * 100}%` }}
+                    style={{ width: `${(regStep / 7) * 100}%` }}
                   ></div>
                 </div>
 
@@ -514,12 +557,12 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
             )}
 
-            {/* STEP 2: Phone Number + OTP Verification (ONLY BD and Malaysia) */}
+            {/* STEP 2: Phone Number Input with Strict Validation */}
             {regStep === 2 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">মোবাইল নম্বর ও ওটিপি ভেরিফিকেশন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">বাংলাদেশ 🇧🇩 অথবা মালয়েশিয়া 🇲🇾 নম্বর নির্বাচন করুন</p>
+                  <h3 className="text-base font-black text-slate-900">মোবাইল নম্বর লিখুন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">সঠিক বাংলাদেশ 🇧🇩 বা মালয়েশিয়া 🇲🇾 নম্বর দিন</p>
                 </div>
 
                 <div className="space-y-4">
@@ -531,14 +574,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       <div className="flex gap-2">
                         {/* Allowed Country Selector */}
                         <select
-                          disabled={otpSent && isPhoneVerified}
                           value={regCountryCode}
                           onChange={(e) => {
                             setRegCountryCode(e.target.value);
                             const matched = allowedCountries.find(c => c.code === e.target.value);
                             setRegForm({ ...regForm, country: matched?.name || 'Bangladesh' });
                           }}
-                          className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0"
+                          className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0 cursor-pointer"
                         >
                           {allowedCountries.map(c => (
                             <option key={c.code} value={c.code}>
@@ -551,7 +593,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                           <Phone className="w-4 h-4 text-slate-400 absolute left-3" />
                           <input
                             type="tel"
-                            disabled={otpSent && isPhoneVerified}
+                            autoFocus
                             value={regForm.phone}
                             onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
                             placeholder={regCountryCode === '+880' ? '017XXXXXXXX' : '01XXXXXXXX'}
@@ -560,59 +602,107 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         </div>
                       </div>
 
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+                        <span className="font-bold block text-slate-700">নম্বর ফরম্যাট নির্দেশনা:</span>
+                        {regCountryCode === '+880' ? (
+                          <p className="text-[11px] text-emerald-800 font-medium">
+                            🇧🇩 বাংলাদেশ: <b>013, 014, 015, 016, 017, 018, 019</b> দিয়ে শুরু মোট <b>১১ সংখ্যার</b> নম্বর হতে হবে (যেমন: 01712345678)।
+                          </p>
+                        ) : (
+                          <p className="text-[11px] text-emerald-800 font-medium">
+                            🇲🇾 মালয়েশিয়া: <b>010, 011, 012, 013, 014, 016, 017, 018, 019</b> দিয়ে শুরু সঠিক নম্বর দিন (যেমন: 0123456789 বা 01112345678)।
+                          </p>
+                        )}
+                      </div>
+
                       <button
                         type="button"
                         onClick={handleSendOtp}
-                        className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-3 rounded-xl text-xs shadow-sm cursor-pointer"
+                        className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-3 cursor-pointer"
                       >
-                        {otpSent ? "পুনরায় ওটিপি কোড পাঠান" : "মোবাইলে ওটিপি কোড পাঠান ➔"}
+                        <span>ওটিপি কোড পাঠান ➔</span>
                       </button>
                     </div>
                   </div>
-
-                  {otpSent && (
-                    <div className="p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 space-y-3 animate-fade-in">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-[#00823B]" />
-                          ওটিপি কোড পাঠানো হয়েছে
-                        </span>
-                        <span className="text-xs font-mono font-bold text-emerald-800">
-                          {otpTimer > 0 ? `সময় বাকি: ${otpTimer}s` : "কোডের মেয়াদ শেষ"}
-                        </span>
-                      </div>
-
-                      <div className="bg-white p-3 rounded-xl border border-emerald-300 flex items-center gap-2 text-xs text-slate-700">
-                        <CheckCircle2 className="w-4 h-4 text-[#00823B] shrink-0" />
-                        <span>আপনার মোবাইল নম্বরে প্রাপ্ত ৪ সংখ্যার কোড নিচে দিন:</span>
-                      </div>
-
-                      <div>
-                        <input
-                          type="text"
-                          maxLength={6}
-                          value={inputOtp}
-                          onChange={(e) => setInputOtp(e.target.value)}
-                          placeholder="XXXX"
-                          className="w-full bg-white border-2 border-[#00823B] rounded-xl py-3 px-4 text-center text-xl font-mono font-black tracking-widest text-slate-900 focus:outline-none"
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={handleVerifyOtp}
-                        className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition-all text-center cursor-pointer"
-                      >
-                        ওটিপি কোড যাচাই করুন ও পরবর্তী ধাপে যান ✅
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
 
-            {/* STEP 3: Address & Country Selection (ONLY Bangladesh and Malaysia) */}
+            {/* STEP 3: SEPARATE DEDICATED OTP VERIFICATION SCREEN */}
             {regStep === 3 && (
+              <div className="space-y-4 pt-1 animate-fade-in">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-[#00823B] mb-2">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-base font-black text-slate-900">ওটিপি কোড যাচাইকরণ</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">আপনার প্রদত্ত মোবাইল নম্বরে পাঠানো ৪ সংখ্যার কোড দিন</p>
+                </div>
+
+                <div className="p-4 bg-emerald-50/70 rounded-2xl border-2 border-emerald-300 space-y-4">
+                  {/* Phone number info pill */}
+                  <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-emerald-200">
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-[#00823B]" />
+                      <span className="text-xs font-mono font-bold text-slate-800">
+                        {regCountryCode} {regForm.phone}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setRegStep(2)}
+                      className="text-xs text-emerald-700 hover:text-emerald-900 font-bold underline cursor-pointer"
+                    >
+                      নম্বর পরিবর্তন
+                    </button>
+                  </div>
+
+                  {/* Timer */}
+                  <div className="flex items-center justify-between text-xs px-1">
+                    <span className="font-bold text-slate-600">ভেরিফিকেশন কোড:</span>
+                    <span className="font-mono font-bold text-emerald-800">
+                      {otpTimer > 0 ? `মেয়াদ বাকি: ${otpTimer}s` : "কোডের মেয়াদ শেষ"}
+                    </span>
+                  </div>
+
+                  {/* 4-digit OTP Input */}
+                  <div>
+                    <input
+                      type="text"
+                      autoFocus
+                      maxLength={4}
+                      value={inputOtp}
+                      onChange={(e) => setInputOtp(e.target.value.replace(/\D/g, ''))}
+                      placeholder="XXXX"
+                      className="w-full bg-white border-2 border-[#00823B] rounded-2xl py-3.5 px-4 text-center text-2xl font-mono font-black tracking-widest text-slate-900 focus:outline-none shadow-sm placeholder:text-slate-300"
+                    />
+                  </div>
+
+                  {/* Verify Button */}
+                  <button
+                    type="button"
+                    onClick={handleVerifyOtp}
+                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center cursor-pointer"
+                  >
+                    ওটিপি যাচাই করুন ও পরবর্তী ধাপে যান ➔
+                  </button>
+
+                  {/* Resend OTP button */}
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      className="text-xs font-bold text-slate-600 hover:text-[#00823B] transition-colors cursor-pointer"
+                    >
+                      কোড পাননি? <span className="underline text-emerald-700">পুনরায় ওটিপি পাঠান</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4: Address & Country Selection (ONLY Bangladesh and Malaysia) */}
+            {regStep === 4 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-black text-slate-900">বাসা ও দেশ নির্বাচন</h3>
@@ -691,7 +781,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         showToast("দয়া করে আপনার বাসার ঠিকানা লিখুন", "error");
                         return;
                       }
-                      setRegStep(4);
+                      setRegStep(5);
                     }}
                     className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
                   >
@@ -701,8 +791,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
             )}
 
-            {/* STEP 4: PIN & Password (Only PIN & Password together) */}
-            {regStep === 4 && (
+            {/* STEP 5: PIN & Password */}
+            {regStep === 5 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-black text-slate-900">সিকিউরিটি পিন ও পাসওয়ার্ড নির্ধারণ</h3>
@@ -757,7 +847,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         showToast("দয়া করে নিরাপদ পাসওয়ার্ড দিন", "error");
                         return;
                       }
-                      setRegStep(5);
+                      setRegStep(6);
                     }}
                     className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
                   >
@@ -767,8 +857,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
             )}
 
-            {/* STEP 5: Profile Photo (ONLY Upload Option, Camera Removed) */}
-            {regStep === 5 && (
+            {/* STEP 6: Profile Photo (ONLY Upload Option, Camera Removed) */}
+            {regStep === 6 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-black text-slate-900">প্রোফাইল ছবি আপলোড করুন</h3>
@@ -800,7 +890,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
                 <button
                   type="button"
-                  onClick={() => setRegStep(6)}
+                  onClick={() => setRegStep(7)}
                   className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center mt-3 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>পরবর্তী ধাপ: পর্যালোচনা ও চূড়ান্ত সাবমিট ➔</span>
@@ -808,8 +898,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
             )}
 
-            {/* STEP 6: Review & Final Confirmation */}
-            {regStep === 6 && (
+            {/* STEP 7: Review & Final Confirmation */}
+            {regStep === 7 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-black text-slate-900">রেজিস্ট্রেশন পর্যালোচনা ও প্রত্যয়ন</h3>
@@ -869,7 +959,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   <button
                     type="button"
-                    onClick={() => setRegStep(5)}
+                    onClick={() => setRegStep(6)}
                     className="tap-effect bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl text-xs text-center cursor-pointer"
                   >
                     আগের ধাপ
