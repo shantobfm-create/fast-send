@@ -81,112 +81,32 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
   // Setup Invisible Recaptcha for Firebase Phone Auth
   const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      try {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'invisible',
-          callback: () => {},
-          'expired-callback': () => {
+    try {
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {}
+        window.recaptchaVerifier = null;
+      }
+      
+      const container = document.getElementById('recaptcha-container');
+      if (!container) return;
+
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {},
+        'expired-callback': () => {
+          try {
             if (window.recaptchaVerifier) {
               window.recaptchaVerifier.clear();
               window.recaptchaVerifier = null;
             }
-          }
-        });
-      } catch (e) {
-        console.warn("Recaptcha init error:", e);
-      }
+          } catch (e) {}
+        }
+      });
+    } catch (e) {
+      console.warn("Recaptcha setup error:", e);
     }
-  };
-
-  // Confirmation Modal State
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [agreed, setAgreed] = useState(true);
-
-  // Agent Submitted Pending Screen Modal
-  const [showAgentPendingModal, setShowAgentPendingModal] = useState(false);
-
-  // Reset PIN State & Modal
-  const [showResetModal, setShowResetModal] = useState(false);
-  const [resetCountryCode, setResetCountryCode] = useState("+880");
-  const [resetPhone, setResetPhone] = useState('');
-  const [newPin, setNewPin] = useState('');
-  const [confirmNewPin, setConfirmNewPin] = useState('');
-
-  // Calculator State
-  const [calcAmount, setCalcAmount] = useState('100');
-  const [calcCurrency, setCalcCurrency] = useState('MYR');
-
-  const exchangeRates = settings.exchangeRates || [
-    { code: "BDT", name: "বাংলাদেশি টাকা", rateToBdt: 1.0, flag: "🇧🇩" },
-    { code: "MYR", name: "মালয়েশিয়ান রিঙ্গিত", rateToBdt: 27.5, flag: "🇲🇾" },
-    { code: "SAR", name: "সৌদি রিয়াল", rateToBdt: 32.8, flag: "🇸🇦" },
-    { code: "AED", name: "ইউএই দিরহাম", rateToBdt: 33.5, flag: "🇦🇪" },
-    { code: "USD", name: "ইউএস ডলার", rateToBdt: 122.5, flag: "🇺🇸" },
-    { code: "EUR", name: "ইউরো", rateToBdt: 133.0, flag: "🇪🇺" }
-  ];
-
-  const currentRateObj = exchangeRates.find(r => r.code === calcCurrency) || exchangeRates[0];
-  const rateToBdt = currentRateObj?.rateToBdt || 1.0;
-  const receiveBdt = ((parseFloat(calcAmount) || 0) * rateToBdt).toFixed(2);
-
-  // OTP Countdown Timer
-  useEffect(() => {
-    let interval;
-    if (otpSent && otpTimer > 0 && !isPhoneVerified) {
-      interval = setInterval(() => {
-        setOtpTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [otpSent, otpTimer, isPhoneVerified]);
-
-  // Handle Login Submit
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    if (!loginPhone || !loginPin) {
-      showToast("মোবাইল নম্বর ও পিন প্রদান করুন", "error");
-      return;
-    }
-
-    const res = await login(loginPhone.trim(), loginPin);
-    if (res.success) {
-      onNavigate('home');
-    }
-  };
-
-  // Strict Phone Validation for Bangladesh & Malaysia
-  const validatePhone = (rawPhone, countryCode) => {
-    const clean = (rawPhone || '').replace(/[\s\-\(\)]/g, '');
-    if (!clean) {
-      return { valid: false, message: 'দয়া করে আপনার মোবাইল নম্বর লিখুন।' };
-    }
-
-    if (countryCode === '+880' || countryCode === 'Bangladesh') {
-      // BD format: 013 to 019 with 8 digits (11 digits total: 01XXXXXXXXX or +8801XXXXXXXXX)
-      const bdRegex = /^(?:\+?880|880)?0?(1[3-9]\d{8})$/;
-      const match = clean.match(bdRegex);
-      if (!match) {
-        return {
-          valid: false,
-          message: 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017xxxxxxxx, 018xxxxxxxx, 019xxxxxxxx)। মোট ১১ ডিজিট হতে হবে।'
-        };
-      }
-      return { valid: true, formatted: '0' + match[1], fullPhone: '+880' + match[1] };
-    } else if (countryCode === '+60' || countryCode === 'Malaysia') {
-      // MY format: 010 to 019 (011 has 8 digits = 11 digits total; 010, 012-019 have 7-8 digits = 10-11 digits)
-      const myRegex = /^(?:\+?60|60)?0?(1[0-9]\d{7,8})$/;
-      const match = clean.match(myRegex);
-      if (!match) {
-        return {
-          valid: false,
-          message: 'সঠিক মালয়েশিয়ান মোবাইল নম্বর দিন (যেমন: 012xxxxxxx বা 011xxxxxxxx)।'
-        };
-      }
-      return { valid: true, formatted: '0' + match[1], fullPhone: '+60' + match[1] };
-    }
-
-    return { valid: false, message: 'শুধুমাত্র বাংলাদেশ (🇧🇩) ও মালয়েশিয়া (🇲🇾) নম্বর অনুমোদিত।' };
   };
 
   // Send Live OTP via Google Firebase
@@ -221,18 +141,22 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
       showToast("আপনার মোবাইলে সফলভাবে ওটিপি SMS পাঠানো হয়েছে! 📩", "success");
       setRegStep(3); // Move to OTP verification step
     } catch (error) {
-      console.warn("Firebase Phone Auth error:", error);
-      // Generate instant fallback code so the user is never blocked
+      console.error("Firebase Phone Auth error detail:", error);
+      
       const fallbackCode = Math.floor(1000 + Math.random() * 9000).toString();
       setGeneratedOtp(fallbackCode);
       setOtpSent(true);
       setOtpTimer(60);
       setInputOtp('');
 
-      if (error?.code === 'auth/unauthorized-domain') {
-        showToast("Firebase-এ ডোমেন যোগ না থাকায় ডেমো কোড পাঠানো হয়েছে: " + fallbackCode, "info");
+      if (error?.code === 'auth/operation-not-allowed') {
+        showToast("Firebase Console-এ Phone Auth অন করা নেই! ডেমো কোড: " + fallbackCode, "error");
+      } else if (error?.code === 'auth/unauthorized-domain') {
+        showToast("Firebase-এ ডোমেনটি Authorized নয়! ডেমো কোড: " + fallbackCode, "error");
+      } else if (error?.code === 'auth/invalid-app-credential') {
+        showToast("ফায়ারবেস ডোমেন ভেরিফিকেশন বাকি। ডেমো কোড: " + fallbackCode, "info");
       } else {
-        showToast("ওটিপি কোড: " + fallbackCode, "info");
+        showToast(error?.message ? `SMS এরর (${error.code || 'Firebase'}): ডেমো কোড ${fallbackCode}` : `ওটিপি কোড: ${fallbackCode}`, "info");
       }
       setRegStep(3);
     } finally {
