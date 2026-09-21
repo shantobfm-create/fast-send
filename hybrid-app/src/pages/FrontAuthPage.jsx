@@ -266,7 +266,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
       <div className="bg-[#00823B] text-white pt-6 pb-5 px-5 text-center flex flex-col items-center shadow-xs">
         <FastSendLogo size="lg" showText={true} />
         
-        <div className="mt-2.5 flex items-center gap-1.5 text-xs font-bold text-white bg-[#006837] px-4 py-1.5 rounded-full border border-emerald-500/40 shadow-xs">
+        <div className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-white bg-[#006837] px-4 py-1.5 rounded-full border border-emerald-500/40 shadow-xs">
           <Heart className="w-3.5 h-3.5 text-rose-300 fill-rose-300" />
           <span>{settings.tagline || "এই ট্রান্সফারে কোনো ট্রান্সফার ফি নেই"}</span>
         </div>
@@ -276,7 +276,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
       <div className="bg-white px-4 pt-3 border-b border-slate-200 flex justify-around">
         <button
           onClick={() => changeTab('login')}
-          className={`pb-2.5 text-sm font-black transition-all border-b-2 ${
+          className={`pb-2.5 text-sm font-semibold transition-all border-b-2 ${
             activeTab === 'login'
               ? 'border-[#00823B] text-[#00823B]'
               : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -290,7 +290,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             changeTab('register');
             setRegStep(0);
           }}
-          className={`pb-2.5 text-sm font-black transition-all border-b-2 ${
+          className={`pb-2.5 text-sm font-semibold transition-all border-b-2 ${
             activeTab === 'register'
               ? 'border-[#00823B] text-[#00823B]'
               : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -301,7 +301,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
         <button
           onClick={() => changeTab('calculator')}
-          className={`pb-2.5 text-sm font-black transition-all border-b-2 ${
+          className={`pb-2.5 text-sm font-semibold transition-all border-b-2 ${
             activeTab === 'calculator'
               ? 'border-[#00823B] text-[#00823B]'
               : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -318,13 +318,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
         {activeTab === 'login' && (
           <div className="space-y-4 animate-fade-in">
             <div className="text-center pb-1">
-              <h2 className="text-lg font-black text-slate-900">অ্যাকাউন্টে প্রবেশ করুন</h2>
-              <p className="text-xs text-slate-500 mt-0.5">আপনার মোবাইল নম্বর ও ৬-সংখ্যার পিন দিন</p>
+              <h2 className="text-lg font-bold text-slate-900">অ্যাকাউন্টে প্রবেশ করুন</h2>
+              <p className="text-xs text-slate-500 mt-0.5 font-normal">আপনার মোবাইল নম্বর ও ৬-সংখ্যার পিন দিন</p>
             </div>
 
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">
                   মোবাইল নম্বর
                 </label>
                 <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
@@ -335,13 +335,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     value={loginPhone}
                     onChange={(e) => setLoginPhone(e.target.value)}
                     placeholder="মোবাইল নম্বর লিখুন"
-                    className="w-full bg-transparent py-3.5 pl-11 pr-3 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
+                    className="w-full bg-transparent py-3.5 pl-11 pr-3 text-sm font-medium font-mono text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">
                   সিকিউরিটি পিন (৬ সংখ্যা) বা পাসওয়ার্ড
                 </label>
                 <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
@@ -353,7 +353,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     value={loginPin}
                     onChange={(e) => setLoginPin(e.target.value)}
                     placeholder="••••••"
-                    className="w-full bg-transparent py-3.5 pl-11 pr-11 text-sm font-mono font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
+                    className="w-full bg-transparent py-3.5 pl-11 pr-11 text-sm font-mono font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                   />
                   <button
                     type="button"
@@ -369,7 +369,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-base shadow-md transition-all text-center mt-2 cursor-pointer"
+                className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-base shadow-md transition-all text-center mt-2 cursor-pointer"
               >
                 {loading ? "যাচাই করা হচ্ছে..." : "লগইন করুন ➔"}
               </button>
@@ -380,7 +380,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               <button
                 type="button"
                 onClick={() => setShowResetModal(true)}
-                className="text-xs font-bold text-emerald-800 hover:underline flex items-center justify-center gap-1 mx-auto cursor-pointer"
+                className="text-xs font-medium text-emerald-800 hover:underline flex items-center justify-center gap-1 mx-auto cursor-pointer"
               >
                 <KeyRound className="w-4 h-4" />
                 <span>পিন বা পাসওয়ার্ড ভুলে গেছেন? রিসেট করুন</span>
@@ -389,7 +389,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
             {/* Switch to Register */}
             <div className="text-center pt-2 border-t border-slate-100">
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 font-normal">
                 নতুন একাউন্ট খুলতে চান?{' '}
                 <button
                   type="button"
@@ -397,7 +397,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     changeTab('register');
                     setRegStep(0);
                   }}
-                  className="text-[#00823B] font-black hover:underline cursor-pointer"
+                  className="text-[#00823B] font-semibold hover:underline cursor-pointer"
                 >
                   বিনামূল্যে নিবন্ধন করুন
                 </button>
@@ -413,9 +413,9 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {/* Step Progress Header (1 to 7) */}
             {regStep > 0 && (
               <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/80">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1.5">
+                <div className="flex items-center justify-between text-xs font-medium text-slate-700 mb-1.5">
                   <span className="flex items-center gap-1.5 text-[#00823B]">
-                    <span className="w-5 h-5 rounded-full bg-[#00823B] text-white flex items-center justify-center text-[10px] font-mono">
+                    <span className="w-5 h-5 rounded-full bg-[#00823B] text-white flex items-center justify-center text-[10px] font-mono font-bold">
                       {regStep}
                     </span>
                     {regStep === 1 && "ধাপ ১: পূর্ণ নাম"}
@@ -426,7 +426,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     {regStep === 6 && "ধাপ ৬: প্রোফাইল ছবি আপলোড"}
                     {regStep === 7 && "ধাপ ৭: পর্যালোচনা ও সাবমিট"}
                   </span>
-                  <span className="text-slate-500 font-mono text-[11px] font-bold">ধাপ {regStep}/৭</span>
+                  <span className="text-slate-500 font-mono text-[11px] font-medium">ধাপ {regStep}/৭</span>
                 </div>
                 
                 {/* Progress Bar */}
@@ -441,11 +441,11 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   <button 
                     type="button"
                     onClick={() => setRegStep(prev => Math.max(0, prev - 1))}
-                    className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" /> আগের ধাপ
                   </button>
-                  <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full">
+                  <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full">
                     অ্যাকাউন্ট: {regForm.userType}
                   </span>
                 </div>
@@ -456,8 +456,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {regStep === 0 && (
               <div className="space-y-4">
                 <div className="text-center">
-                  <h2 className="text-lg font-black text-slate-900">অ্যাকাউন্টের ধরন নির্বাচন করুন</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">বাংলাদেশ 🇧🇩 ও মালয়েশিয়া 🇲🇾 প্রবাসী এবং গ্রাহকদের জন্য</p>
+                  <h2 className="text-lg font-bold text-slate-900">অ্যাকাউন্টের ধরন নির্বাচন করুন</h2>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">বাংলাদেশ 🇧🇩 ও মালয়েশিয়া 🇲🇾 প্রবাসী এবং গ্রাহকদের জন্য</p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3.5 pt-2">
@@ -474,8 +474,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         <User className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-slate-900 text-sm">পার্সোনাল অ্যাকাউন্ট</h3>
-                        <p className="text-xs text-slate-500">টাকা পাঠানো, অ্যাড-মানি ও রেমিটেন্স সেবা</p>
+                        <h3 className="font-semibold text-slate-900 text-sm">পার্সোনাল অ্যাকাউন্ট</h3>
+                        <p className="text-xs text-slate-500 font-normal">টাকা পাঠানো, অ্যাড-মানি ও রেমিটেন্স সেবা</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
@@ -495,17 +495,17 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <h3 className="font-bold text-slate-900 text-sm">এজেন্ট অ্যাকাউন্ট</h3>
-                          <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">ভেরিফিকেশন আবশ্যক</span>
+                          <h3 className="font-semibold text-slate-900 text-sm">এজেন্ট অ্যাকাউন্ট</h3>
+                          <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-semibold">ভেরিফিকেশন আবশ্যক</span>
                         </div>
-                        <p className="text-xs text-slate-500">ক্যাশ-ইন ও ক্যাশ-আউট সার্ভিস পয়েন্ট</p>
+                        <p className="text-xs text-slate-500 font-normal">ক্যাশ-ইন ও ক্যাশ-আউট সার্ভিস পয়েন্ট</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 group-hover:text-emerald-600 transition-all" />
                   </div>
                 </div>
 
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5">
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 font-normal flex items-start gap-2.5">
                   <ShieldCheck className="w-5 h-5 text-[#00823B] shrink-0 mt-0.5" />
                   <span>
                     শুধুমাত্র বাংলাদেশ (🇧🇩) ও মালয়েশিয়া (🇲🇾) নম্বরে রেজিস্ট্রেশন চালু রয়েছে।
@@ -518,13 +518,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {regStep === 1 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">আপনার পূর্ণ নাম লিখুন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">জাতীয় পরিচয়পত্র বা অফিসিয়াল নথির সাথে মিল রেখে নাম দিন</p>
+                  <h3 className="text-base font-bold text-slate-900">আপনার পূর্ণ নাম লিখুন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">জাতীয় পরিচয়পত্র বা অফিসিয়াল নথির সাথে মিল রেখে নাম দিন</p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
                       পূর্ণ নাম (বাংলা বা ইংরেজি)
                     </label>
                     <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
@@ -534,8 +534,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         autoFocus
                         value={regForm.name}
                         onChange={(e) => setRegForm({ ...regForm, name: e.target.value })}
-                        placeholder="যেমন: শান্ত হক (Shanto Haque)"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
+                        placeholder="আপনার পূর্ণ নাম লিখুন"
+                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
                   </div>
@@ -549,7 +549,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       }
                       setRegStep(2);
                     }}
-                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-4 cursor-pointer"
+                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-4 cursor-pointer"
                   >
                     <span>পরবর্তী ধাপ: মোবাইল নম্বর ➔</span>
                   </button>
@@ -561,13 +561,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {regStep === 2 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">মোবাইল নম্বর লিখুন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">সঠিক বাংলাদেশ 🇧🇩 বা মালয়েশিয়া 🇲🇾 নম্বর দিন</p>
+                  <h3 className="text-base font-bold text-slate-900">মোবাইল নম্বর লিখুন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">সঠিক বাংলাদেশ 🇧🇩 বা মালয়েশিয়া 🇲🇾 নম্বর দিন</p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
                       দেশ ও মোবাইল নম্বর
                     </label>
                     <div className="space-y-2">
@@ -580,7 +580,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                             const matched = allowedCountries.find(c => c.code === e.target.value);
                             setRegForm({ ...regForm, country: matched?.name || 'Bangladesh' });
                           }}
-                          className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0 cursor-pointer"
+                          className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0 cursor-pointer"
                         >
                           {allowedCountries.map(c => (
                             <option key={c.code} value={c.code}>
@@ -597,19 +597,19 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                             value={regForm.phone}
                             onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
                             placeholder={regCountryCode === '+880' ? '017XXXXXXXX' : '01XXXXXXXX'}
-                            className="w-full bg-transparent py-3.5 pl-9 pr-3 text-sm font-bold font-mono text-slate-900 focus:outline-none placeholder:text-slate-400"
+                            className="w-full bg-transparent py-3.5 pl-9 pr-3 text-sm font-medium font-mono text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                           />
                         </div>
                       </div>
 
                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
-                        <span className="font-bold block text-slate-700">নম্বর ফরম্যাট নির্দেশনা:</span>
+                        <span className="font-semibold block text-slate-700">নম্বর ফরম্যাট নির্দেশনা:</span>
                         {regCountryCode === '+880' ? (
-                          <p className="text-[11px] text-emerald-800 font-medium">
+                          <p className="text-[11px] text-emerald-800 font-normal">
                             🇧🇩 বাংলাদেশ: <b>013, 014, 015, 016, 017, 018, 019</b> দিয়ে শুরু মোট <b>১১ সংখ্যার</b> নম্বর হতে হবে (যেমন: 01712345678)।
                           </p>
                         ) : (
-                          <p className="text-[11px] text-emerald-800 font-medium">
+                          <p className="text-[11px] text-emerald-800 font-normal">
                             🇲🇾 মালয়েশিয়া: <b>010, 011, 012, 013, 014, 016, 017, 018, 019</b> দিয়ে শুরু সঠিক নম্বর দিন (যেমন: 0123456789 বা 01112345678)।
                           </p>
                         )}
@@ -618,7 +618,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       <button
                         type="button"
                         onClick={handleSendOtp}
-                        className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-3 cursor-pointer"
+                        className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-3 cursor-pointer"
                       >
                         <span>ওটিপি কোড পাঠান ➔</span>
                       </button>
@@ -635,8 +635,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-[#00823B] mb-2">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-black text-slate-900">ওটিপি কোড যাচাইকরণ</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">আপনার প্রদত্ত মোবাইল নম্বরে পাঠানো ৪ সংখ্যার কোড দিন</p>
+                  <h3 className="text-base font-bold text-slate-900">ওটিপি কোড যাচাইকরণ</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">আপনার প্রদত্ত মোবাইল নম্বরে পাঠানো ৪ সংখ্যার কোড দিন</p>
                 </div>
 
                 <div className="p-4 bg-emerald-50/70 rounded-2xl border-2 border-emerald-300 space-y-4">
@@ -644,14 +644,14 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-emerald-200">
                     <div className="flex items-center gap-2">
                       <Phone className="w-4 h-4 text-[#00823B]" />
-                      <span className="text-xs font-mono font-bold text-slate-800">
+                      <span className="text-xs font-mono font-semibold text-slate-800">
                         {regCountryCode} {regForm.phone}
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setRegStep(2)}
-                      className="text-xs text-emerald-700 hover:text-emerald-900 font-bold underline cursor-pointer"
+                      className="text-xs text-emerald-700 hover:text-emerald-900 font-medium underline cursor-pointer"
                     >
                       নম্বর পরিবর্তন
                     </button>
@@ -659,8 +659,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
                   {/* Timer */}
                   <div className="flex items-center justify-between text-xs px-1">
-                    <span className="font-bold text-slate-600">ভেরিফিকেশন কোড:</span>
-                    <span className="font-mono font-bold text-emerald-800">
+                    <span className="font-medium text-slate-600">ভেরিফিকেশন কোড:</span>
+                    <span className="font-mono font-semibold text-emerald-800">
                       {otpTimer > 0 ? `মেয়াদ বাকি: ${otpTimer}s` : "কোডের মেয়াদ শেষ"}
                     </span>
                   </div>
@@ -674,7 +674,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       value={inputOtp}
                       onChange={(e) => setInputOtp(e.target.value.replace(/\D/g, ''))}
                       placeholder="XXXX"
-                      className="w-full bg-white border-2 border-[#00823B] rounded-2xl py-3.5 px-4 text-center text-2xl font-mono font-black tracking-widest text-slate-900 focus:outline-none shadow-sm placeholder:text-slate-300"
+                      className="w-full bg-white border-2 border-[#00823B] rounded-2xl py-3.5 px-4 text-center text-2xl font-mono font-bold tracking-widest text-slate-900 focus:outline-none shadow-sm placeholder:text-slate-300 placeholder:font-normal"
                     />
                   </div>
 
@@ -682,7 +682,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   <button
                     type="button"
                     onClick={handleVerifyOtp}
-                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center cursor-pointer"
+                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center cursor-pointer"
                   >
                     ওটিপি যাচাই করুন ও পরবর্তী ধাপে যান ➔
                   </button>
@@ -692,9 +692,9 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     <button
                       type="button"
                       onClick={handleSendOtp}
-                      className="text-xs font-bold text-slate-600 hover:text-[#00823B] transition-colors cursor-pointer"
+                      className="text-xs font-medium text-slate-600 hover:text-[#00823B] transition-colors cursor-pointer"
                     >
-                      কোড পাননি? <span className="underline text-emerald-700">পুনরায় ওটিপি পাঠান</span>
+                      কোড পাননি? <span className="underline text-emerald-700 font-semibold">পুনরায় ওটিপি পাঠান</span>
                     </button>
                   </div>
                 </div>
@@ -705,13 +705,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {regStep === 4 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">বাসা ও দেশ নির্বাচন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">আপনার বর্তমান বাসার ঠিকানা ও দেশ নির্বাচন করুন</p>
+                  <h3 className="text-base font-bold text-slate-900">বাসা ও দেশ নির্বাচন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">আপনার বর্তমান বাসার ঠিকানা ও দেশ নির্বাচন করুন</p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
                       দেশ নির্বাচন করুন (শুধুমাত্র বাংলাদেশ ও মালয়েশিয়া)
                     </label>
                     <div className="grid grid-cols-2 gap-3">
@@ -719,8 +719,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         onClick={() => setRegForm({ ...regForm, country: 'Bangladesh' })}
                         className={`p-3 rounded-xl border-2 flex items-center gap-2 cursor-pointer transition-all ${
                           regForm.country === 'Bangladesh' 
-                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-bold shadow-xs' 
-                            : 'border-slate-300 bg-white text-slate-700'
+                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-semibold shadow-xs' 
+                            : 'border-slate-300 bg-white text-slate-700 font-normal'
                         }`}
                       >
                         <span className="text-xl">🇧🇩</span>
@@ -731,8 +731,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         onClick={() => setRegForm({ ...regForm, country: 'Malaysia' })}
                         className={`p-3 rounded-xl border-2 flex items-center gap-2 cursor-pointer transition-all ${
                           regForm.country === 'Malaysia' 
-                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-bold shadow-xs' 
-                            : 'border-slate-300 bg-white text-slate-700'
+                            ? 'border-[#00823B] bg-emerald-50 text-[#00823B] font-semibold shadow-xs' 
+                            : 'border-slate-300 bg-white text-slate-700 font-normal'
                         }`}
                       >
                         <span className="text-xl">🇲🇾</span>
@@ -742,8 +742,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      বাসার ঠিকানা (House / Road / City)
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                      বাসার ঠিকানা
                     </label>
                     <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
                       <MapPin className="w-5 h-5 text-slate-400 absolute left-3.5" />
@@ -752,14 +752,14 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         required
                         value={regForm.address}
                         onChange={(e) => setRegForm({ ...regForm, address: e.target.value })}
-                        placeholder="যেমন: বাড়ি ১২, রোড ৪, সেক্টর ৭ / Kuala Lumpur, Malaysia"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
+                        placeholder="বাসার সম্পূর্ণ ঠিকানা লিখুন"
+                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
                       জাতীয় পরিচয়পত্র / পাসপোর্ট নম্বর (ঐচ্ছিক)
                     </label>
                     <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
@@ -768,8 +768,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         type="text"
                         value={regForm.nid}
                         onChange={(e) => setRegForm({ ...regForm, nid: e.target.value })}
-                        placeholder="1995874512458 / A12345678"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
+                        placeholder="এনআইডি বা পাসপোর্ট নম্বর (যদি থাকে)"
+                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
                   </div>
@@ -783,7 +783,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       }
                       setRegStep(5);
                     }}
-                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
+                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
                   >
                     <span>পরবর্তী ধাপ: পিন ও পাসওয়ার্ড ➔</span>
                   </button>
@@ -795,13 +795,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {regStep === 5 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">সিকিউরিটি পিন ও পাসওয়ার্ড নির্ধারণ</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">আপনার অ্যাকাউন্টের গোপনীয় ৬-সংখ্যার পিন ও পাসওয়ার্ড দিন</p>
+                  <h3 className="text-base font-bold text-slate-900">সিকিউরিটি পিন ও পাসওয়ার্ড নির্ধারণ</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">আপনার অ্যাকাউন্টের গোপনীয় ৬-সংখ্যার পিন ও পাসওয়ার্ড দিন</p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
                       সিকিউরিটি পিন (অবশ্যই ৬ সংখ্যার হতে হবে)
                     </label>
                     <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
@@ -812,15 +812,15 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         required
                         value={regForm.pin}
                         onChange={(e) => setRegForm({ ...regForm, pin: e.target.value })}
-                        placeholder="যেমন: 242312"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
+                        placeholder="৬ সংখ্যার নতুন পিন"
+                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
-                    <span className="text-[11px] text-slate-500 mt-1 block">টাকা পাঠানো ও লেনদেনের সময় এই ৬ সংখ্যার পিন লাগবে।</span>
+                    <span className="text-[11px] text-slate-500 mt-1 block font-normal">টাকা পাঠানো ও লেনদেনের সময় এই ৬ সংখ্যার পিন লাগবে।</span>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
                       লগইন পাসওয়ার্ড (কমপক্ষে ৪ অক্ষর)
                     </label>
                     <div className="relative flex items-center bg-white rounded-xl border-2 border-slate-300 focus-within:border-[#00823B] shadow-xs">
@@ -830,8 +830,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         required
                         value={regForm.password}
                         onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
-                        placeholder="যেমন: Pass@1234"
-                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
+                        placeholder="পাসওয়ার্ড লিখুন"
+                        className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-mono font-medium text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
                   </div>
@@ -849,7 +849,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       }
                       setRegStep(6);
                     }}
-                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
+                    className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
                   >
                     <span>পরবর্তী ধাপ: প্রোফাইল ছবি যুক্ত করুন ➔</span>
                   </button>
@@ -861,15 +861,15 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {regStep === 6 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">প্রোফাইল ছবি আপলোড করুন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">আপনার ডিভাইস বা গ্যালারি থেকে পরিষ্কার ছবি নির্বাচন করুন</p>
+                  <h3 className="text-base font-bold text-slate-900">প্রোফাইল ছবি আপলোড করুন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">আপনার ডিভাইস বা গ্যালারি থেকে পরিষ্কার ছবি নির্বাচন করুন</p>
                 </div>
 
                 <div className="flex flex-col items-center">
                   <div className="w-28 h-28 rounded-full border-4 border-[#00823B] overflow-hidden bg-slate-200 shadow-md">
                     <img src={regForm.photo} alt="User Avatar" className="w-full h-full object-cover" />
                   </div>
-                  <span className="text-xs text-[#00823B] mt-2 font-bold flex items-center gap-1">
+                  <span className="text-xs text-[#00823B] mt-2 font-medium flex items-center gap-1">
                     <CheckCircle2 className="w-4 h-4" /> নির্বাচিত ছবির প্রিভিউ
                   </span>
                 </div>
@@ -881,8 +881,8 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       <Upload className="w-7 h-7" />
                     </div>
                     <div>
-                      <span className="text-sm font-black text-slate-800 block">গ্যালারি / ডিভাইস থেকে ছবি আপলোড করুন</span>
-                      <span className="text-xs text-slate-500 mt-0.5 block">JPG, PNG বা যেকোনো ফরম্যাটের ছবি নির্বাচন করতে এখানে চাপুন</span>
+                      <span className="text-sm font-semibold text-slate-800 block">গ্যালারি / ডিভাইস থেকে ছবি আপলোড করুন</span>
+                      <span className="text-xs text-slate-500 mt-0.5 block font-normal">JPG, PNG বা যেকোনো ফরম্যাটের ছবি নির্বাচন করতে এখানে চাপুন</span>
                     </div>
                     <input type="file" accept="image/*" onChange={handlePhotoFileSelect} className="hidden" />
                   </label>
@@ -891,7 +891,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                 <button
                   type="button"
                   onClick={() => setRegStep(7)}
-                  className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center mt-3 flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="tap-effect w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md transition-all text-center mt-3 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>পরবর্তী ধাপ: পর্যালোচনা ও চূড়ান্ত সাবমিট ➔</span>
                 </button>
@@ -902,17 +902,17 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             {regStep === 7 && (
               <div className="space-y-4 pt-1">
                 <div className="text-center">
-                  <h3 className="text-base font-black text-slate-900">রেজিস্ট্রেশন পর্যালোচনা ও প্রত্যয়ন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">সব তথ্য সঠিক আছে কিনা যাচাই করে চূড়ান্ত সাবমিট করুন</p>
+                  <h3 className="text-base font-bold text-slate-900">রেজিস্ট্রেশন পর্যালোচনা ও প্রত্যয়ন</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">সব তথ্য সঠিক আছে কিনা যাচাই করে চূড়ান্ত সাবমিট করুন</p>
                 </div>
 
                 <div className="bg-slate-50 rounded-2xl p-4 border-2 border-slate-200 space-y-3">
                   <div className="flex items-center gap-3 border-b border-slate-200 pb-3">
                     <img src={regForm.photo} alt="Avatar" className="w-14 h-14 rounded-2xl object-cover border-2 border-[#00823B]" />
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">{regForm.name}</h4>
-                      <p className="text-xs font-mono font-bold text-slate-600">{regForm.phone}</p>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full mt-1 inline-block">
+                      <h4 className="font-semibold text-slate-900 text-sm">{regForm.name}</h4>
+                      <p className="text-xs font-mono font-medium text-slate-600">{regForm.phone}</p>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full mt-1 inline-block">
                         {regForm.userType} অ্যাকাউন্ট
                       </span>
                     </div>
@@ -920,22 +920,22 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
                   <div className="grid grid-cols-2 gap-2 text-xs text-slate-700 pt-1">
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 block font-bold">বাসার ঠিকানা:</span>
-                      <span className="font-bold">{regForm.address}</span>
+                      <span className="text-[10px] text-slate-500 block font-medium">বাসার ঠিকানা:</span>
+                      <span className="font-semibold text-slate-800">{regForm.address}</span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 block font-bold">দেশ:</span>
-                      <span className="font-bold flex items-center gap-1">
+                      <span className="text-[10px] text-slate-500 block font-medium">দেশ:</span>
+                      <span className="font-semibold text-slate-800 flex items-center gap-1">
                         {regForm.country === 'Malaysia' ? '🇲🇾 মালয়েশিয়া' : '🇧🇩 বাংলাদেশ'}
                       </span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 block font-bold">সিকিউরিটি পিন:</span>
-                      <span className="font-mono font-bold">•••••• ({regForm.pin})</span>
+                      <span className="text-[10px] text-slate-500 block font-medium">সিকিউরিটি পিন:</span>
+                      <span className="font-mono font-semibold text-slate-800">••••••</span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 block font-bold">পাসওয়ার্ড:</span>
-                      <span className="font-mono font-bold">••••••</span>
+                      <span className="text-[10px] text-slate-500 block font-medium">পাসওয়ার্ড:</span>
+                      <span className="font-mono font-semibold text-slate-800">••••••</span>
                     </div>
                   </div>
 
@@ -950,7 +950,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                         <Square className="w-5 h-5 text-slate-400" />
                       )}
                     </div>
-                    <span className="text-xs text-slate-800 leading-snug select-none font-bold">
+                    <span className="text-xs text-slate-800 leading-snug select-none font-medium">
                       আমি প্রত্যয়ন করছি যে উপরে প্রদত্ত সমস্ত তথ্য সঠিক ও সত্য।
                     </span>
                   </div>
@@ -960,7 +960,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   <button
                     type="button"
                     onClick={() => setRegStep(6)}
-                    className="tap-effect bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl text-xs text-center cursor-pointer"
+                    className="tap-effect bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3.5 rounded-xl text-xs text-center cursor-pointer"
                   >
                     আগের ধাপ
                   </button>
@@ -969,7 +969,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     type="button"
                     onClick={handleFinalRegister}
                     disabled={loading || !agreed}
-                    className={`tap-effect font-bold py-3.5 rounded-xl text-sm shadow-md text-center cursor-pointer ${
+                    className={`tap-effect font-semibold py-3.5 rounded-xl text-sm shadow-md text-center cursor-pointer ${
                       agreed 
                         ? 'bg-[#00823B] hover:bg-[#006837] text-white' 
                         : 'bg-slate-300 text-slate-500 cursor-not-allowed'
@@ -988,26 +988,26 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
         {activeTab === 'calculator' && (
           <div className="space-y-4 animate-fade-in">
             <div className="text-center">
-              <h2 className="text-lg font-black text-slate-900">লাইভ এক্সচেঞ্জ রেট ক্যালকুলেটর</h2>
-              <p className="text-xs text-slate-500 mt-0.5">মালয়েশিয়া 🇲🇾 বা যেকোনো দেশ থেকে টাকায় রিয়েল-টাইম কনভার্সন</p>
+              <h2 className="text-lg font-bold text-slate-900">লাইভ এক্সচেঞ্জ রেট ক্যালকুলেটর</h2>
+              <p className="text-xs text-slate-500 mt-0.5 font-normal">মালয়েশিয়া 🇲🇾 বা যেকোনো দেশ থেকে টাকায় রিয়েল-টাইম কনভার্সন</p>
             </div>
 
             <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">আপনি দিবেন</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">আপনি দিবেন</label>
                 <div className="flex items-center justify-between border-b-2 border-slate-200 pb-1">
                   <input
                     type="number"
                     value={calcAmount}
                     onChange={(e) => setCalcAmount(e.target.value)}
-                    className="text-2xl font-black text-slate-800 w-full focus:outline-none bg-transparent font-mono"
+                    className="text-2xl font-bold text-slate-800 w-full focus:outline-none bg-transparent font-mono"
                   />
                   <div className="flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-full border">
                     <span className="text-base">{currentRateObj.flag || "🇲🇾"}</span>
                     <select
                       value={calcCurrency}
                       onChange={(e) => setCalcCurrency(e.target.value)}
-                      className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                      className="bg-transparent text-xs font-medium text-slate-800 focus:outline-none cursor-pointer"
                     >
                       {exchangeRates.map((c) => (
                         <option key={c.code} value={c.code}>{c.code}</option>
@@ -1018,17 +1018,17 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">তারা পাবে</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">তারা পাবে</label>
                 <div className="flex items-center justify-between border-b-2 border-slate-200 pb-1">
-                  <span className="text-2xl font-black text-[#00823B] font-mono">{receiveBdt}</span>
+                  <span className="text-2xl font-bold text-[#00823B] font-mono">{receiveBdt}</span>
                   <div className="flex items-center gap-1 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
                     <span className="text-base">🇧🇩</span>
-                    <span className="text-xs font-black text-emerald-800">BDT</span>
+                    <span className="text-xs font-bold text-emerald-800">BDT</span>
                   </div>
                 </div>
               </div>
 
-              <div className="text-center text-xs font-bold text-slate-600 pt-1 flex items-center justify-center gap-1">
+              <div className="text-center text-xs font-medium text-slate-600 pt-1 flex items-center justify-center gap-1">
                 <ArrowRightLeft className="w-3.5 h-3.5 text-[#00823B]" />
                 <span>এক্সচেঞ্জ রেট: 1 {calcCurrency} = {rateToBdt} BDT</span>
               </div>
@@ -1037,7 +1037,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 onClick={() => changeTab('login')}
-                className="tap-effect bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3 rounded-xl text-xs text-center shadow-sm"
+                className="tap-effect bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3 rounded-xl text-xs text-center shadow-sm"
               >
                 টাকা পাঠাতে লগইন করুন
               </button>
@@ -1046,7 +1046,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   changeTab('register');
                   setRegStep(0);
                 }}
-                className="tap-effect bg-white hover:bg-slate-50 text-[#00823B] border-2 border-[#00823B] font-bold py-3 rounded-xl text-xs text-center"
+                className="tap-effect bg-white hover:bg-slate-50 text-[#00823B] border-2 border-[#00823B] font-semibold py-3 rounded-xl text-xs text-center"
               >
                 নতুন অ্যাকাউন্ট খুলুন
               </button>
@@ -1061,7 +1061,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-4">
             <div className="flex justify-between items-center pb-2 border-b">
-              <h3 className="font-black text-base text-slate-900 flex items-center gap-1.5">
+              <h3 className="font-bold text-base text-slate-900 flex items-center gap-1.5">
                 <KeyRound className="w-4 h-4 text-[#00823B]" />
                 পিন / পাসওয়ার্ড রিসেট
               </h3>
@@ -1070,25 +1070,25 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               </button>
             </div>
 
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-600 font-normal">
               আপনার অ্যাকাউন্টের মোবাইল নম্বর দিন এবং নতুন ৬ সংখ্যার সিকিউরিটি পিন সেট করুন:
             </p>
 
             <form onSubmit={handleResetSubmit} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">মোবাইল নম্বর</label>
+                <label className="text-xs font-medium text-slate-700 block mb-1.5">মোবাইল নম্বর</label>
                 <input
                   type="tel"
                   required
                   value={resetPhone}
                   onChange={(e) => setResetPhone(e.target.value)}
-                  placeholder="017XXXXXXXX"
-                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-sm font-mono font-bold focus:outline-none focus:border-[#00823B]"
+                  placeholder="মোবাইল নম্বর লিখুন"
+                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-sm font-mono font-medium focus:outline-none focus:border-[#00823B] placeholder:font-normal"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">নতুন পিন (৬ সংখ্যা)</label>
+                <label className="text-xs font-medium text-slate-700 block mb-1.5">নতুন পিন (৬ সংখ্যা)</label>
                 <input
                   type="password"
                   maxLength={6}
@@ -1096,12 +1096,12 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value)}
                   placeholder="******"
-                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-sm font-mono font-bold focus:outline-none focus:border-[#00823B]"
+                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-sm font-mono font-medium focus:outline-none focus:border-[#00823B] placeholder:font-normal"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">নতুন পিন পুনরায় লিখুন</label>
+                <label className="text-xs font-medium text-slate-700 block mb-1.5">নতুন পিন পুনরায় লিখুন</label>
                 <input
                   type="password"
                   maxLength={6}
@@ -1109,7 +1109,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                   value={confirmNewPin}
                   onChange={(e) => setConfirmNewPin(e.target.value)}
                   placeholder="******"
-                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-sm font-mono font-bold focus:outline-none focus:border-[#00823B]"
+                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-sm font-mono font-medium focus:outline-none focus:border-[#00823B] placeholder:font-normal"
                 />
               </div>
 
@@ -1117,14 +1117,14 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                 <button
                   type="button"
                   onClick={() => setShowResetModal(false)}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs cursor-pointer"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl text-xs cursor-pointer"
                 >
                   বাতিল
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3 rounded-xl text-xs shadow-md cursor-pointer"
+                  className="bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3 rounded-xl text-xs shadow-md cursor-pointer"
                 >
                   রিসেট সম্পন্ন করুন
                 </button>
@@ -1143,14 +1143,14 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-lg font-black text-slate-900">এজেন্ট আবেদন জমা হয়েছে!</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h3 className="text-lg font-bold text-slate-900">এজেন্ট আবেদন জমা হয়েছে!</h3>
+              <p className="text-xs text-slate-600 leading-relaxed font-normal">
                 আপনার এজেন্ট অ্যাকাউন্টের আবেদনটি সফলভাবে <b>সুপার অ্যাডমিনের</b> নিকট পাঠানো হয়েছে।
               </p>
             </div>
 
-            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-950 text-left space-y-1">
-              <div className="font-bold flex items-center gap-1">
+            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-950 text-left space-y-1 font-normal">
+              <div className="font-semibold flex items-center gap-1 text-amber-900">
                 <ShieldCheck className="w-4 h-4 text-amber-700" />
                 ভেরিফিকেশন প্রক্রিয়া:
               </div>
@@ -1164,7 +1164,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                 setShowAgentPendingModal(false);
                 changeTab('login');
               }}
-              className="w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-sm shadow-md cursor-pointer"
+              className="w-full bg-[#00823B] hover:bg-[#006837] text-white font-semibold py-3.5 rounded-2xl text-sm shadow-md cursor-pointer"
             >
               লগইন পেজে ফিরে যান
             </button>
@@ -1174,7 +1174,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
       {/* 6. Clean Copyright Footer */}
       <div className="mt-6 py-5 border-t border-slate-100 text-center bg-slate-50/60">
-        <p className="text-xs font-semibold text-slate-500">
+        <p className="text-xs font-medium text-slate-500">
           © 2026 Fast Send. All rights reserved.
         </p>
       </div>
