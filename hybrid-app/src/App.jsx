@@ -92,8 +92,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 flex justify-center items-start sm:py-4">
-      <div className={`w-full max-w-md bg-white min-h-screen sm:min-h-[844px] sm:rounded-[2.5rem] sm:shadow-2xl sm:border sm:border-slate-300 relative flex flex-col font-sans overflow-hidden ${user ? 'pb-20' : ''}`}>
+    <div className="min-h-screen bg-slate-900 text-slate-900 flex justify-center items-start sm:py-6">
+      <div className={`w-full max-w-md bg-[#F4F7F6] min-h-screen sm:min-h-[844px] sm:rounded-[2.5rem] sm:shadow-2xl sm:border sm:border-slate-700/50 relative flex flex-col font-sans overflow-hidden ${user ? 'pb-20' : ''}`}>
         {renderScreen()}
         
         {/* Fixed Global Bottom Navigation only for logged-in users */}

@@ -145,19 +145,19 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between w-full">
+    <div className="min-h-screen bg-[#F4F7F6] flex flex-col justify-between w-full">
       <div>
-        {/* Top Header - Black Theme */}
-        <div className="bg-slate-950 text-white px-5 pt-4 pb-4 border-b border-slate-800 flex items-center justify-between shadow-md">
+        {/* Top Header - Secondary Brand Ocean Blue */}
+        <div className="bg-gradient-to-r from-[#1F6391] to-[#2980B9] text-white px-5 pt-5 pb-5 flex items-center justify-between shadow-md">
           <button
             onClick={() => onNavigate('select-recipient')}
-            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-800 transition-all shadow-sm"
+            className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-base font-bold text-white tracking-wide">
+          <h2 className="text-base font-extrabold text-white tracking-wide uppercase">
             {t('paymentTitle')}
           </h2>
           <div className="w-10" />
@@ -165,63 +165,63 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
 
         <div className="p-5 space-y-4">
 
-        {/* Amount to Deposit Banner */}
-        <div className="bg-slate-900 text-white rounded-2xl p-4 mb-4 shadow-md">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-slate-400 font-medium">
-              {isBn ? 'ট্রান্সফার পরিমাণ (ডিপোজিট করুন):' : 'Amount to Deposit:'}
+        {/* Amount to Pay Header Box */}
+        <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              {isBn ? 'পরিশোধের পরিমাণ' : 'Amount to Pay'}
             </span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold">
-              {details.flag} {transferDraft.sourceCurrency}
-            </span>
+            <div className="text-2xl font-black text-[#2C3E50] mt-0.5">
+              {transferDraft.sourceAmount} <span className="text-lg font-bold text-[#2980B9]">{transferDraft.sourceCurrency}</span>
+            </div>
           </div>
-          <div className="flex items-baseline justify-between">
-            <h3 className="text-2xl font-black text-emerald-400">
-              {transferDraft.sourceAmount} {transferDraft.sourceCurrency}
-            </h3>
-            <span className="text-xs text-slate-300 font-medium">
-              ➔ ৳{Number(transferDraft.targetAmount).toLocaleString()} BDT
+          <div className="text-right">
+            <span className="text-[11px] font-semibold text-slate-400 block">
+              {isBn ? 'প্রাপক পাবেন' : 'Recipient gets'}
+            </span>
+            <span className="text-sm font-black text-[#25CC71]">
+              ৳{Number(transferDraft.targetAmount).toLocaleString()} BDT
             </span>
           </div>
         </div>
 
         {/* Local Payment Method Toggle: Bank Account vs Mobile Wallet */}
-        <div className="flex bg-slate-200/80 p-1 rounded-2xl mb-4 shadow-inner">
+        <div className="flex bg-slate-200/70 p-1.5 rounded-2xl mb-4 shadow-inner">
           <button
             type="button"
             onClick={() => setPayChannel('bank')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
               payChannel === 'bank'
-                ? 'bg-white text-emerald-800 shadow-sm'
+                ? 'bg-white text-[#2C3E50] shadow-md'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>🏦</span>
-            <span>{isBn ? 'লোকাল ব্যাংক অ্যাকাউন্ট' : 'Local Bank Account'}</span>
+            <span className="text-sm">🏦</span>
+            <span>{isBn ? 'লোকাল ব্যাংক একাউন্ট' : 'Bank Transfer'}</span>
           </button>
           <button
             type="button"
             onClick={() => setPayChannel('wallet')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
               payChannel === 'wallet'
-                ? 'bg-white text-emerald-800 shadow-sm'
+                ? 'bg-white text-[#2C3E50] shadow-md'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>📱</span>
-            <span>{isBn ? 'লোকাল মোবাইল ওয়ালেট' : 'Mobile Wallet / P2P'}</span>
+            <span className="text-sm">📱</span>
+            <span>{isBn ? 'মোবাইল ওয়ালেট' : 'Mobile Wallet'}</span>
           </button>
         </div>
 
         {/* Payment Account Details Box */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm mb-5 space-y-3.5">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm mb-5 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <span className="text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider">
               {payChannel === 'bank' 
-                ? (isMalaysia ? 'Maybank / CIMB Transfer' : 'UAE Local Bank Transfer')
-                : (isMalaysia ? "Touch 'n Go (TNG) / DuitNow" : 'Careem Pay / Botim / Al Ansari')}
+                ? (isMalaysia ? 'Admin Bank Details (Maybank/CIMB)' : 'Admin Bank Details (Emirates NBD)')
+                : (isMalaysia ? "Admin Wallet (Touch 'n Go / DuitNow)" : 'Admin Wallet (Careem / Botim / Al Ansari)')}
             </span>
-            <span className="text-xs font-bold text-emerald-600">
+            <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-[#E8F8F0] text-[#1EA85D]">
               {details.flag} {details.country}
             </span>
           </div>
@@ -230,36 +230,31 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
           {payChannel === 'bank' ? (
             <>
               {/* Primary Bank Name */}
-              <div>
-                <p className="text-[11px] font-medium text-slate-500">{t('bankName')}</p>
-                <p className="text-sm font-bold text-slate-900">{details.bankName}</p>
-                {details.secondaryBank && (
-                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    {isBn ? 'বিকল্প ব্যাংক:' : 'Alternative:'} {details.secondaryBank}
-                  </p>
-                )}
+              <div className="grid grid-cols-3 gap-2 py-1">
+                <span className="text-xs font-bold text-slate-500">Bank:</span>
+                <span className="text-xs font-black text-[#2C3E50] col-span-2 text-right">{details.bankName}</span>
               </div>
 
               {/* Account Name */}
-              <div>
-                <p className="text-[11px] font-medium text-slate-500">{t('accountName')}</p>
-                <p className="text-sm font-bold text-slate-900">{details.accountName}</p>
+              <div className="grid grid-cols-3 gap-2 py-1">
+                <span className="text-xs font-bold text-slate-500">Acc Name:</span>
+                <span className="text-xs font-extrabold text-[#2C3E50] col-span-2 text-right truncate">{details.accountName}</span>
               </div>
 
               {/* Primary Account / IBAN with 1-click Copy */}
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+              <div className="p-3.5 bg-[#F4F7F6] rounded-2xl border border-slate-200 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase">
+                  <p className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
                     {isMalaysia ? 'Maybank Account Number' : 'Emirates NBD IBAN / Account'}
                   </p>
-                  <p className="text-sm font-mono font-extrabold text-slate-900 tracking-wide select-all">
+                  <p className="text-sm font-mono font-black text-[#2C3E50] tracking-wider select-all mt-0.5">
                     {details.accountNumber}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleCopy(details.accountNumber.replace(/\s+/g, ''), 'bank-acc')}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-1 shadow-sm active:scale-95 transition-all"
+                  className="px-3.5 py-2 rounded-xl bg-[#25CC71] hover:bg-[#1EA85D] text-white font-extrabold text-xs flex items-center space-x-1.5 shadow-md shadow-[#25CC71]/20 active:scale-95 transition-all"
                 >
                   <span>{copiedField === 'bank-acc' ? '✓' : '📋'}</span>
                   <span>{copiedField === 'bank-acc' ? 'Copied' : t('copy')}</span>
@@ -268,19 +263,19 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
 
               {/* Malaysia Optional CIMB Account */}
               {isMalaysia && details.cimbNumber && (
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-3.5 bg-[#F4F7F6] rounded-2xl border border-slate-200 flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">
+                    <p className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
                       CIMB Bank Account Number
                     </p>
-                    <p className="text-sm font-mono font-extrabold text-slate-900 tracking-wide select-all">
+                    <p className="text-sm font-mono font-black text-[#2C3E50] tracking-wider select-all mt-0.5">
                       {details.cimbNumber}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleCopy(details.cimbNumber.replace(/\s+/g, ''), 'cimb-acc')}
-                    className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs flex items-center space-x-1 shadow-sm active:scale-95 transition-all"
+                    className="px-3.5 py-2 rounded-xl bg-[#2980B9] hover:bg-[#1F6391] text-white font-extrabold text-xs flex items-center space-x-1.5 shadow-md shadow-[#2980B9]/20 active:scale-95 transition-all"
                   >
                     <span>{copiedField === 'cimb-acc' ? '✓' : '📋'}</span>
                     <span>{copiedField === 'cimb-acc' ? 'Copied' : t('copy')}</span>
@@ -292,37 +287,31 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
             /* If Local Mobile Wallet / P2P is selected */
             <>
               {/* Wallet Provider Name */}
-              <div>
-                <p className="text-[11px] font-medium text-slate-500">
-                  {isBn ? 'ওয়ালেট / পেমেন্ট প্ল্যাটফর্ম' : 'Wallet Provider'}
-                </p>
-                <p className="text-sm font-bold text-emerald-700">
-                  {details.walletProvider}
-                </p>
+              <div className="grid grid-cols-3 gap-2 py-1">
+                <span className="text-xs font-bold text-slate-500">Provider:</span>
+                <span className="text-xs font-black text-[#25CC71] col-span-2 text-right">{details.walletProvider}</span>
               </div>
 
               {/* Wallet Account Name */}
-              <div>
-                <p className="text-[11px] font-medium text-slate-500">
-                  {isBn ? 'ওয়ালেট রিসিভার নাম' : 'Wallet Receiver Name'}
-                </p>
-                <p className="text-sm font-bold text-slate-900">{details.walletName}</p>
+              <div className="grid grid-cols-3 gap-2 py-1">
+                <span className="text-xs font-bold text-slate-500">Receiver:</span>
+                <span className="text-xs font-extrabold text-[#2C3E50] col-span-2 text-right">{details.walletName}</span>
               </div>
 
               {/* Wallet Number / ID with 1-click Copy */}
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+              <div className="p-3.5 bg-[#F4F7F6] rounded-2xl border border-slate-200 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase">
-                    {isMalaysia ? "TNG Number / DuitNow ID" : 'Careem Pay / Botim / Mobile'}
+                  <p className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
+                    {isMalaysia ? "TNG / DuitNow ID" : 'Careem / Botim Number'}
                   </p>
-                  <p className="text-sm font-mono font-extrabold text-slate-900 tracking-wide select-all">
+                  <p className="text-sm font-mono font-black text-[#2C3E50] tracking-wider select-all mt-0.5">
                     {details.walletNumber}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleCopy(details.walletNumber.replace(/\s+/g, ''), 'wallet-num')}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-1 shadow-sm active:scale-95 transition-all"
+                  className="px-3.5 py-2 rounded-xl bg-[#25CC71] hover:bg-[#1EA85D] text-white font-extrabold text-xs flex items-center space-x-1.5 shadow-md shadow-[#25CC71]/20 active:scale-95 transition-all"
                 >
                   <span>{copiedField === 'wallet-num' ? '✓' : '📋'}</span>
                   <span>{copiedField === 'wallet-num' ? 'Copied' : t('copy')}</span>
@@ -331,23 +320,23 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
 
               {/* Malaysia DuitNow QR inside wallet tab */}
               {isMalaysia && (
-                <div className="pt-2 border-t border-slate-100 flex flex-col items-center text-center">
-                  <p className="text-xs font-bold text-slate-700 mb-2">
-                    {isBn ? 'অথবা স্ক্যান করুন DuitNow QR কোড:' : 'Or Scan DuitNow QR Code:'}
-                  </p>
-                  <div className="w-36 h-36 bg-white p-2 rounded-2xl border-2 border-dashed border-emerald-600 flex items-center justify-center shadow-inner">
+                <div className="pt-3 border-t border-slate-100 flex flex-col items-center text-center">
+                  <div className="w-40 h-40 bg-white p-2.5 rounded-2xl border-2 border-[#25CC71]/50 flex items-center justify-center shadow-md mb-2">
                     <img 
                       src={details.duitNowQr} 
                       alt="DuitNow QR Code" 
                       className="w-full h-full object-contain rounded-lg"
                     />
                   </div>
+                  <div className="px-3 py-1 bg-slate-900 text-white rounded-full text-[10px] font-black tracking-wider uppercase shadow-sm">
+                    Scan & Pay in your Banking App
+                  </div>
                 </div>
               )}
 
               {/* UAE Al Ansari Exchange reference info */}
               {!isMalaysia && details.alAnsariDetails && (
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
                   <p className="text-[10px] font-bold text-amber-800 uppercase">
                     Al Ansari Exchange পিকআপ ডিটেইলস:
                   </p>
@@ -360,9 +349,9 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
           )}
 
           {/* Transfer Instruction Guide Note */}
-          <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600">
+          <div className="p-3 bg-[#EBF5FB] rounded-2xl border border-[#2980B9]/20 text-[11px] text-[#1F6391] font-medium leading-relaxed">
             💡 {isBn 
-              ? 'উপরের অ্যাকাউন্ট নম্বরটি কপি করে আপনার মোবাইল ব্যাংকিং বা ওয়ালেট অ্যাপ থেকে টাকা পাঠান এবং পেমেন্ট সফল হওয়ার স্ক্রিনশট নিচে আপলোড করুন।' 
+              ? 'উপরের অ্যাকাউন্ট নম্বরটি কপি করে আপনার ব্যাংক বা ওয়ালেট অ্যাপ থেকে টাকা পাঠান এবং রসিদের স্ক্রিনশট নিচে আপলোড করুন।' 
               : 'Copy the account details above, transfer via your banking app or wallet, and upload the successful transaction screenshot below.'}
           </div>
         </div>
@@ -370,22 +359,22 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
         {/* Upload Receipt Section */}
         <form onSubmit={handleSubmitOrder} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              {t('uploadPrompt')} *
+            <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
+              {isBn ? 'পেমেন্ট প্রুফ আপলোড (রসিদ/স্ক্রিনশট) *' : 'Upload Payment Proof (Receipt/Screenshot) *'}
             </label>
 
             {!screenshotPreview ? (
-              <label className="border-2 border-dashed border-slate-300 hover:border-emerald-600 bg-white hover:bg-emerald-50/30 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all shadow-sm">
+              <label className="border-2 border-dashed border-[#25CC71]/60 hover:border-[#25CC71] bg-white hover:bg-[#E8F8F0]/30 rounded-3xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all shadow-sm group">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-2">
-                  📸
+                <div className="w-12 h-12 rounded-2xl bg-[#E8F8F0] text-[#25CC71] flex items-center justify-center text-2xl mb-2 group-hover:scale-110 transition-transform">
+                  ☁️
                 </div>
-                <span className="text-sm font-bold text-slate-800">
+                <span className="text-sm font-extrabold text-[#2C3E50]">
                   {isBn ? 'টাকা পাঠানোর রসিদ বা স্ক্রিনশট দিন' : 'Tap to upload slip / screenshot'}
                 </span>
                 <span className="text-xs text-slate-400 mt-0.5">
@@ -393,7 +382,7 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
                 </span>
               </label>
             ) : (
-              <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-md">
+              <div className="relative rounded-3xl overflow-hidden border border-slate-200 bg-slate-900 shadow-md">
                 <img
                   src={screenshotPreview}
                   alt="Receipt Preview"
@@ -402,7 +391,7 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute top-3 right-3 px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow flex items-center space-x-1"
+                  className="absolute top-3 right-3 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center space-x-1"
                 >
                   <span>✕</span>
                   <span>{t('removeImage')}</span>
@@ -413,15 +402,15 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
 
           {/* TrxID / Reference Input */}
           <div>
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-              {t('referenceLabel')}
+            <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
+              {isBn ? 'রেফারেন্স / TrxID' : 'Reference / TrxID'}
             </label>
             <input
               type="text"
               value={referenceNumber}
               onChange={(e) => setReferenceNumber(e.target.value)}
-              placeholder={isMalaysia ? 'e.g. MB12345678 বা TNG Ref' : 'e.g. ENBD Ref / Careem TrxID'}
-              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+              placeholder={isMalaysia ? '[MY-B23458]' : '[DXB-98241]'}
+              className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
             />
           </div>
 
@@ -430,13 +419,13 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-extrabold rounded-2xl shadow-lg shadow-emerald-600/30 transition-all text-base flex items-center justify-center space-x-2"
+              className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <span>{t('loading')}</span>
               ) : (
                 <>
-                  <span>{t('submitOrderBtn')}</span>
+                  <span>{isBn ? 'পেমেন্ট সাবমিট করুন' : 'Submit Payment'}</span>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                   </svg>

@@ -97,19 +97,19 @@ export const AddRecipientScreen = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between w-full">
+    <div className="min-h-screen bg-[#F4F7F6] flex flex-col justify-between w-full">
       <div>
-        {/* Top Header - Black Theme */}
-        <div className="bg-slate-950 text-white px-5 pt-4 pb-4 border-b border-slate-800 flex items-center justify-between shadow-md">
+        {/* Top Header - Secondary Brand Ocean Blue */}
+        <div className="bg-gradient-to-r from-[#1F6391] to-[#2980B9] text-white px-5 pt-5 pb-5 flex items-center justify-between shadow-md">
           <button
             onClick={() => onNavigate('select-recipient')}
-            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-800 transition-all shadow-sm"
+            className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-base font-bold text-white tracking-wide">
+          <h2 className="text-base font-extrabold text-white tracking-wide uppercase">
             {t('addRecipientTitle')}
           </h2>
           <div className="w-10" />
@@ -117,30 +117,30 @@ export const AddRecipientScreen = ({ onNavigate }) => {
 
         <div className="p-5 space-y-4">
 
-        {/* Tab Toggle: Mobile Wallet vs Bank Account */}
-        <div className="flex bg-slate-200/80 p-1 rounded-2xl mb-5 shadow-inner">
+        {/* Tab Toggle: Mobile Wallet vs Bank Transfer */}
+        <div className="flex bg-slate-200/70 p-1.5 rounded-2xl mb-5 shadow-inner">
           <button
             type="button"
             onClick={() => setActiveTab('wallet')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
               activeTab === 'wallet'
-                ? 'bg-white text-emerald-800 shadow-sm'
+                ? 'bg-white text-[#2C3E50] shadow-md'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>📱</span>
+            <span className="text-sm">📱</span>
             <span>{t('mobileWalletTab')}</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('bank')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
               activeTab === 'bank'
-                ? 'bg-white text-emerald-800 shadow-sm'
+                ? 'bg-white text-[#2C3E50] shadow-md'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>🏦</span>
+            <span className="text-sm">🏦</span>
             <span>{t('bankTransferTab')}</span>
           </button>
         </div>
@@ -148,7 +148,7 @@ export const AddRecipientScreen = ({ onNavigate }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Recipient Full Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
               {t('recipientName')} *
             </label>
             <input
@@ -157,7 +157,7 @@ export const AddRecipientScreen = ({ onNavigate }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={language === 'bn' ? 'যেমন: মোহাম্মদ রহিম' : 'e.g. Mohammad Rahim'}
-              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+              className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm transition-all"
             />
           </div>
 
@@ -165,7 +165,7 @@ export const AddRecipientScreen = ({ onNavigate }) => {
             <>
               {/* Wallet Provider Selector Grid */}
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
                   {t('selectProvider')} *
                 </label>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -174,14 +174,14 @@ export const AddRecipientScreen = ({ onNavigate }) => {
                       type="button"
                       key={opt.id}
                       onClick={() => setSelectedWallet(opt.id)}
-                      className={`p-3 rounded-2xl border-2 text-left flex items-center space-x-2.5 transition-all ${
+                      className={`p-3.5 rounded-2xl border-2 text-left flex items-center space-x-2.5 transition-all ${
                         selectedWallet === opt.id
-                          ? 'border-emerald-600 bg-emerald-50/50 shadow-sm'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
+                          ? 'border-[#25CC71] bg-[#E8F8F0] shadow-sm'
+                          : 'border-slate-200/80 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-xl">{opt.icon}</span>
-                      <span className="text-xs font-bold text-slate-900">
+                      <span className="text-2xl">{opt.icon}</span>
+                      <span className="text-xs font-extrabold text-[#2C3E50]">
                         {opt.name}
                       </span>
                     </button>
@@ -191,11 +191,11 @@ export const AddRecipientScreen = ({ onNavigate }) => {
 
               {/* Wallet Mobile Number */}
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {t('walletNumber')} *
                 </label>
-                <div className="flex items-center bg-white border border-slate-200 focus-within:border-emerald-600 rounded-2xl p-1 shadow-sm transition-all">
-                  <div className="flex items-center space-x-1 px-3 py-2 border-r border-slate-200 text-xs font-bold text-slate-700">
+                <div className="flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 shadow-sm transition-all">
+                  <div className="flex items-center space-x-1 px-3 py-2 border-r border-slate-200 text-xs font-extrabold text-[#2C3E50]">
                     <span>🇧🇩</span>
                     <span>+880</span>
                   </div>
@@ -213,17 +213,17 @@ export const AddRecipientScreen = ({ onNavigate }) => {
 
               {/* Account Type (Personal / Agent) */}
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {t('accountType')}
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"
                     onClick={() => setWalletType('Personal')}
-                    className={`py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                    className={`py-3 rounded-xl border text-xs font-extrabold transition-all ${
                       walletType === 'Personal'
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
-                        : 'border-slate-200 bg-white text-slate-600'
+                        ? 'border-[#25CC71] bg-[#E8F8F0] text-[#1EA85D] shadow-sm'
+                        : 'border-slate-200/80 bg-white text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     {t('personal')} (Personal)
@@ -231,10 +231,10 @@ export const AddRecipientScreen = ({ onNavigate }) => {
                   <button
                     type="button"
                     onClick={() => setWalletType('Agent')}
-                    className={`py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                    className={`py-3 rounded-xl border text-xs font-extrabold transition-all ${
                       walletType === 'Agent'
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
-                        : 'border-slate-200 bg-white text-slate-600'
+                        ? 'border-[#25CC71] bg-[#E8F8F0] text-[#1EA85D] shadow-sm'
+                        : 'border-slate-200/80 bg-white text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     {t('agent')} (Agent)
@@ -246,13 +246,13 @@ export const AddRecipientScreen = ({ onNavigate }) => {
             <>
               {/* Bank Name Selector */}
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {t('selectBank')} *
                 </label>
                 <select
                   value={selectedBank}
                   onChange={(e) => setSelectedBank(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
                 >
                   {bdBanks.map((b) => (
                     <option key={b} value={b}>
@@ -264,7 +264,7 @@ export const AddRecipientScreen = ({ onNavigate }) => {
 
               {/* Bank Account Number */}
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {t('accountNumber')} *
                 </label>
                 <input
@@ -273,13 +273,13 @@ export const AddRecipientScreen = ({ onNavigate }) => {
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
                   placeholder="2050XXXXXXXXXXXX"
-                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
                 />
               </div>
 
               {/* Branch / Routing */}
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {t('branchName')}
                 </label>
                 <input
@@ -287,7 +287,7 @@ export const AddRecipientScreen = ({ onNavigate }) => {
                   value={branchName}
                   onChange={(e) => setBranchName(e.target.value)}
                   placeholder={language === 'bn' ? 'যেমন: গুলশান শাখা / অনলাইন' : 'e.g. Gulshan Branch / Online'}
-                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
                 />
               </div>
             </>
@@ -295,19 +295,19 @@ export const AddRecipientScreen = ({ onNavigate }) => {
 
           {/* Relationship */}
           <div>
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
               {t('relationship')}
             </label>
-            <div className="flex space-x-2">
+            <div className="flex space-x-2.5">
               {['Family', 'Friend', 'Self'].map((rel) => (
                 <button
                   type="button"
                   key={rel}
                   onClick={() => setRelationship(rel)}
-                  className={`flex-1 py-2 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex-1 py-2.5 rounded-xl border text-xs font-extrabold transition-all ${
                     relationship === rel
-                      ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
-                      : 'border-slate-200 bg-white text-slate-600'
+                      ? 'border-[#25CC71] bg-[#E8F8F0] text-[#1EA85D] shadow-sm'
+                      : 'border-slate-200/80 bg-white text-slate-600 hover:border-slate-300'
                   }`}
                 >
                   {rel === 'Family' ? t('family') : rel === 'Friend' ? t('friend') : 'নিজ'}
@@ -321,7 +321,7 @@ export const AddRecipientScreen = ({ onNavigate }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 transition-all text-base flex items-center justify-center space-x-2"
+              className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <span>{t('loading')}</span>

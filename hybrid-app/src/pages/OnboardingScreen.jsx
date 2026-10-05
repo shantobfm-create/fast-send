@@ -160,29 +160,29 @@ export const OnboardingScreen = ({ onNavigate }) => {
 
         {/* Security & Speed Trust Badges */}
         <div className="mt-8 grid grid-cols-2 gap-3 text-center">
-          <div className="p-3 bg-white rounded-xl border border-slate-200">
-            <p className="text-emerald-600 font-bold text-sm">⚡ ১০-৩০ মিনিট</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">দ্রুত ভেরিফিকেশন ও ডেলিভারি</p>
+          <div className="p-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+            <p className="text-[#25CC71] font-black text-sm">⚡ ১০-৩০ মিনিট</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 font-medium">দ্রুত ভেরিফিকেশন ও ডেলিভারি</p>
           </div>
-          <div className="p-3 bg-white rounded-xl border border-slate-200">
-            <p className="text-blue-600 font-bold text-sm">🔒 ১০০% নিরাপদ</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">ম্যানুয়াল ভেরিফাইড ট্রানজেকশন</p>
+          <div className="p-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+            <p className="text-[#2980B9] font-black text-sm">🔒 ১০০% নিরাপদ</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 font-medium">ম্যানুয়াল ভেরিফাইড ট্রানজেকশন</p>
           </div>
         </div>
       </div>
 
       {/* CTA Buttons: Get Started / Register vs Login */}
-      <div className="pt-6 pb-2 space-y-2.5">
+      <div className="pt-6 pb-2 space-y-3">
         <button
           onClick={() => onNavigate('auth', { defaultTab: 'register' })}
-          className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center space-x-2 transition-all text-base"
+          className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 flex items-center justify-center space-x-2 transition-all text-base"
         >
           <span>{language === 'bn' ? 'নতুন রেজিস্ট্রেশন করুন ➔' : 'Register Now ➔'}</span>
         </button>
 
         <button
           onClick={() => onNavigate('auth', { defaultTab: 'login' })}
-          className="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white font-semibold rounded-2xl border border-slate-800 flex items-center justify-center space-x-2 transition-all text-sm shadow-md"
+          className="w-full py-3.5 px-6 bg-[#2C3E50] hover:bg-[#1C3144] active:scale-[0.99] text-white font-bold rounded-2xl flex items-center justify-center space-x-2 transition-all text-sm shadow-md"
         >
           <span>{language === 'bn' ? 'লগইন করুন (Log In)' : 'Log In to Account'}</span>
         </button>

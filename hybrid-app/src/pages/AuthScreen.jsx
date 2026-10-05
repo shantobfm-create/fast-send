@@ -185,43 +185,43 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between max-w-md mx-auto">
+    <div className="min-h-screen bg-[#F4F7F6] flex flex-col justify-between w-full">
       <div>
-        {/* Top Header - Black Theme */}
-        <div className="bg-slate-950 text-white px-5 pt-4 pb-4 border-b border-slate-800 flex items-center justify-between shadow-md">
+        {/* Top Header - Secondary Brand Ocean Blue */}
+        <div className="bg-gradient-to-r from-[#1F6391] to-[#2980B9] text-white px-5 pt-5 pb-5 flex items-center justify-between shadow-md">
           <button
             onClick={() => onNavigate('onboarding')}
-            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-800 transition-all shadow-sm"
+            className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
-          <h2 className="text-base font-bold text-white tracking-wide">
+          <h2 className="text-base font-extrabold text-white tracking-wide uppercase">
             {authMode === 'login' 
               ? (isBn ? 'লগইন (Login)' : 'Log In') 
               : (isBn ? 'রেজিস্ট্রেশন (Register)' : 'Register')}
           </h2>
 
           {/* Language Switch */}
-          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-full p-1 shadow-sm">
+          <div className="flex items-center bg-black/20 border border-white/20 rounded-full p-1 shadow-sm">
             <button
               onClick={() => setLanguage('bn')}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold transition-all ${
                 language === 'bn'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#25CC71] text-white shadow-sm'
+                  : 'text-white/70 hover:text-white'
               }`}
             >
               বাং
             </button>
             <button
               onClick={() => setLanguage('en')}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold transition-all ${
                 language === 'en'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#25CC71] text-white shadow-sm'
+                  : 'text-white/70 hover:text-white'
               }`}
             >
               EN
@@ -253,16 +253,16 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
           </div>
 
           {/* Top Auth Mode Tabs: Login vs Register */}
-          <div className="flex bg-slate-200/80 p-1 rounded-2xl mb-5 shadow-inner">
+          <div className="flex bg-slate-200/70 p-1.5 rounded-2xl mb-5 shadow-inner">
             <button
               type="button"
               onClick={() => {
                 setAuthMode('login');
                 setOtpStep('phone');
               }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
                 authMode === 'login'
-                  ? 'bg-white text-slate-900 shadow-sm'
+                  ? 'bg-white text-[#2C3E50] shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -272,9 +272,9 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
             <button
               type="button"
               onClick={() => setAuthMode('register')}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+              className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
                 authMode === 'register'
-                  ? 'bg-white text-slate-900 shadow-sm'
+                  ? 'bg-white text-[#2C3E50] shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -287,16 +287,16 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
           {authMode === 'login' && (
             <div>
               {/* Login Method Toggle: OTP vs PIN */}
-              <div className="flex items-center justify-center space-x-4 mb-4 text-xs font-semibold">
+              <div className="flex items-center justify-center space-x-6 mb-5 text-xs font-bold">
                 <button
                   type="button"
                   onClick={() => {
                     setLoginMethod('otp');
                     setOtpStep('phone');
                   }}
-                  className={`pb-1 border-b-2 transition-all ${
+                  className={`pb-1.5 border-b-2 transition-all ${
                     loginMethod === 'otp'
-                      ? 'border-emerald-600 text-emerald-700 font-bold'
+                      ? 'border-[#25CC71] text-[#25CC71] font-black'
                       : 'border-transparent text-slate-400 hover:text-slate-600'
                   }`}
                 >
@@ -305,9 +305,9 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                 <button
                   type="button"
                   onClick={() => setLoginMethod('pin')}
-                  className={`pb-1 border-b-2 transition-all ${
+                  className={`pb-1.5 border-b-2 transition-all ${
                     loginMethod === 'pin'
-                      ? 'border-emerald-600 text-emerald-700 font-bold'
+                      ? 'border-[#25CC71] text-[#25CC71] font-black'
                       : 'border-transparent text-slate-400 hover:text-slate-600'
                   }`}
                 >
@@ -320,11 +320,11 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                 otpStep === 'phone' ? (
                   <form onSubmit={handleSendOtp} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
                         {isBn ? 'আপনার মোবাইল নম্বর দিন' : 'Enter mobile number'}
                       </label>
-                      <div className="flex items-center bg-white border-2 border-slate-200 focus-within:border-emerald-600 rounded-2xl p-1 transition-all shadow-sm">
-                        <div className="flex items-center space-x-1.5 px-3.5 py-3 border-r border-slate-200 text-slate-800 font-bold text-base">
+                      <div className="flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
+                        <div className="flex items-center space-x-1.5 px-3.5 py-3 border-r border-slate-200 text-[#2C3E50] font-black text-base">
                           <span>{countryFlag}</span>
                           <span>{countryPrefix}</span>
                         </div>
@@ -334,7 +334,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder={placeholderExample}
                           autoFocus
-                          className="w-full px-4 py-3 bg-transparent text-slate-900 font-semibold text-lg focus:outline-none placeholder-slate-400"
+                          className="w-full px-4 py-3 bg-transparent text-slate-900 font-bold text-lg focus:outline-none placeholder-slate-400"
                         />
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 transition-all text-base flex items-center justify-center space-x-2"
+                      className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base flex items-center justify-center space-x-2"
                     >
                       <span>{isBn ? 'ওটিপি কোড পাঠান ➔' : 'Send OTP Code ➔'}</span>
                     </button>
@@ -352,7 +352,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                     <p className="text-sm text-slate-500 mb-1">
                       {isBn ? '৬-সংখ্যার কোডটি দিন যা পাঠানো হয়েছে:' : 'Enter 6-digit code sent to:'}
                     </p>
-                    <p className="text-base font-bold text-slate-900 mb-6">
+                    <p className="text-base font-black text-[#2C3E50] mb-6">
                       {countryFlag} {countryPrefix} {phone}
                     </p>
 
@@ -368,21 +368,21 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                           onChange={(e) => handleOtpChange(idx, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(idx, e)}
                           autoFocus={idx === 0}
-                          className="h-14 text-center text-2xl font-extrabold rounded-xl border-2 transition-all bg-white border-slate-200 focus:border-emerald-600 focus:outline-none text-slate-900"
+                          className="h-14 text-center text-2xl font-black rounded-2xl border-2 transition-all bg-white border-slate-200 focus:border-[#25CC71] focus:outline-none text-slate-900 shadow-sm"
                         />
                       ))}
                     </div>
 
                     <div className="text-center mb-5">
                       {resendTimer > 0 ? (
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-slate-400 font-medium">
                           {isBn ? `পুনরায় কোড পাঠাতে অপেক্ষা করুন ${resendTimer} সেকেন্ড` : `Resend in ${resendTimer}s`}
                         </p>
                       ) : (
                         <button
                           type="button"
                           onClick={() => setResendTimer(60)}
-                          className="text-xs font-bold text-emerald-600 underline"
+                          className="text-xs font-bold text-[#25CC71] underline"
                         >
                           {isBn ? 'আবার কোড পাঠান' : 'Resend Code'}
                         </button>
@@ -393,7 +393,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                       type="button"
                       onClick={handleVerifyOtp}
                       disabled={loading}
-                      className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 transition-all text-base"
+                      className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base"
                     >
                       {loading ? (isBn ? 'যাচাই করা হচ্ছে...' : 'Verifying...') : (isBn ? 'যাচাই ও প্রবেশ করুন ✓' : 'Verify & Log In ✓')}
                     </button>
@@ -403,11 +403,11 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                 /* PIN / Password Login */
                 <form onSubmit={handlePinLogin} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
                       {isBn ? 'মোবাইল নম্বর' : 'Mobile Number'}
                     </label>
-                    <div className="flex items-center bg-white border-2 border-slate-200 focus-within:border-emerald-600 rounded-2xl p-1 transition-all shadow-sm">
-                      <div className="flex items-center space-x-1.5 px-3.5 py-3 border-r border-slate-200 text-slate-800 font-bold text-base">
+                    <div className="flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
+                      <div className="flex items-center space-x-1.5 px-3.5 py-3 border-r border-slate-200 text-[#2C3E50] font-black text-base">
                         <span>{countryFlag}</span>
                         <span>{countryPrefix}</span>
                       </div>
@@ -416,16 +416,16 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder={placeholderExample}
-                        className="w-full px-4 py-3 bg-transparent text-slate-900 font-semibold text-lg focus:outline-none placeholder-slate-400"
+                        className="w-full px-4 py-3 bg-transparent text-slate-900 font-bold text-lg focus:outline-none placeholder-slate-400"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
                       {isBn ? 'সিকিউরিটি পিন (PIN)' : 'Security PIN'}
                     </label>
-                    <div className="relative flex items-center bg-white border-2 border-slate-200 focus-within:border-emerald-600 rounded-2xl p-1 transition-all shadow-sm">
+                    <div className="relative flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
                       <input
                         type={showPin ? "text" : "password"}
                         value={pin}
@@ -447,7 +447,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 transition-all text-base"
+                    className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base"
                   >
                     {loading ? (isBn ? 'লগইন হচ্ছে...' : 'Logging in...') : (isBn ? 'লগইন করুন ➔' : 'Log In ➔')}
                   </button>
@@ -460,7 +460,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
           {authMode === 'register' && (
             <form onSubmit={handleRegisterSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {isBn ? 'আপনার পূর্ণ নাম' : 'Full Name'} *
                 </label>
                 <input
@@ -469,16 +469,16 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                   value={regForm.name}
                   onChange={(e) => setRegForm({ ...regForm, name: e.target.value })}
                   placeholder={isBn ? 'যেমন: মোহাম্মদ রহিম' : 'e.g. Mohammad Rahim'}
-                  className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {isBn ? 'মোবাইল নম্বর' : 'Mobile Number'} *
                 </label>
-                <div className="flex items-center bg-white border-2 border-slate-200 focus-within:border-emerald-600 rounded-2xl p-1 transition-all shadow-sm">
-                  <div className="flex items-center space-x-1.5 px-3.5 py-2.5 border-r border-slate-200 text-slate-800 font-bold text-sm">
+                <div className="flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
+                  <div className="flex items-center space-x-1.5 px-3.5 py-2.5 border-r border-slate-200 text-[#2C3E50] font-black text-sm">
                     <span>{countryFlag}</span>
                     <span>{countryPrefix}</span>
                   </div>
@@ -488,13 +488,13 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                     value={regForm.phone}
                     onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
                     placeholder={placeholderExample}
-                    className="w-full px-3 py-2 bg-transparent text-slate-900 font-semibold text-base focus:outline-none placeholder-slate-400"
+                    className="w-full px-3 py-2 bg-transparent text-slate-900 font-bold text-base focus:outline-none placeholder-slate-400"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {isBn ? 'সিকিউরিটি পিন (৪ বা ৬ সংখ্যা)' : 'Security PIN'} *
                 </label>
                 <input
@@ -504,12 +504,12 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                   value={regForm.pin}
                   onChange={(e) => setRegForm({ ...regForm, pin: e.target.value })}
                   placeholder="••••"
-                  className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-2xl text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
                   {isBn ? 'পিন পুনরায় লিখুন (Confirm PIN)' : 'Confirm PIN'} *
                 </label>
                 <input
@@ -519,7 +519,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                   value={regForm.confirmPin}
                   onChange={(e) => setRegForm({ ...regForm, confirmPin: e.target.value })}
                   placeholder="••••"
-                  className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-2xl text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-600 shadow-sm"
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
                 />
               </div>
 
@@ -527,7 +527,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 transition-all text-base flex items-center justify-center space-x-2"
+                  className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base flex items-center justify-center space-x-2"
                 >
                   {loading ? (
                     <span>{isBn ? 'অ্যাকাউন্ট তৈরি হচ্ছে...' : 'Creating account...'}</span>
@@ -542,23 +542,23 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
           {/* Switch tab footer text */}
           <div className="text-center pt-5">
             {authMode === 'login' ? (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 font-medium">
                 {isBn ? 'অ্যাকাউন্ট নেই?' : "Don't have an account?"}{' '}
                 <button
                   type="button"
                   onClick={() => setAuthMode('register')}
-                  className="font-bold text-emerald-600 hover:underline ml-1"
+                  className="font-extrabold text-[#25CC71] hover:underline ml-1"
                 >
                   {isBn ? 'এখানে রেজিস্টার করুন' : 'Register Here'}
                 </button>
               </p>
             ) : (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 font-medium">
                 {isBn ? 'আগে থেকেই অ্যাকাউন্ট আছে?' : 'Already have an account?'}{' '}
                 <button
                   type="button"
                   onClick={() => setAuthMode('login')}
-                  className="font-bold text-emerald-600 hover:underline ml-1"
+                  className="font-extrabold text-[#25CC71] hover:underline ml-1"
                 >
                   {isBn ? 'এখানে লগইন করুন' : 'Log In Here'}
                 </button>
