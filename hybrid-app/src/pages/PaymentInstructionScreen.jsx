@@ -21,18 +21,22 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
 
   // Bank instruction based on country
   const isMalaysia = selectedCountry === 'MY';
+  const foundAccount = Array.isArray(settings?.senderAccounts)
+    ? settings.senderAccounts.find(a => a.id === selectedCountry)
+    : (isMalaysia ? settings?.senderAccounts?.malaysia : settings?.senderAccounts?.uae);
+
   const senderBankInfo = isMalaysia
     ? {
-        bankName: settings?.senderAccounts?.malaysia?.bankName || 'Maybank (Malayan Banking Berhad)',
-        accountName: settings?.senderAccounts?.malaysia?.accountName || 'Fast Send Global Services',
-        accountNumber: settings?.senderAccounts?.malaysia?.accountNumber || '1642 9840 2201',
-        qrImage: settings?.senderAccounts?.malaysia?.qrCodeUrl || '/duitnow-qr.png',
-        typeLabel: 'DuitNow / Interbank Transfer'
+        bankName: foundAccount?.bankName || 'Maybank (Malayan Banking Berhad)',
+        accountName: foundAccount?.accountName || 'Fast Send Global Services',
+        accountNumber: foundAccount?.accountNumber || '1642 9840 2201',
+        qrImage: foundAccount?.qrCodeUrl || '/duitnow-qr.png',
+        typeLabel: 'Maybank / DuitNow QR'
       }
     : {
-        bankName: settings?.senderAccounts?.uae?.bankName || 'Emirates NBD',
-        accountName: settings?.senderAccounts?.uae?.accountName || 'Fast Send Global Remittance LLC',
-        accountNumber: settings?.senderAccounts?.uae?.iban || 'AE24 0260 0012 3456 7890 123',
+        bankName: foundAccount?.bankName || 'Emirates NBD',
+        accountName: foundAccount?.accountName || 'Fast Send UAE LLC',
+        accountNumber: foundAccount?.accountNumber || foundAccount?.iban || 'AE25 0260 0012 3456 7890 123',
         qrImage: null,
         typeLabel: 'UAE Local Transfer / IBAN'
       };
