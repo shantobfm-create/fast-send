@@ -100,9 +100,9 @@ export const HomeScreen = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-16 max-w-md mx-auto">
+    <div className="min-h-screen bg-slate-50 pb-16 w-full">
       {/* Top App Bar Header */}
-      <div className="bg-slate-900 text-white px-5 pt-5 pb-6 rounded-b-[2rem] shadow-lg shadow-slate-900/10">
+      <div className="bg-slate-900 text-white px-5 pt-5 pb-6 shadow-lg shadow-slate-900/10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-400/40 flex items-center justify-center font-bold text-emerald-400">

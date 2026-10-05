@@ -88,7 +88,7 @@ export const OrderTrackerScreen = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between max-w-md mx-auto pb-12">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between w-full pb-12">
       <div>
         {/* Top Header - Black Theme */}
         <div className="bg-slate-950 text-white px-5 pt-4 pb-4 border-b border-slate-800 flex items-center justify-between shadow-md">

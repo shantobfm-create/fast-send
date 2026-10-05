@@ -92,8 +92,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 flex justify-center items-start sm:py-4">
-      <div className={`w-full max-w-md bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-xl border border-slate-200 relative flex flex-col font-sans ${user ? 'pb-20' : ''}`}>
+    <div className="min-h-screen bg-slate-100 text-slate-900 flex justify-center items-start">
+      <div className={`w-full min-h-screen bg-white shadow-xl relative flex flex-col font-sans ${user ? 'pb-20' : ''}`}>
         {renderScreen()}
         
         {/* Fixed Global Bottom Navigation only for logged-in users */}
