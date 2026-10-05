@@ -31,11 +31,55 @@ const defaultDb = {
       { id: "card", name: "কার্ড অ্যাড-মানি", type: "ভিসা / মাস্টারকার্ড", number: "যেকোনো ডেবিট / ক্রেডিট কার্ড", accountType: "Instant Gateway", active: true },
       { id: "cash", name: "ক্যাশ-পিকআপ", type: "ক্যাশ পয়েন্ট", number: "নিকটস্থ Fast Send পয়েন্ট", accountType: "Agent Outlet", active: true }
     ],
+    senderAccounts: [
+      {
+        id: "MY",
+        country: "Malaysia",
+        countryBn: "মালয়েশিয়া",
+        currency: "MYR",
+        flag: "🇲🇾",
+        rateToBdt: 27.50,
+        bankName: "Maybank (Malayan Banking Berhad)",
+        accountName: "Fast Send Global MY",
+        accountNumber: "514012345678",
+        duitNowId: "+60123456789",
+        active: true,
+        instructions: "Maybank2u অথবা যেকোনো মালয়েশিয়ান ব্যাংক থেকে DuitNow / ব্যাংক ট্রান্সফার করে পেমেন্টের স্ক্রিনশট আপলোড করুন।"
+      },
+      {
+        id: "SA",
+        country: "Saudi Arabia",
+        countryBn: "সৌদি আরব",
+        currency: "SAR",
+        flag: "🇸🇦",
+        rateToBdt: 32.80,
+        bankName: "Al Rajhi Bank (مصرف الراجحي)",
+        accountName: "Fast Send KSA",
+        accountNumber: "SA4480000123456789012345",
+        stcPay: "+966501234567",
+        active: true,
+        instructions: "Al Rajhi ব্যাংক ট্রান্সফার অথবা STC Pay দিয়ে টাকা পাঠিয়ে পেমেন্টের রসিদ / স্ক্রিনশট আপলোড করুন।"
+      },
+      {
+        id: "AE",
+        country: "UAE",
+        countryBn: "সংযুক্ত আরব আমিরাত (দুবাই)",
+        currency: "AED",
+        flag: "🇦🇪",
+        rateToBdt: 33.50,
+        bankName: "Emirates NBD / Mashreq Bank",
+        accountName: "Fast Send UAE LLC",
+        accountNumber: "AE250260001234567890123",
+        payByPhone: "+971501234567",
+        active: true,
+        instructions: "Emirates NBD অথবা যেকোনো ইউএই ব্যাংক বা আল আনসারি ট্রান্সফার করে পেমেন্টের স্ক্রিনশট আপলোড করুন।"
+      }
+    ],
     exchangeRates: [
-      { code: "BDT", name: "বাংলাদেশি টাকা", symbol: "৳", rateToBdt: 1.00, flag: "🇧🇩" },
       { code: "MYR", name: "মালয়েশিয়ান রিঙ্গিত", symbol: "RM", rateToBdt: 27.50, flag: "🇲🇾" },
       { code: "SAR", name: "সৌদি রিয়াল", symbol: "SR", rateToBdt: 32.80, flag: "🇸🇦" },
       { code: "AED", name: "ইউএই দিরহাম", symbol: "AED", rateToBdt: 33.50, flag: "🇦🇪" },
+      { code: "BDT", name: "বাংলাদেশি টাকা", symbol: "৳", rateToBdt: 1.00, flag: "🇧🇩" },
       { code: "USD", name: "ইউএস ডলার", symbol: "$", rateToBdt: 122.50, flag: "🇺🇸" },
       { code: "EUR", name: "ইউরো", symbol: "€", rateToBdt: 133.00, flag: "🇪🇺" },
       { code: "GBP", name: "ব্রিটিশ পাউন্ড", symbol: "£", rateToBdt: 156.00, flag: "🇬🇧" },
@@ -110,7 +154,49 @@ function loadDb() {
       return defaultDb;
     }
     const data = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    let changed = false;
+    if (!parsed.settings.senderAccounts || parsed.settings.senderAccounts.length === 0) {
+      parsed.settings.senderAccounts = defaultDb.settings.senderAccounts;
+      changed = true;
+    }
+    if (!parsed.recipients) {
+      parsed.recipients = [
+        {
+          id: "rec-101",
+          senderPhone: "01754150019",
+          name: "মোসাঃ ফাতেমা বেগম",
+          phone: "01712345678",
+          channel: "bkash",
+          bankName: "",
+          accountNumber: "",
+          branch: "",
+          accountHolder: "মোসাঃ ফাতেমা বেগম",
+          district: "ঢাকা",
+          relationship: "মা",
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: "rec-102",
+          senderPhone: "01754150019",
+          name: "মোঃ রফিকুল ইসলাম",
+          phone: "01812345678",
+          channel: "bank",
+          bankName: "ইসলামী ব্যাংক বাংলাদেশ পিএলসি",
+          accountNumber: "2050345678901234",
+          branch: "মতিঝিল শাখা",
+          accountHolder: "মোঃ রফিকুল ইসলাম",
+          district: "ঢাকা",
+          relationship: "ভাই",
+          createdAt: new Date().toISOString()
+        }
+      ];
+      changed = true;
+    }
+    if (changed) {
+      fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+    }
+    return parsed;
   } catch (err) {
     return defaultDb;
   }
@@ -154,36 +240,60 @@ app.post('/api/auth/register', (req, res) => {
   const db = loadDb();
   const cleanPhone = phone.trim().replace(/[\s\-\(\)]/g, '');
   
-  // Strict phone validation for Bangladesh & Malaysia
+  // 1. Bangladesh check - BLOCKED as requested by user
   const isBd = /^(?:\+?880|880)?0?1[3-9]\d{8}$/.test(cleanPhone);
-  const isMy = /^(?:\+?60|60)?0?1[0-9]\d{7,8}$/.test(cleanPhone);
+  if (isBd || cleanPhone.startsWith('+880') || cleanPhone.startsWith('880') || country === 'Bangladesh') {
+    return res.status(400).json({
+      success: false,
+      message: "বাংলাদেশ থেকে অ্যাকাউন্ট তৈরি বন্ধ রয়েছে। শুধুমাত্র মালয়েশিয়া (🇲🇾), সৌদি আরব (🇸🇦) ও দুবাই (🇦🇪) থেকে রেমিটেন্স পাঠানো চালু আছে।"
+    });
+  }
 
-  if (!isBd && !isMy) {
+  // 2. Validate Allowed Sender Countries: Malaysia (+60), Saudi Arabia (+966), UAE (+971)
+  const isMy = /^(?:\+?60|60)?0?1[0-9]\d{7,8}$/.test(cleanPhone);
+  const isSa = /^(?:\+?966|966)?0?5\d{8}$/.test(cleanPhone);
+  const isAe = /^(?:\+?971|971)?0?5\d{8}$/.test(cleanPhone);
+
+  if (!isMy && !isSa && !isAe) {
     return res.status(400).json({ 
       success: false, 
-      message: "অবৈধ মোবাইল নম্বর! রেজিস্ট্রেশনের জন্য শুধুমাত্র বাংলাদেশ (যেমন: 017xxxxxxxx) বা মালয়েশিয়ার (যেমন: 012xxxxxxx) সঠিক নম্বর দিন।" 
+      message: "অবৈধ মোবাইল নম্বর! শুধুমাত্র মালয়েশিয়া (+60), সৌদি আরব (+966) অথবা দুবাই/ইউএই (+971) এর নম্বর দিয়ে অ্যাকাউন্ট তৈরি করা যাবে।" 
     });
   }
 
   const existing = db.users.find(u => {
     const up = (u.phone || '').trim().replace(/[\s\-\(\)]/g, '');
-    return up === cleanPhone || up.replace(/^\+?880?/, '') === cleanPhone.replace(/^\+?880?/, '') || up.replace(/^\+?60?/, '') === cleanPhone.replace(/^\+?60?/, '');
+    return up === cleanPhone || 
+      up.replace(/^\+?60?/, '') === cleanPhone.replace(/^\+?60?/, '') ||
+      up.replace(/^\+?966?/, '') === cleanPhone.replace(/^\+?966?/, '') ||
+      up.replace(/^\+?971?/, '') === cleanPhone.replace(/^\+?971?/, '');
   });
   if (existing) return res.status(400).json({ success: false, message: "এই ফোন নাম্বার দিয়ে ইতিমধ্যে একটি একাউন্ট তৈরি করা আছে।" });
 
   const isAgent = userType === 'এজেন্ট' || userType === 'Agent';
   const initialStatus = isAgent ? 'pending_approval' : 'active';
 
+  let detectedCountry = "Malaysia";
+  let detectedCurrency = "MYR";
+  if (isSa || country === 'Saudi Arabia') {
+    detectedCountry = "Saudi Arabia";
+    detectedCurrency = "SAR";
+  } else if (isAe || country === 'UAE' || country === 'Dubai') {
+    detectedCountry = "UAE";
+    detectedCurrency = "AED";
+  }
+
   const newUser = {
     id: "u-" + Math.floor(1000 + Math.random() * 9000),
-    name: name || "গ্রাহক",
+    name: name || "প্রবাসী গ্রাহক",
     phone: cleanPhone,
-    country: (isMy || country === 'Malaysia') ? "Malaysia" : "Bangladesh",
+    country: detectedCountry,
+    currency: detectedCurrency,
     address: address || "",
     userType: isAgent ? "এজেন্ট" : "পার্সোনাল",
     pin: pin.trim(),
     password: password ? password.trim() : pin.trim(),
-    balance: isAgent ? 0 : 500, // Welcome gift for personal
+    balance: isAgent ? 0 : 500, // Welcome gift
     nid: nid || "",
     nidStatus: nid ? "পেন্ডিং ভেরিফিকেশন" : "আনভেরিফাইড",
     status: initialStatus,
@@ -217,6 +327,8 @@ app.post('/api/auth/login', (req, res) => {
     if (userPhone === cleanInput) return true;
     if (userPhone.replace(/^\+88/, '') === cleanInput.replace(/^\+88/, '')) return true;
     if (userPhone.replace(/^\+60/, '') === cleanInput.replace(/^\+60/, '')) return true;
+    if (userPhone.replace(/^\+966/, '') === cleanInput.replace(/^\+966/, '')) return true;
+    if (userPhone.replace(/^\+971/, '') === cleanInput.replace(/^\+971/, '')) return true;
     if (userPhone.replace(/^0+/, '') === cleanInput.replace(/^0+/, '')) return true;
     return false;
   });
@@ -289,6 +401,151 @@ app.post('/api/auth/verify-nid', (req, res) => {
 app.get('/api/settings', (req, res) => {
   const db = loadDb();
   return res.json({ success: true, settings: db.settings });
+});
+
+// ==================== RECIPIENT MANAGEMENT ====================
+app.get('/api/recipients', (req, res) => {
+  const { phone } = req.query;
+  const db = loadDb();
+  if (!phone) return res.status(400).json({ success: false, message: "ফোন নম্বর প্রয়োজন।" });
+  const clean = phone.trim().replace(/[\s\-\(\)]/g, '');
+  const list = (db.recipients || []).filter(r => 
+    r.senderPhone === clean || 
+    r.senderPhone.replace(/^\+?60?/, '') === clean.replace(/^\+?60?/, '') ||
+    r.senderPhone.replace(/^\+?966?/, '') === clean.replace(/^\+?966?/, '') ||
+    r.senderPhone.replace(/^\+?971?/, '') === clean.replace(/^\+?971?/, '')
+  );
+  return res.json({ success: true, recipients: list });
+});
+
+app.post('/api/recipients', (req, res) => {
+  const { senderPhone, name, phone, channel, bankName, accountNumber, branch, accountHolder, district, relationship } = req.body;
+  if (!senderPhone || !name || (!phone && !accountNumber)) {
+    return res.status(400).json({ success: false, message: "প্রাপকের নাম এবং নম্বর বা অ্যাকাউন্ট নম্বর প্রদান করুন।" });
+  }
+
+  const db = loadDb();
+  if (!db.recipients) db.recipients = [];
+
+  const newRecipient = {
+    id: "rec-" + Math.floor(100000 + Math.random() * 900000),
+    senderPhone: senderPhone.trim().replace(/[\s\-\(\)]/g, ''),
+    name: name.trim(),
+    phone: (phone || '').trim(),
+    channel: channel || 'bkash', // bkash, nagad, rocket, upay, bank, cash
+    channelName: channel === 'bank' ? 'ব্যাংক ট্রান্সফার' : (channel === 'cash' ? 'ক্যাশ পিকআপ' : (channel || 'বিকাশ').toUpperCase()),
+    bankName: bankName || '',
+    accountNumber: (accountNumber || '').trim(),
+    branch: (branch || '').trim(),
+    accountHolder: (accountHolder || name || '').trim(),
+    district: (district || '').trim(),
+    relationship: relationship || 'পরিবার',
+    createdAt: new Date().toISOString()
+  };
+
+  db.recipients.unshift(newRecipient);
+  saveDb(db);
+
+  return res.json({ success: true, message: "প্রাপকের তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!", recipient: newRecipient });
+});
+
+app.delete('/api/recipients/:id', (req, res) => {
+  const { id } = req.params;
+  const db = loadDb();
+  if (!db.recipients) db.recipients = [];
+  const idx = db.recipients.findIndex(r => r.id === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "প্রাপক পাওয়া যায়নি।" });
+
+  db.recipients.splice(idx, 1);
+  saveDb(db);
+  return res.json({ success: true, message: "প্রাপক মুছে ফেলা হয়েছে!" });
+});
+
+// ==================== REMITTANCE MANUAL FLOW ====================
+app.post('/api/transactions/remittance', (req, res) => {
+  const {
+    senderPhone,
+    senderName,
+    senderCountry,
+    senderCurrency,
+    sendAmount,
+    exchangeRate,
+    receiveAmount,
+    recipient,
+    depositAccount,
+    trxId,
+    proofImage,
+    senderNote
+  } = req.body;
+
+  const db = loadDb();
+  const cleanSenderPhone = (senderPhone || '').trim().replace(/[\s\-\(\)]/g, '');
+  const user = db.users.find(u => (u.phone || '').trim().replace(/[\s\-\(\)]/g, '') === cleanSenderPhone);
+
+  const numSend = Number(sendAmount);
+  if (!numSend || numSend <= 0) {
+    return res.status(400).json({ success: false, message: "টাকার সঠিক পরিমাণ দিন।" });
+  }
+
+  if (!recipient || (!recipient.phone && !recipient.accountNumber)) {
+    return res.status(400).json({ success: false, message: "প্রাপকের সঠিক তথ্য প্রদান করুন।" });
+  }
+
+  if (!proofImage) {
+    return res.status(400).json({ success: false, message: "পেমেন্টের স্ক্রিনশট / রসিদ আপলোড করা আবশ্যক!" });
+  }
+
+  const txId = "FS-REM-" + Math.floor(100000 + Math.random() * 900000);
+  const numRate = Number(exchangeRate) || 1;
+  const numReceive = Number(receiveAmount) || Math.round(numSend * numRate);
+
+  const newTx = {
+    id: txId,
+    type: "remittance",
+    senderPhone: cleanSenderPhone,
+    senderName: senderName || (user ? user.name : "প্রবাসী গ্রাহক"),
+    senderCountry: senderCountry || "Malaysia",
+    senderCurrency: senderCurrency || "MYR",
+    sendAmount: numSend,
+    exchangeRate: numRate,
+    amount: numReceive, // in BDT
+    receiveAmount: numReceive,
+    receiveCurrency: "BDT",
+    recipient: {
+      name: recipient.name || "",
+      phone: recipient.phone || "",
+      channel: recipient.channel || "bkash",
+      channelName: recipient.channelName || (recipient.channel === 'bank' ? 'ব্যাংক ট্রান্সফার' : (recipient.channel === 'cash' ? 'ক্যাশ পিকআপ' : (recipient.channel || 'বিকাশ').toUpperCase())),
+      bankName: recipient.bankName || "",
+      accountNumber: recipient.accountNumber || "",
+      branch: recipient.branch || "",
+      accountHolder: recipient.accountHolder || recipient.name || "",
+      district: recipient.district || "",
+      relationship: recipient.relationship || "পরিবার"
+    },
+    receiverPhone: recipient.phone || recipient.accountNumber || "",
+    receiverName: recipient.name || "প্রাপক",
+    method: recipient.channel || "remittance",
+    methodName: `রেমিটেন্স (${senderCurrency || 'MYR'} ➔ BDT)`,
+    depositAccount: depositAccount || null,
+    trxId: trxId || ("DEP-" + Math.floor(100000 + Math.random() * 900000)),
+    proofImage: proofImage,
+    senderNote: senderNote || "",
+    status: "pending",
+    requestedAt: new Date().toISOString(),
+    adminProcessedAt: null,
+    adminNote: "এডমিন স্ক্রিনশট ও পেমেন্ট যাচাই করে বাংলাদেশে টাকা পাঠিয়ে দিবেন।",
+    payoutTrxId: null
+  };
+
+  db.transactions.unshift(newTx);
+  saveDb(db);
+
+  return res.json({
+    success: true,
+    message: "রেমিটেন্স রিকোয়েস্ট সফলভাবে জমা হয়েছে! এডমিন যাচাই করে প্রাপকের নম্বরে টাকা পাঠিয়ে দিবেন।",
+    transaction: newTx
+  });
 });
 
 // Transactions
@@ -514,7 +771,7 @@ app.post('/api/admin/users/update-status', (req, res) => {
 
 app.post('/api/admin/transactions/:id/status', (req, res) => {
   const { id } = req.params;
-  const { status, adminNote } = req.body;
+  const { status, adminNote, payoutTrxId } = req.body;
   const db = loadDb();
   const tx = db.transactions.find(t => t.id === id);
   if (!tx) return res.status(404).json({ success: false, message: "ট্রানজেকশন পাওয়া যায়নি।" });
@@ -523,6 +780,7 @@ app.post('/api/admin/transactions/:id/status', (req, res) => {
   tx.status = status;
   tx.adminProcessedAt = new Date().toISOString();
   if (adminNote) tx.adminNote = adminNote;
+  if (payoutTrxId) tx.payoutTrxId = payoutTrxId;
 
   const sender = db.users.find(u => u.phone === tx.senderPhone);
   if (tx.type === 'add_money' && status === 'approved' && old !== 'approved') {

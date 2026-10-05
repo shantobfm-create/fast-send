@@ -119,13 +119,13 @@ export const AdminProvider = ({ children }) => {
   }, []);
 
   // Approve or Reject Transaction
-  const updateTransactionStatus = async (id, status, adminNote = "") => {
+  const updateTransactionStatus = async (id, status, adminNote = "", payoutTrxId = "") => {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/transactions/${id}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, adminNote })
+        body: JSON.stringify({ status, adminNote, payoutTrxId })
       });
       const data = await res.json();
       setLoading(false);

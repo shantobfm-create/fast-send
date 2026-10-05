@@ -42,14 +42,15 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     if (onTabChange) onTabChange(tab);
   };
 
-  // Country Code Selection: ONLY BD (🇧🇩 +880) and Malaysia (🇲🇾 +60)
+  // Sender Countries ONLY: Malaysia (🇲🇾 +60), Saudi Arabia (🇸🇦 +966), UAE / Dubai (🇦🇪 +971)
   const allowedCountries = [
-    { code: "+880", name: "Bangladesh", nameBn: "বাংলাদেশ", flag: "🇧🇩", example: "017XXXXXXXX" },
-    { code: "+60", name: "Malaysia", nameBn: "মালয়েশিয়া", flag: "🇲🇾", example: "01XXXXXXXX" }
+    { code: "+60", name: "Malaysia", nameBn: "মালয়েশিয়া", flag: "🇲🇾", currency: "MYR", example: "01XXXXXXXX" },
+    { code: "+966", name: "Saudi Arabia", nameBn: "সৌদি আরব", flag: "🇸🇦", currency: "SAR", example: "05XXXXXXXX" },
+    { code: "+971", name: "UAE", nameBn: "দুবাই / ইউএই", flag: "🇦🇪", currency: "AED", example: "05XXXXXXXX" }
   ];
 
   // Login State
-  const [loginCountryCode, setLoginCountryCode] = useState("+880");
+  const [loginCountryCode, setLoginCountryCode] = useState("+60");
   const [loginPhone, setLoginPhone] = useState('');
   const [loginPin, setLoginPin] = useState('');
   const [showLoginPin, setShowLoginPin] = useState(false);
@@ -57,12 +58,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
   // Multi-step Register State
   const [regStep, setRegStep] = useState(0);
 
-  const [regCountryCode, setRegCountryCode] = useState("+880");
+  const [regCountryCode, setRegCountryCode] = useState("+60");
   const [regForm, setRegForm] = useState({
     userType: 'পার্সোনাল', // 'পার্সোনাল' | 'এজেন্ট'
     name: '',
     phone: '',
-    country: 'Bangladesh',
+    country: 'Malaysia',
+    currency: 'MYR',
     pin: '',
     password: '',
     nid: '',
@@ -135,7 +137,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     }
   };
 
-  // Strict Phone Validation for Bangladesh & Malaysia
+  // Strict Phone Validation for Malaysia, Saudi Arabia, and UAE
   const validatePhone = (rawPhone, countryCode) => {
     const clean = (rawPhone || '').replace(/[\s\-\(\)]/g, '');
     if (!clean) {
@@ -143,17 +145,13 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     }
 
     if (countryCode === '+880' || countryCode === 'Bangladesh') {
-      // BD format: 013 to 019 with 8 digits (11 digits total: 01XXXXXXXXX or +8801XXXXXXXXX)
-      const bdRegex = /^(?:\+?880|880)?0?(1[3-9]\d{8})$/;
-      const match = clean.match(bdRegex);
-      if (!match) {
-        return {
-          valid: false,
-          message: 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017xxxxxxxx, 018xxxxxxxx, 019xxxxxxxx)। মোট ১১ ডিজিট হতে হবে।'
-        };
-      }
-      return { valid: true, formatted: '0' + match[1], fullPhone: '+880' + match[1] };
-    } else if (countryCode === '+60' || countryCode === 'Malaysia') {
+      return { 
+        valid: false, 
+        message: 'বাংলাদেশ থেকে অ্যাকাউন্ট তৈরি বা টাকা পাঠানো বন্ধ রয়েছে। শুধুমাত্র মালয়েশিয়া (🇲🇾), সৌদি আরব (🇸🇦) ও দুবাই (🇦🇪) থেকে রেমিটেন্স পাঠানো চালু আছে।' 
+      };
+    }
+
+    if (countryCode === '+60' || countryCode === 'Malaysia') {
       // MY format: 010 to 019 (011 has 8 digits = 11 digits total; 010, 012-019 have 7-8 digits = 10-11 digits)
       const myRegex = /^(?:\+?60|60)?0?(1[0-9]\d{7,8})$/;
       const match = clean.match(myRegex);
@@ -164,9 +162,31 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
         };
       }
       return { valid: true, formatted: '0' + match[1], fullPhone: '+60' + match[1] };
+    } else if (countryCode === '+966' || countryCode === 'Saudi Arabia') {
+      // KSA format: starts with 05 or 5 followed by 8 digits (total 9-10 digits)
+      const saRegex = /^(?:\+?966|966)?0?(5\d{8})$/;
+      const match = clean.match(saRegex);
+      if (!match) {
+        return {
+          valid: false,
+          message: 'সঠিক সৌদি মোবাইল নম্বর দিন (যেমন: 05xxxxxxxx বা 5xxxxxxxx)।'
+        };
+      }
+      return { valid: true, formatted: '0' + match[1], fullPhone: '+966' + match[1] };
+    } else if (countryCode === '+971' || countryCode === 'UAE' || countryCode === 'Dubai') {
+      // UAE format: starts with 05 or 5 followed by 8 digits (total 9-10 digits)
+      const aeRegex = /^(?:\+?971|971)?0?(5\d{8})$/;
+      const match = clean.match(aeRegex);
+      if (!match) {
+        return {
+          valid: false,
+          message: 'সঠিক দুবাই/ইউএই মোবাইল নম্বর দিন (যেমন: 05xxxxxxxx বা 5xxxxxxxx)।'
+        };
+      }
+      return { valid: true, formatted: '0' + match[1], fullPhone: '+971' + match[1] };
     }
 
-    return { valid: false, message: 'শুধুমাত্র বাংলাদেশ (🇧🇩) ও মালয়েশিয়া (🇲🇾) নম্বর অনুমোদিত।' };
+    return { valid: false, message: 'শুধুমাত্র মালয়েশিয়া (🇲🇾), সৌদি আরব (🇸🇦) ও দুবাই (🇦🇪) নম্বর অনুমোদিত।' };
   };
 
   // Setup Invisible Recaptcha for Firebase Phone Auth
@@ -545,7 +565,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               <div className="space-y-4">
                 <div className="text-center">
                   <h2 className="text-lg font-bold text-slate-900">অ্যাকাউন্টের ধরন নির্বাচন করুন</h2>
-                  <p className="text-xs text-slate-500 mt-0.5 font-normal">বাংলাদেশ 🇧🇩 ও মালয়েশিয়া 🇲🇾 প্রবাসী এবং গ্রাহকদের জন্য</p>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">মালয়েশিয়া 🇲🇾, সৌদি আরব 🇸🇦 ও দুবাই 🇦🇪 প্রবাসীদের জন্য</p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3.5 pt-2">
@@ -586,17 +606,17 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                           <h3 className="font-semibold text-slate-900 text-sm">এজেন্ট অ্যাকাউন্ট</h3>
                           <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-semibold">ভেরিফিকেশন আবশ্যক</span>
                         </div>
-                        <p className="text-xs text-slate-500 font-normal">ক্যাশ-ইন ও ক্যাশ-আউট সার্ভিস পয়েন্ট</p>
+                        <p className="text-xs text-slate-500 font-normal">প্রবাসী পয়েন্ট ও ক্যাশ সার্ভিস</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 group-hover:text-emerald-600 transition-all" />
                   </div>
                 </div>
 
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 font-normal flex items-start gap-2.5">
+                <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200 text-xs text-emerald-950 font-normal flex items-start gap-2.5">
                   <ShieldCheck className="w-5 h-5 text-[#00823B] shrink-0 mt-0.5" />
                   <span>
-                    শুধুমাত্র বাংলাদেশ (🇧🇩) ও মালয়েশিয়া (🇲🇾) নম্বরে রেজিস্ট্রেশন চালু রয়েছে।
+                    রেমিটেন্স প্রেরণের জন্য শুধুমাত্র <b>মালয়েশিয়া (🇲🇾)</b>, <b>সৌদি আরব (🇸🇦)</b> এবং <b>দুবাই (🇦🇪)</b> থেকে অ্যাকাউন্ট তৈরি করা যাবে। বাংলাদেশ শুধু টাকা গ্রহণকারী দেশ হিসেবে কার্যকর।
                   </span>
                 </div>
               </div>
@@ -650,7 +670,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
               <div className="space-y-4 pt-1">
                 <div className="text-center">
                   <h3 className="text-base font-bold text-slate-900">মোবাইল নম্বর লিখুন</h3>
-                  <p className="text-xs text-slate-500 mt-0.5 font-normal">সঠিক বাংলাদেশ 🇧🇩 বা মালয়েশিয়া 🇲🇾 নম্বর দিন</p>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">মালয়েশিয়া 🇲🇾, সৌদি আরব 🇸🇦 বা দুবাই 🇦🇪 নম্বর দিন</p>
                 </div>
 
                 <div className="space-y-4">
@@ -666,7 +686,11 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                           onChange={(e) => {
                             setRegCountryCode(e.target.value);
                             const matched = allowedCountries.find(c => c.code === e.target.value);
-                            setRegForm({ ...regForm, country: matched?.name || (e.target.value === '+60' ? 'Malaysia' : 'Bangladesh') });
+                            setRegForm({ 
+                              ...regForm, 
+                              country: matched?.name || 'Malaysia',
+                              currency: matched?.currency || 'MYR'
+                            });
                           }}
                           className="bg-white border-2 border-slate-300 rounded-xl px-2.5 py-3.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#00823B] shrink-0 cursor-pointer"
                         >
@@ -684,7 +708,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                             autoFocus
                             value={regForm.phone}
                             onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
-                            placeholder={regCountryCode === '+880' ? '017XXXXXXXX' : '01XXXXXXXX'}
+                            placeholder={regCountryCode === '+60' ? '01XXXXXXXX' : '05XXXXXXXX'}
                             className="w-full bg-transparent py-3.5 pl-9 pr-3 text-sm font-medium font-mono text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                           />
                         </div>
@@ -692,13 +716,19 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
 
                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
                         <span className="font-semibold block text-slate-700">নম্বর ফরম্যাট নির্দেশনা:</span>
-                        {regCountryCode === '+880' ? (
+                        {regCountryCode === '+60' && (
                           <p className="text-[11px] text-emerald-800 font-normal">
-                            🇧🇩 বাংলাদেশ: <b>013, 014, 015, 016, 017, 018, 019</b> দিয়ে শুরু মোট <b>১১ সংখ্যার</b> নম্বর হতে হবে (যেমন: 01712345678)।
+                            🇲🇾 মালয়েশিয়া: <b>010, 011, 012, 013, 014, 016, 017, 018, 019</b> দিয়ে শুরু নম্বর দিন (যেমন: 0123456789 বা 01112345678)।
                           </p>
-                        ) : (
+                        )}
+                        {regCountryCode === '+966' && (
                           <p className="text-[11px] text-emerald-800 font-normal">
-                            🇲🇾 মালয়েশিয়া: <b>010, 011, 012, 013, 014, 016, 017, 018, 019</b> দিয়ে শুরু সঠিক নম্বর দিন (যেমন: 0123456789 বা 01112345678)।
+                            🇸🇦 সৌদি আরব: <b>05</b> অথবা <b>5</b> দিয়ে শুরু ৯-১০ সংখ্যার নম্বর দিন (যেমন: 0501234567)।
+                          </p>
+                        )}
+                        {regCountryCode === '+971' && (
+                          <p className="text-[11px] text-emerald-800 font-normal">
+                            🇦🇪 দুবাই / ইউএই: <b>05</b> অথবা <b>5</b> দিয়ে শুরু ৯-১০ সংখ্যার নম্বর দিন (যেমন: 0551234567)।
                           </p>
                         )}
                       </div>
@@ -937,7 +967,9 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">
                       <span className="text-[10px] text-slate-500 block font-medium">দেশ (অটো-চিহ্নিত):</span>
                       <span className="font-semibold text-slate-800 flex items-center gap-1">
-                        {regCountryCode === '+60' || regForm.country === 'Malaysia' ? '🇲🇾 মালয়েশিয়া' : '🇧🇩 বাংলাদেশ'}
+                        {regCountryCode === '+60' || regForm.country === 'Malaysia' 
+                          ? '🇲🇾 মালয়েশিয়া' 
+                          : (regCountryCode === '+966' || regForm.country === 'Saudi Arabia' ? '🇸🇦 সৌদি আরব' : '🇦🇪 দুবাই / ইউএই')}
                       </span>
                     </div>
                     <div className="bg-white p-2.5 rounded-xl border border-slate-200">

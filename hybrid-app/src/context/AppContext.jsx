@@ -40,6 +40,7 @@ export const AppProvider = ({ children }) => {
   });
 
   const [transactions, setTransactions] = useState([]);
+  const [recipients, setRecipients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -59,6 +60,20 @@ export const AppProvider = ({ children }) => {
       }
     } catch (err) {
       console.error("Fetch settings error:", err);
+    }
+  };
+
+  const fetchRecipients = async (phone) => {
+    const targetPhone = phone || (user && user.phone);
+    if (!targetPhone) return;
+    try {
+      const res = await fetch(`/api/recipients?phone=${targetPhone}`);
+      const data = await res.json();
+      if (data.success && data.recipients) {
+        setRecipients(data.recipients);
+      }
+    } catch (err) {
+      console.error("Fetch recipients error:", err);
     }
   };
 
@@ -82,6 +97,7 @@ export const AppProvider = ({ children }) => {
       if (tData.success && tData.transactions) {
         setTransactions(tData.transactions);
       }
+      fetchRecipients(targetPhone);
     } catch (err) {
       console.error("Fetch user data error:", err);
     }
@@ -91,6 +107,7 @@ export const AppProvider = ({ children }) => {
     fetchSettings();
     if (user && user.phone) {
       fetchUserData(user.phone);
+      fetchRecipients(user.phone);
     }
 
     let eventSource;
@@ -356,12 +373,91 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const addRecipient = async (recipientData) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/recipients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderPhone: user.phone,
+          ...recipientData
+        })
+      });
+      const data = await res.json();
+      setLoading(false);
+      if (data.success && data.recipient) {
+        showToast("প্রাপক সফলভাবে যুক্ত হয়েছে!", "success");
+        fetchRecipients(user.phone);
+        return { success: true, recipient: data.recipient };
+      } else {
+        showToast(data.message || "প্রাপক যুক্ত করা যায়নি।", "error");
+        return { success: false, message: data.message };
+      }
+    } catch (err) {
+      setLoading(false);
+      showToast("সার্ভার ত্রুটি!", "error");
+      return { success: false, message: err.message };
+    }
+  };
+
+  const deleteRecipient = async (recipientId) => {
+    try {
+      const res = await fetch(`/api/recipients/${recipientId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("প্রাপক তালিকা থেকে সরানো হয়েছে।", "info");
+        fetchRecipients(user.phone);
+        return { success: true };
+      } else {
+        showToast(data.message || "মুছে ফেলা যায়নি।", "error");
+        return { success: false };
+      }
+    } catch (err) {
+      showToast("সার্ভার ত্রুটি!", "error");
+      return { success: false };
+    }
+  };
+
+  const submitRemittance = async (payload) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/transactions/remittance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderPhone: user.phone,
+          senderName: user.name,
+          ...payload
+        })
+      });
+      const data = await res.json();
+      setLoading(false);
+
+      if (data.success) {
+        showToast(data.message, "success");
+        fetchUserData(user.phone);
+        return { success: true, transaction: data.transaction };
+      } else {
+        showToast(data.message, "error");
+        return { success: false, message: data.message };
+      }
+    } catch (err) {
+      setLoading(false);
+      showToast("রেমিটেন্স সাবমিট করতে সমস্যা হয়েছে।", "error");
+      return { success: false, message: err.message };
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
         user,
         settings,
         transactions,
+        recipients,
         loading,
         toast,
         showToast,
@@ -371,6 +467,10 @@ export const AppProvider = ({ children }) => {
         logout,
         fetchUserData,
         fetchSettings,
+        fetchRecipients,
+        addRecipient,
+        deleteRecipient,
+        submitRemittance,
         submitAddMoney,
         submitTransfer,
         submitPayBill,

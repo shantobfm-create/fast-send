@@ -23,6 +23,7 @@ export const SettingsManager = () => {
     whatsappNumber: "",
     minTransferLimit: 50000,
     paymentMethods: [],
+    senderAccounts: [],
     banners: []
   });
 
@@ -35,6 +36,7 @@ export const SettingsManager = () => {
         whatsappNumber: settings.whatsappNumber || "",
         minTransferLimit: settings.minTransferLimit || 50000,
         paymentMethods: settings.paymentMethods || [],
+        senderAccounts: settings.senderAccounts || [],
         banners: settings.banners || []
       });
     }
@@ -80,6 +82,120 @@ export const SettingsManager = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         
+        {/* 0. Sender Deposit Accounts Control (Malaysia, Saudi Arabia, Dubai) */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+            <Building className="w-5 h-5 text-emerald-400" />
+            <div>
+              <h3 className="font-bold text-sm text-white">প্রবাসী ডিপোজিট অ্যাকাউন্টসমূহ (Malaysia, Saudi Arabia, Dubai)</h3>
+              <p className="text-xs text-slate-400">প্রবাসীরা টাকা পাঠানোর সময় এই অ্যাকাউন্ট নম্বর ও বিস্তারিত তথ্য অ্যাপে দেখতে পাবে</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            {form.senderAccounts.map((acc, aIdx) => (
+              <div key={acc.id || aIdx} className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
+                  <span className="font-bold text-sm text-emerald-400 flex items-center gap-1.5">
+                    <span>{acc.flag}</span>
+                    <span>{acc.countryBn} ({acc.currency})</span>
+                  </span>
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-0.5">ব্যাংকের নাম</label>
+                  <input
+                    type="text"
+                    value={acc.bankName || ''}
+                    onChange={(e) => {
+                      const updated = [...form.senderAccounts];
+                      updated[aIdx].bankName = e.target.value;
+                      setForm({ ...form, senderAccounts: updated });
+                    }}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-0.5">অ্যাকাউন্টের নাম (হিসাবধারী)</label>
+                  <input
+                    type="text"
+                    value={acc.accountName || ''}
+                    onChange={(e) => {
+                      const updated = [...form.senderAccounts];
+                      updated[aIdx].accountName = e.target.value;
+                      setForm({ ...form, senderAccounts: updated });
+                    }}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-0.5">অ্যাকাউন্ট নম্বর / IBAN</label>
+                  <input
+                    type="text"
+                    value={acc.accountNumber || ''}
+                    onChange={(e) => {
+                      const updated = [...form.senderAccounts];
+                      updated[aIdx].accountNumber = e.target.value;
+                      setForm({ ...form, senderAccounts: updated });
+                    }}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-emerald-300 font-mono font-bold"
+                  />
+                </div>
+
+                {acc.currency === 'MYR' && (
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">DuitNow ID / Phone</label>
+                    <input
+                      type="text"
+                      value={acc.duitNowId || ''}
+                      onChange={(e) => {
+                        const updated = [...form.senderAccounts];
+                        updated[aIdx].duitNowId = e.target.value;
+                        setForm({ ...form, senderAccounts: updated });
+                      }}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono"
+                    />
+                  </div>
+                )}
+
+                {acc.currency === 'SAR' && (
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">STC Pay ID / Phone</label>
+                    <input
+                      type="text"
+                      value={acc.stcPay || ''}
+                      onChange={(e) => {
+                        const updated = [...form.senderAccounts];
+                        updated[aIdx].stcPay = e.target.value;
+                        setForm({ ...form, senderAccounts: updated });
+                      }}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono"
+                    />
+                  </div>
+                )}
+
+                {acc.currency === 'AED' && (
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">PayBy / Mobile Phone</label>
+                    <input
+                      type="text"
+                      value={acc.payByPhone || ''}
+                      onChange={(e) => {
+                        const updated = [...form.senderAccounts];
+                        updated[aIdx].payByPhone = e.target.value;
+                        setForm({ ...form, senderAccounts: updated });
+                      }}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono"
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* 1. Payment Numbers & Gateways Control (bKash, Nagad, Rocket, Bank) */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
