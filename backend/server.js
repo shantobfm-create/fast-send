@@ -39,13 +39,20 @@ const defaultDb = {
         currency: "MYR",
         flag: "🇲🇾",
         rateToBdt: 27.50,
+        // Local Bank Account (Maybank, CIMB, RHB, etc.)
         bankName: "Maybank (Malayan Banking Berhad)",
-        accountName: "QuickRemit Services / Fast Send Global",
+        secondaryBankName: "CIMB Bank / RHB Bank",
+        accountName: "Fast Send Global Services (M) Sdn Bhd",
         accountNumber: "1642 9840 2201",
-        duitNowId: "+60123456789",
+        cimbAccountNumber: "8009 1234 5678",
+        // Local Mobile Wallet (Touch 'n Go eWallet / DuitNow)
+        walletProvider: "Touch 'n Go (TNG) eWallet",
+        walletNumber: "+6012 345 6789",
+        walletName: "Fast Send TNG Official",
+        duitNowId: "+6012 345 6789",
         duitNowQr: "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DuitNow-164298402201-FastSend",
         active: true,
-        instructions: "Maybank2u অথবা যেকোনো মালয়েশিয়ান ব্যাংক থেকে DuitNow QR বা ব্যাংক ট্রান্সফার করে পেমেন্টের স্ক্রিনশট আপলোড করুন।"
+        instructions: "Maybank / CIMB অ্যাপ থেকে ব্যাংক ট্রান্সফার করুন অথবা Touch 'n Go (TNG) / DuitNow দিয়ে টাকা পাঠিয়ে পেমেন্ট স্লিপের স্ক্রিনশট আপলোড করুন।"
       },
       {
         id: "SA",
@@ -57,6 +64,9 @@ const defaultDb = {
         bankName: "Al Rajhi Bank (مصرف الراجحي)",
         accountName: "Fast Send KSA",
         accountNumber: "SA4480000123456789012345",
+        walletProvider: "STC Pay / Urpay",
+        walletNumber: "+96650 123 4567",
+        walletName: "Fast Send STC Pay",
         stcPay: "+966501234567",
         active: true,
         instructions: "Al Rajhi ব্যাংক ট্রান্সফার অথবা STC Pay দিয়ে টাকা পাঠিয়ে পেমেন্টের রসিদ / স্ক্রিনশট আপলোড করুন।"
@@ -68,12 +78,20 @@ const defaultDb = {
         currency: "AED",
         flag: "🇦🇪",
         rateToBdt: 33.50,
-        bankName: "Emirates NBD / Mashreq Bank",
-        accountName: "Fast Send UAE LLC",
-        accountNumber: "AE250260001234567890123",
+        // Local Bank Account (Emirates NBD, Mashreq, ADIB)
+        bankName: "Emirates NBD",
+        secondaryBankName: "Mashreq Bank / Abu Dhabi Islamic Bank (ADIB)",
+        accountName: "Fast Send Global Remittance LLC",
+        accountNumber: "AE25 0260 0012 3456 7890 123",
+        iban: "AE25 0260 0012 3456 7890 123",
+        // Local Mobile Wallet / P2P (Careem Pay, Botim Pay, Al Ansari Exchange)
+        walletProvider: "Careem Pay / Botim Pay / Al Ansari Exchange",
+        walletNumber: "+971 50 123 4567",
+        walletName: "Fast Send Dubai Official",
         payByPhone: "+971501234567",
+        alAnsariDetails: "Fast Send UAE LLC (Branch: Deira, Dubai)",
         active: true,
-        instructions: "Emirates NBD অথবা যেকোনো ইউএই ব্যাংক বা আল আনসারি ট্রান্সফার করে পেমেন্টের স্ক্রিনশট আপলোড করুন।"
+        instructions: "Emirates NBD / Mashreq / ADIB-এর IBAN একাউন্টে অথবা Careem Pay, Botim Pay বা Al Ansari Exchange-এ টাকা পাঠিয়ে স্লিপ আপলোড করুন।"
       }
     ],
     exchangeRates: [

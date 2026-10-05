@@ -102,8 +102,8 @@ export const SettingsManager = () => {
                   </span>
                 </div>
 
-                <div>
-                  <label className="text-[10px] text-slate-400 block mb-0.5">ব্যাংকের নাম</label>
+                 <div>
+                  <label className="text-[10px] text-slate-400 block mb-0.5">প্রধান ব্যাংকের নাম</label>
                   <input
                     type="text"
                     value={acc.bankName || ''}
@@ -112,6 +112,22 @@ export const SettingsManager = () => {
                       updated[aIdx].bankName = e.target.value;
                       setForm({ ...form, senderAccounts: updated });
                     }}
+                    placeholder="যেমন: Maybank / Emirates NBD"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-0.5">বিকল্প ব্যাংক (ঐচ্ছিক)</label>
+                  <input
+                    type="text"
+                    value={acc.secondaryBankName || ''}
+                    onChange={(e) => {
+                      const updated = [...form.senderAccounts];
+                      updated[aIdx].secondaryBankName = e.target.value;
+                      setForm({ ...form, senderAccounts: updated });
+                    }}
+                    placeholder="যেমন: CIMB / RHB বা Mashreq"
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
                   />
                 </div>
@@ -141,6 +157,38 @@ export const SettingsManager = () => {
                       setForm({ ...form, senderAccounts: updated });
                     }}
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-emerald-300 font-mono font-bold"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-slate-800">
+                  <label className="text-[10px] text-emerald-400 font-bold block mb-0.5">
+                    লোকাল মোবাইল ওয়ালেট প্রোভাইডার
+                  </label>
+                  <input
+                    type="text"
+                    value={acc.walletProvider || ''}
+                    onChange={(e) => {
+                      const updated = [...form.senderAccounts];
+                      updated[aIdx].walletProvider = e.target.value;
+                      setForm({ ...form, senderAccounts: updated });
+                    }}
+                    placeholder="যেমন: Touch 'n Go বা Careem Pay / Botim"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-0.5">ওয়ালেট নম্বর / P2P মোবাইল নম্বর</label>
+                  <input
+                    type="text"
+                    value={acc.walletNumber || ''}
+                    onChange={(e) => {
+                      const updated = [...form.senderAccounts];
+                      updated[aIdx].walletNumber = e.target.value;
+                      setForm({ ...form, senderAccounts: updated });
+                    }}
+                    placeholder="যেমন: +6012 345 6789 বা +971 50 123 4567"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold"
                   />
                 </div>
 
@@ -178,16 +226,17 @@ export const SettingsManager = () => {
 
                 {acc.currency === 'AED' && (
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5">PayBy / Mobile Phone</label>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">Al Ansari Exchange / ব্রাঞ্চ নোট</label>
                     <input
                       type="text"
-                      value={acc.payByPhone || ''}
+                      value={acc.alAnsariDetails || ''}
                       onChange={(e) => {
                         const updated = [...form.senderAccounts];
-                        updated[aIdx].payByPhone = e.target.value;
+                        updated[aIdx].alAnsariDetails = e.target.value;
                         setForm({ ...form, senderAccounts: updated });
                       }}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono"
+                      placeholder="যেমন: Fast Send UAE LLC (Deira Branch)"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
                     />
                   </div>
                 )}
