@@ -1,29 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 
 export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
   const { t, language, setLanguage } = useLanguage();
-  const { selectedCountry, setCountry, login, otpLogin, register, showToast, settings } = useApp();
+  const { selectedCountry, setCountry, login, register, showToast } = useApp();
 
   const isBn = language === 'bn';
 
   // Mode: 'login' | 'register'
   const [authMode, setAuthMode] = useState(defaultTab || 'login');
 
-  // Login Method: 'otp' | 'pin'
-  const [loginMethod, setLoginMethod] = useState('otp'); // 'otp' | 'pin'
-
-  // Phone & OTP states
+  // Login Form States (Phone + Password/PIN)
   const [phone, setPhone] = useState('');
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [otpStep, setOtpStep] = useState('phone'); // 'phone' | 'otp'
-  const [resendTimer, setResendTimer] = useState(60);
   const [loading, setLoading] = useState(false);
 
-  // Register Form states
+  // Register Form States
   const [regForm, setRegForm] = useState({
     name: '',
     phone: '',
@@ -31,97 +25,14 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
     pin: '',
     confirmPin: ''
   });
+  const [showRegPin, setShowRegPin] = useState(false);
 
   const countryPrefix = selectedCountry === 'MY' ? '+60' : '+971';
   const countryFlag = selectedCountry === 'MY' ? '🇲🇾' : '🇦🇪';
   const placeholderExample = selectedCountry === 'MY' ? '12-345 6789' : '50 123 4567';
 
-  // Countdown timer for OTP resend
-  useEffect(() => {
-    let interval;
-    if (otpStep === 'otp' && resendTimer > 0) {
-      interval = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [otpStep, resendTimer]);
-
-  // Handle OTP send
-  const handleSendOtp = (e) => {
-    e.preventDefault();
-    const cleanNumber = phone.replace(/\D/g, '');
-    if (!cleanNumber || cleanNumber.length < 7) {
-      showToast(isBn ? 'সঠিক মোবাইল নম্বর লিখুন' : 'Please enter a valid mobile number', 'error');
-      return;
-    }
-
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOtpStep('otp');
-      setResendTimer(60);
-      showToast(
-        isBn 
-          ? `ভেরিফিকেশন কোড পাঠানো হয়েছে (${countryPrefix} ${cleanNumber})` 
-          : `Verification code sent to ${countryPrefix} ${cleanNumber}`, 
-        'info'
-      );
-    }, 500);
-  };
-
-  const handleOtpChange = (index, value) => {
-    if (value.length > 1) {
-      const pastedDigits = value.replace(/\D/g, '').slice(0, 6).split('');
-      const newOtp = [...otp];
-      pastedDigits.forEach((digit, i) => {
-        newOtp[i] = digit;
-      });
-      setOtp(newOtp);
-      const nextInput = document.getElementById(`otp-input-${Math.min(pastedDigits.length, 5)}`);
-      if (nextInput) nextInput.focus();
-      return;
-    }
-
-    const digit = value.replace(/\D/g, '');
-    const newOtp = [...otp];
-    newOtp[index] = digit;
-    setOtp(newOtp);
-
-    if (digit && index < 5) {
-      const nextInput = document.getElementById(`otp-input-${index + 1}`);
-      if (nextInput) nextInput.focus();
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      const prevInput = document.getElementById(`otp-input-${index - 1}`);
-      if (prevInput) prevInput.focus();
-    }
-  };
-
-  // OTP Login verify
-  const handleVerifyOtp = async () => {
-    const otpCode = otp.join('');
-    if (otpCode.length !== 6) {
-      showToast(isBn ? '৬-সংখ্যার কোড দিন' : 'Enter 6-digit code', 'error');
-      return;
-    }
-
-    const fullPhone = `${countryPrefix}${phone.replace(/\D/g, '')}`;
-    setLoading(true);
-
-    const res = await otpLogin(fullPhone, otpCode, selectedCountry);
-    setLoading(false);
-
-    if (res.success) {
-      onNavigate('home');
-    }
-  };
-
   // Password / PIN Login
-  const handlePinLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     const cleanNumber = phone.replace(/\D/g, '');
     if (!cleanNumber || cleanNumber.length < 7) {
@@ -129,7 +40,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
       return;
     }
     if (!pin) {
-      showToast(isBn ? 'আপনার পিন দিন' : 'Enter your PIN', 'error');
+      showToast(isBn ? 'আপনার পাসওয়ার্ড বা পিন দিন' : 'Enter your password or PIN', 'error');
       return;
     }
 
@@ -156,11 +67,11 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
       return;
     }
     if (!regForm.pin || regForm.pin.length < 4) {
-      showToast(isBn ? 'কমপক্ষে ৪ ডিজিটের পিন দিন' : 'PIN must be at least 4 digits', 'error');
+      showToast(isBn ? 'কমপক্ষে ৪ সংখ্যার পাসওয়ার্ড/পিন দিন' : 'Password/PIN must be at least 4 characters', 'error');
       return;
     }
     if (regForm.pin !== regForm.confirmPin) {
-      showToast(isBn ? 'পিন কনফার্মেশন মেলেনি' : 'PIN confirmation does not match', 'error');
+      showToast(isBn ? 'পাসওয়ার্ড কনফার্মেশন মেলেনি' : 'Password confirmation does not match', 'error');
       return;
     }
 
@@ -231,14 +142,14 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
 
         <div className="p-5">
           {/* Country Flag Badge & Switch */}
-          <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-3 mb-4 shadow-xs">
+          <div className="flex items-center justify-between bg-white border border-slate-200/90 rounded-2xl p-3 mb-4 shadow-sm">
             <div className="flex items-center space-x-2.5">
               <span className="text-2xl">{countryFlag}</span>
               <div>
-                <p className="text-xs font-bold text-slate-900">
+                <p className="text-xs font-black text-[#2C3E50]">
                   {selectedCountry === 'MY' ? 'Malaysia (মালয়েশিয়া)' : 'UAE (দুবাই)'}
                 </p>
-                <p className="text-[10px] text-slate-500 font-medium">
+                <p className="text-[10px] text-slate-500 font-semibold">
                   {selectedCountry === 'MY' ? 'Country Code: +60' : 'Country Code: +971'}
                 </p>
               </div>
@@ -246,7 +157,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
             <button
               type="button"
               onClick={() => setCountry(selectedCountry === 'MY' ? 'AE' : 'MY')}
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-200"
+              className="text-xs font-extrabold text-[#25CC71] hover:text-[#1EA85D] bg-[#E8F8F0] px-3 py-1.5 rounded-xl border border-[#25CC71]/20 transition-all"
             >
               {isBn ? 'দেশ পরিবর্তন' : 'Change'}
             </button>
@@ -256,10 +167,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
           <div className="flex bg-slate-200/70 p-1.5 rounded-2xl mb-5 shadow-inner">
             <button
               type="button"
-              onClick={() => {
-                setAuthMode('login');
-                setOtpStep('phone');
-              }}
+              onClick={() => setAuthMode('login')}
               className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
                 authMode === 'login'
                   ? 'bg-white text-[#2C3E50] shadow-md'
@@ -283,177 +191,74 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
             </button>
           </div>
 
-          {/* ===================== LOGIN FORM ===================== */}
+          {/* ===================== PASSWORD & NUMBER LOGIN FORM ===================== */}
           {authMode === 'login' && (
-            <div>
-              {/* Login Method Toggle: OTP vs PIN */}
-              <div className="flex items-center justify-center space-x-6 mb-5 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginMethod('otp');
-                    setOtpStep('phone');
-                  }}
-                  className={`pb-1.5 border-b-2 transition-all ${
-                    loginMethod === 'otp'
-                      ? 'border-[#25CC71] text-[#25CC71] font-black'
-                      : 'border-transparent text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  ⚡ {isBn ? 'ওটিপি দিয়ে লগইন' : 'Login via OTP'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLoginMethod('pin')}
-                  className={`pb-1.5 border-b-2 transition-all ${
-                    loginMethod === 'pin'
-                      ? 'border-[#25CC71] text-[#25CC71] font-black'
-                      : 'border-transparent text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  🔒 {isBn ? 'পিন/পাসওয়ার্ড দিয়ে লগইন' : 'Login via PIN'}
-                </button>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Phone Number Field */}
+              <div>
+                <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
+                  {isBn ? 'মোবাইল নম্বর' : 'Mobile Number'} *
+                </label>
+                <div className="flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
+                  <div className="flex items-center space-x-1.5 px-3.5 py-3 border-r border-slate-200 text-[#2C3E50] font-black text-base">
+                    <span>{countryFlag}</span>
+                    <span>{countryPrefix}</span>
+                  </div>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder={placeholderExample}
+                    autoFocus
+                    className="w-full px-4 py-3 bg-transparent text-slate-900 font-bold text-lg focus:outline-none placeholder-slate-400"
+                  />
+                </div>
               </div>
 
-              {loginMethod === 'otp' ? (
-                /* OTP Flow */
-                otpStep === 'phone' ? (
-                  <form onSubmit={handleSendOtp} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
-                        {isBn ? 'আপনার মোবাইল নম্বর দিন' : 'Enter mobile number'}
-                      </label>
-                      <div className="flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
-                        <div className="flex items-center space-x-1.5 px-3.5 py-3 border-r border-slate-200 text-[#2C3E50] font-black text-base">
-                          <span>{countryFlag}</span>
-                          <span>{countryPrefix}</span>
-                        </div>
-                        <input
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder={placeholderExample}
-                          autoFocus
-                          className="w-full px-4 py-3 bg-transparent text-slate-900 font-bold text-lg focus:outline-none placeholder-slate-400"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base flex items-center justify-center space-x-2"
-                    >
-                      <span>{isBn ? 'ওটিপি কোড পাঠান ➔' : 'Send OTP Code ➔'}</span>
-                    </button>
-                  </form>
-                ) : (
-                  <div>
-                    <p className="text-sm text-slate-500 mb-1">
-                      {isBn ? '৬-সংখ্যার কোডটি দিন যা পাঠানো হয়েছে:' : 'Enter 6-digit code sent to:'}
-                    </p>
-                    <p className="text-base font-black text-[#2C3E50] mb-6">
-                      {countryFlag} {countryPrefix} {phone}
-                    </p>
-
-                    <div className="grid grid-cols-6 gap-2 mb-6">
-                      {otp.map((digit, idx) => (
-                        <input
-                          key={idx}
-                          id={`otp-input-${idx}`}
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={1}
-                          value={digit}
-                          onChange={(e) => handleOtpChange(idx, e.target.value)}
-                          onKeyDown={(e) => handleKeyDown(idx, e)}
-                          autoFocus={idx === 0}
-                          className="h-14 text-center text-2xl font-black rounded-2xl border-2 transition-all bg-white border-slate-200 focus:border-[#25CC71] focus:outline-none text-slate-900 shadow-sm"
-                        />
-                      ))}
-                    </div>
-
-                    <div className="text-center mb-5">
-                      {resendTimer > 0 ? (
-                        <p className="text-xs text-slate-400 font-medium">
-                          {isBn ? `পুনরায় কোড পাঠাতে অপেক্ষা করুন ${resendTimer} সেকেন্ড` : `Resend in ${resendTimer}s`}
-                        </p>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setResendTimer(60)}
-                          className="text-xs font-bold text-[#25CC71] underline"
-                        >
-                          {isBn ? 'আবার কোড পাঠান' : 'Resend Code'}
-                        </button>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleVerifyOtp}
-                      disabled={loading}
-                      className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base"
-                    >
-                      {loading ? (isBn ? 'যাচাই করা হচ্ছে...' : 'Verifying...') : (isBn ? 'যাচাই ও প্রবেশ করুন ✓' : 'Verify & Log In ✓')}
-                    </button>
-                  </div>
-                )
-              ) : (
-                /* PIN / Password Login */
-                <form onSubmit={handlePinLogin} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
-                      {isBn ? 'মোবাইল নম্বর' : 'Mobile Number'}
-                    </label>
-                    <div className="flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
-                      <div className="flex items-center space-x-1.5 px-3.5 py-3 border-r border-slate-200 text-[#2C3E50] font-black text-base">
-                        <span>{countryFlag}</span>
-                        <span>{countryPrefix}</span>
-                      </div>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder={placeholderExample}
-                        className="w-full px-4 py-3 bg-transparent text-slate-900 font-bold text-lg focus:outline-none placeholder-slate-400"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-2">
-                      {isBn ? 'সিকিউরিটি পিন (PIN)' : 'Security PIN'}
-                    </label>
-                    <div className="relative flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
-                      <input
-                        type={showPin ? "text" : "password"}
-                        value={pin}
-                        maxLength={6}
-                        onChange={(e) => setPin(e.target.value)}
-                        placeholder="••••"
-                        className="w-full px-4 py-3 bg-transparent text-slate-900 font-mono font-bold text-lg focus:outline-none placeholder-slate-400"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPin(!showPin)}
-                        className="px-3 text-slate-400 hover:text-slate-600 text-xs font-bold"
-                      >
-                        {showPin ? 'Hide' : 'Show'}
-                      </button>
-                    </div>
-                  </div>
-
+              {/* Password / PIN Field */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider">
+                    {isBn ? 'পাসওয়ার্ড / পিন' : 'Password / PIN'} *
+                  </label>
+                </div>
+                <div className="relative flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
+                  <input
+                    type={showPin ? "text" : "password"}
+                    required
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)}
+                    placeholder={isBn ? 'পাসওয়ার্ড বা পিন লিখুন' : 'Enter password or PIN'}
+                    className="w-full px-4 py-3 bg-transparent text-slate-900 font-bold text-base focus:outline-none placeholder-slate-400"
+                  />
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base"
+                    type="button"
+                    onClick={() => setShowPin(!showPin)}
+                    className="px-4 py-2 text-slate-400 hover:text-slate-700 text-xs font-extrabold tracking-wider uppercase transition-colors"
                   >
-                    {loading ? (isBn ? 'লগইন হচ্ছে...' : 'Logging in...') : (isBn ? 'লগইন করুন ➔' : 'Log In ➔')}
+                    {showPin ? (isBn ? 'আড়াল' : 'Hide') : (isBn ? 'দেখান' : 'Show')}
                   </button>
-                </form>
-              )}
-            </div>
+                </div>
+              </div>
+
+              {/* Submit Log In CTA Button */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 px-6 bg-[#25CC71] hover:bg-[#1EA85D] active:scale-[0.99] disabled:opacity-50 text-white font-black rounded-2xl shadow-lg shadow-[#25CC71]/30 transition-all text-base flex items-center justify-center space-x-2"
+                >
+                  {loading ? (
+                    <span>{isBn ? 'লগইন হচ্ছে...' : 'Logging in...'}</span>
+                  ) : (
+                    <>
+                      <span>{isBn ? 'লগইন করুন ➔' : 'Log In ➔'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           )}
 
           {/* ===================== REGISTRATION FORM ===================== */}
@@ -495,31 +300,38 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
 
               <div>
                 <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
-                  {isBn ? 'সিকিউরিটি পিন (৪ বা ৬ সংখ্যা)' : 'Security PIN'} *
+                  {isBn ? 'পাসওয়ার্ড / পিন' : 'Password / PIN'} *
                 </label>
-                <input
-                  type="password"
-                  required
-                  maxLength={6}
-                  value={regForm.pin}
-                  onChange={(e) => setRegForm({ ...regForm, pin: e.target.value })}
-                  placeholder="••••"
-                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
-                />
+                <div className="relative flex items-center bg-white border border-slate-200/90 focus-within:border-[#25CC71] focus-within:ring-2 focus-within:ring-[#25CC71]/20 rounded-2xl p-1 transition-all shadow-sm">
+                  <input
+                    type={showRegPin ? "text" : "password"}
+                    required
+                    value={regForm.pin}
+                    onChange={(e) => setRegForm({ ...regForm, pin: e.target.value })}
+                    placeholder="••••••••"
+                    className="w-full px-3 py-2 bg-transparent text-slate-900 font-bold text-base focus:outline-none placeholder-slate-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegPin(!showRegPin)}
+                    className="px-3 text-slate-400 hover:text-slate-700 text-xs font-bold"
+                  >
+                    {showRegPin ? (isBn ? 'আড়াল' : 'Hide') : (isBn ? 'দেখান' : 'Show')}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-extrabold text-[#2C3E50] uppercase tracking-wider mb-1.5">
-                  {isBn ? 'পিন পুনরায় লিখুন (Confirm PIN)' : 'Confirm PIN'} *
+                  {isBn ? 'পাসওয়ার্ড পুনরায় লিখুন (Confirm)' : 'Confirm Password'} *
                 </label>
                 <input
-                  type="password"
+                  type={showRegPin ? "text" : "password"}
                   required
-                  maxLength={6}
                   value={regForm.confirmPin}
                   onChange={(e) => setRegForm({ ...regForm, confirmPin: e.target.value })}
-                  placeholder="••••"
-                  className="w-full px-4 py-3.5 bg-white border border-slate-200/90 rounded-2xl text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 bg-white border border-slate-200/90 rounded-2xl text-sm font-bold text-slate-900 focus:outline-none focus:border-[#25CC71] focus:ring-2 focus:ring-[#25CC71]/20 shadow-sm"
                 />
               </div>
 
@@ -539,7 +351,7 @@ export const AuthScreen = ({ onNavigate, defaultTab = 'login' }) => {
             </form>
           )}
 
-          {/* Switch tab footer text */}
+          {/* Switch Tab Footer Text */}
           <div className="text-center pt-5">
             {authMode === 'login' ? (
               <p className="text-xs text-slate-500 font-medium">
