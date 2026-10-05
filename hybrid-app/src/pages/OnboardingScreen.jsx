@@ -15,48 +15,51 @@ export const OnboardingScreen = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between p-5 max-w-md mx-auto">
-      {/* Top Header / Brand & Language Toggle */}
-      <div>
-        <div className="flex items-center justify-between pt-3 pb-6">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/20 font-bold text-xl">
-              FS
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900 leading-tight">
-                {t('appName')}
-              </h1>
-              <p className="text-xs text-slate-500 font-medium">
-                {t('tagline')}
-              </p>
-            </div>
+    <div className="min-h-screen bg-[#F4F7F6] flex flex-col justify-between w-full">
+      {/* Top Header - #2677AD Brand Color */}
+      <div className="bg-[#2677AD] text-white px-5 pt-5 pb-5 flex items-center justify-between shadow-md">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm font-black text-xl">
+            FS
           </div>
-
-          {/* Language Switcher Pill */}
-          <div className="flex items-center bg-white border border-slate-200 rounded-full p-1 shadow-sm">
-            <button
-              onClick={() => setLanguage('bn')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                language === 'bn'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              বাংলা
-            </button>
-            <button
-              onClick={() => setLanguage('en')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                language === 'en'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              EN
-            </button>
+          <div>
+            <h1 className="text-lg font-black text-white leading-tight">
+              {t('appName')}
+            </h1>
+            <p className="text-[11px] text-white/80 font-medium">
+              {t('tagline')}
+            </p>
           </div>
         </div>
+
+        {/* Language Switcher Pill */}
+        <div className="flex items-center bg-white/20 backdrop-blur-md border border-white/30 rounded-full p-1 shadow-sm">
+          <button
+            onClick={() => setLanguage('bn')}
+            className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              language === 'bn'
+                ? 'bg-white text-[#2677AD] shadow-sm'
+                : 'text-white/80 hover:text-white'
+            }`}
+          >
+            বাংলা
+          </button>
+          <button
+            onClick={() => setLanguage('en')}
+            className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              language === 'en'
+                ? 'bg-white text-[#2677AD] shadow-sm'
+                : 'text-white/80 hover:text-white'
+            }`}
+          >
+            EN
+          </button>
+        </div>
+      </div>
+
+      <div className="p-5 flex-1 flex flex-col justify-between">
+        {/* Main Content */}
+        <div>
 
         {/* Hero Section */}
         <div className="mt-4 mb-8">
@@ -186,6 +189,7 @@ export const OnboardingScreen = ({ onNavigate }) => {
         >
           <span>{language === 'bn' ? 'লগইন করুন (Log In)' : 'Log In to Account'}</span>
         </button>
+      </div>
       </div>
     </div>
   );

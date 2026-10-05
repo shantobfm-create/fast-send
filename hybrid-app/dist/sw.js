@@ -1,5 +1,5 @@
 // Fast Send Service Worker
-const CACHE_NAME = 'fast-send-cache-v1';
+const CACHE_NAME = 'fast-send-cache-v2';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
