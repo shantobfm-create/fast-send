@@ -1,11 +1,12 @@
 import React from 'react';
-import { Home, History, User } from 'lucide-react';
+import { Home, Send, Inbox, User } from 'lucide-react';
 
 export const BottomNav = ({ currentScreen, onNavigate }) => {
   const tabs = [
     { id: 'home', name: 'হোম', icon: Home },
-    { id: 'history', name: 'হিস্ট্রি', icon: History },
-    { id: 'account', name: 'প্রোফাইল', icon: User }
+    { id: 'remittance', name: 'রেমিটেন্স', icon: Send },
+    { id: 'history', name: 'ইনবক্স', icon: Inbox, badge: 3 },
+    { id: 'account', name: 'অ্যাকাউন্ট', icon: User }
   ];
 
   const handleTabClick = (tabId) => {
@@ -14,23 +15,38 @@ export const BottomNav = ({ currentScreen, onNavigate }) => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40">
-      <div className="bg-[#00823B] text-white flex items-center justify-around py-2.5 px-4 shadow-2xl border-t border-emerald-600/60 backdrop-blur-md">
+      <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-3 py-2 flex items-center justify-around shadow-lg">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = (currentScreen === tab.id || (tab.id === 'history' && currentScreen === 'statement') || (tab.id === 'account' && currentScreen === 'profile'));
+          const isActive = 
+            currentScreen === tab.id || 
+            (tab.id === 'history' && (currentScreen === 'statement' || currentScreen === 'history')) || 
+            (tab.id === 'account' && (currentScreen === 'profile' || currentScreen === 'account'));
 
           return (
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className={`tap-effect flex items-center justify-center gap-1.5 py-1.5 px-4 rounded-full transition-all cursor-pointer ${
+              className={`flex flex-col items-center justify-center relative py-1 px-3 rounded-xl transition-all cursor-pointer ${
                 isActive 
-                  ? 'bg-[#005a2f] text-white font-bold shadow-inner ring-1 ring-emerald-400/50' 
-                  : 'text-white/80 hover:text-white hover:bg-emerald-700/40 font-medium'
+                  ? 'text-[#00823B] font-bold' 
+                  : 'text-slate-500 hover:text-slate-800 font-medium'
               }`}
             >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span className="text-xs tracking-wide whitespace-nowrap">{tab.name}</span>
+              <div className="relative">
+                <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                {tab.badge && !isActive && (
+                  <span className="absolute -top-1 -right-2 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center font-mono">
+                    {tab.badge}
+                  </span>
+                )}
+              </div>
+              <span className={`text-[10px] mt-1 tracking-tight ${isActive ? 'font-bold text-[#00823B]' : 'text-slate-500'}`}>
+                {tab.name}
+              </span>
+              {isActive && (
+                <div className="w-1 h-1 rounded-full bg-[#00823B] mt-0.5"></div>
+              )}
             </button>
           );
         })}
