@@ -77,9 +77,9 @@ export const TransactionsManager = () => {
       {/* Top Filter Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div>
-          <h2 className="text-lg font-black text-slate-900">প্রবাসী রেমিটেন্স ও লেনদেন বিবরণী</h2>
+          <h2 className="text-lg font-black text-slate-900">প্রবাসী মানি ট্রান্সফার ও লেনদেন বিবরণী</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            মালয়েশিয়া, সৌদি আরব ও দুবাই থেকে আসা রেমিটেন্সের স্ক্রিনশট যাচাই করুন এবং বাংলাদেশের প্রাপককে টাকা পাঠিয়ে অনুমোদন করুন
+            মালয়েশিয়া, সৌদি আরব ও দুবাই থেকে আসা অর্ডারের স্ক্রিনশট যাচাই করুন এবং বাংলাদেশের প্রাপককে টাকা পাঠিয়ে অনুমোদন করুন
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
@@ -99,7 +99,7 @@ export const TransactionsManager = () => {
             className="bg-slate-50 border border-slate-300 rounded-xl py-2 px-3 text-xs text-slate-700 font-bold focus:border-[#00823B]"
           >
             <option value="all">সকল ধরন</option>
-            <option value="remittance">🌟 প্রবাসী রেমিটেন্স</option>
+            <option value="remittance">🌟 মানি ট্রান্সফার</option>
             <option value="add_money">অ্যাড মানি</option>
             <option value="transfer">অভ্যন্তরীণ ট্রান্সফার</option>
             <option value="pay_bill">পে-বিল</option>
@@ -145,7 +145,7 @@ export const TransactionsManager = () => {
                       <span className="font-bold text-slate-900 block">{tx.id}</span>
                       {isRemittance ? (
                         <span className="text-[10px] bg-emerald-100 text-[#00823B] font-bold px-1.5 py-0.5 rounded-sm inline-block mt-0.5">
-                          রেমিটেন্স ({tx.senderCurrency || 'MYR'})
+                          মানি ট্রান্সফার ({tx.senderCurrency || 'MYR'})
                         </span>
                       ) : (
                         <span className="text-[10px] text-slate-500 font-bold uppercase">{tx.type}</span>
@@ -241,7 +241,7 @@ export const TransactionsManager = () => {
               <div className="flex items-center gap-2">
                 <span className="text-lg">💸</span>
                 <h3 className="font-black text-slate-900 text-base">
-                  {selectedTx.type === 'remittance' ? 'রেমিটেন্স রিভিউ ও প্রাপককে টাকা প্রদান' : 'ট্রানজেকশন বিবরণী'}
+                  {selectedTx.type === 'remittance' ? 'মানি ট্রান্সফার রিভিউ ও প্রাপককে টাকা প্রদান' : 'ট্রানজেকশন বিবরণী'}
                 </h3>
               </div>
               <button onClick={() => setSelectedTx(null)} className="text-slate-400 hover:text-slate-700">

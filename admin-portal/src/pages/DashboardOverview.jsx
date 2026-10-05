@@ -28,7 +28,7 @@ export const DashboardOverview = ({ onSelectTab }) => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="মোট নিবন্ধিত গ্রাহক" value={stats.totalUsers || 0} subtext="সিস্টেম ইউজার সংখ্যা" badge="সক্রিয়" icon={<Users className="w-6 h-6" />} gradient="bg-blue-600" />
-        <StatCard title="মোট সফল লেনদেন ভলিউম" value={`৳ ${Number(stats.totalVolume || 0).toLocaleString('bn-BD')}`} subtext="সফল পরিশোধ ও রেমিটেন্স" badge="লাইভ" icon={<Wallet className="w-6 h-6" />} gradient="bg-[#00823B]" />
+        <StatCard title="মোট সফল লেনদেন ভলিউম" value={`৳ ${Number(stats.totalVolume || 0).toLocaleString('bn-BD')}`} subtext="সফল পরিশোধ ও মানি ট্রান্সফার" badge="লাইভ" icon={<Wallet className="w-6 h-6" />} gradient="bg-[#00823B]" />
         <StatCard title="অপেক্ষমান অ্যাড-মানি" value={stats.pendingAddMoney || 0} subtext="ডিপোজিট ভেরিফিকেশন" badge={stats.pendingAddMoney > 0 ? "অ্যাকশন প্রয়োজন" : "স্বাভাবিক"} icon={<ArrowDownLeft className="w-6 h-6" />} gradient="bg-amber-500" />
         <StatCard title="অপেক্ষমান ট্রান্সফার" value={stats.pendingTransfer || 0} subtext="টাকা ডেলিভারি অনুমোদন" badge={stats.pendingTransfer > 0 ? "জরুরি" : "ক্লিয়ার"} icon={<ArrowUpRight className="w-6 h-6" />} gradient="bg-rose-600" />
       </div>
