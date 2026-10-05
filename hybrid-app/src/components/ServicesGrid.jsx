@@ -133,19 +133,19 @@ export const ServicesGrid = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="space-y-2 px-3 my-1 pb-24">
+    <div className="space-y-2 px-3 my-2 pb-24">
       {/* Row 3 */}
       <div className="grid grid-cols-4 gap-2">
         {row1.map((item) => (
           <button
             key={item.id}
             onClick={item.action}
-            className="tap-effect bg-[#006837] hover:bg-[#005a2f] text-white rounded-2xl py-2 px-1 flex flex-col items-center justify-center gap-1 shadow-sm transition-all text-center aspect-square"
+            className="tap-effect bg-white hover:bg-neutral-50 border border-neutral-200 text-black rounded-2xl py-2 px-1 flex flex-col items-center justify-center gap-1 shadow-2xs transition-all text-center aspect-square cursor-pointer"
           >
-            <div className="h-9 flex items-center justify-center">
+            <div className="h-8 flex items-center justify-center text-black">
               {item.icon}
             </div>
-            <span className="text-xs font-bold leading-none text-white drop-shadow-xs">
+            <span className="text-[11px] font-bold leading-tight text-black">
               {item.name}
             </span>
           </button>
@@ -158,12 +158,12 @@ export const ServicesGrid = ({ onNavigate }) => {
           <button
             key={item.id}
             onClick={item.action}
-            className="tap-effect bg-[#006837] hover:bg-[#005a2f] text-white rounded-2xl py-2 px-1 flex flex-col items-center justify-center gap-1 shadow-sm transition-all text-center aspect-square"
+            className="tap-effect bg-white hover:bg-neutral-50 border border-neutral-200 text-black rounded-2xl py-2 px-1 flex flex-col items-center justify-center gap-1 shadow-2xs transition-all text-center aspect-square cursor-pointer"
           >
-            <div className="h-9 flex items-center justify-center">
+            <div className="h-8 flex items-center justify-center text-black">
               {item.icon}
             </div>
-            <span className="text-xs font-bold leading-none text-white drop-shadow-xs">
+            <span className="text-[11px] font-bold leading-tight text-black">
               {item.name}
             </span>
           </button>

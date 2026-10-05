@@ -15,7 +15,7 @@ export const HomePage = ({ onNavigate, currentScreen }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col max-w-md mx-auto relative">
+    <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col max-w-md mx-auto relative select-none">
       {/* 1. Top Profile Card */}
       <BalanceCard onNavigate={onNavigate} />
 

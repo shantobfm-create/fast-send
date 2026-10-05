@@ -70,17 +70,17 @@ export const QuickActions = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-1.5 px-3 my-1">
+    <div className="grid grid-cols-4 gap-2 px-3 my-2">
       {actions.map((item) => (
         <button
           key={item.id}
           onClick={item.action}
-          className="tap-effect bg-[#006837] hover:bg-[#005a2f] text-white rounded-2xl py-2 px-1 flex flex-col items-center justify-center gap-1 shadow-sm transition-all text-center aspect-square cursor-pointer"
+          className="tap-effect bg-white hover:bg-neutral-50 border border-neutral-200 text-black rounded-2xl py-2 px-1 flex flex-col items-center justify-center gap-1 shadow-2xs transition-all text-center aspect-square cursor-pointer"
         >
-          <div className="h-9 w-9 flex items-center justify-center">
+          <div className="h-8 w-8 flex items-center justify-center text-black">
             {item.icon}
           </div>
-          <span className="text-[11px] font-bold leading-tight text-white drop-shadow-xs whitespace-nowrap">
+          <span className="text-[11px] font-bold leading-tight text-black whitespace-nowrap">
             {item.name}
           </span>
         </button>
