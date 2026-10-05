@@ -15,7 +15,7 @@ export const AppProvider = ({ children }) => {
   const [settings, setSettings] = useState({
     appName: "Fast Send",
     tagline: "❤️ এই ট্রান্সফারে কোনো ট্রান্সফার ফি নেই",
-    noticeText: "যেকোনো প্রয়োজনে এই WhatsApp নাম্বারে মেসেজ করুন: +8801754150019 | Fast Send এ দ্রুত ও নিরাপদ রেমিটেন্স সেবা চালু আছে!",
+    noticeText: "যেকোনো প্রয়োজনে এই WhatsApp নাম্বারে মেসেজ করুন: +8801754150019 | Fast Send এ দ্রুত ও নিরাপদ মানি ট্রান্সফার সেবা চালু আছে!",
     whatsappNumber: "+8801754150019",
     minTransferLimit: 50000,
     maxTransferLimit: 500000,
@@ -494,7 +494,7 @@ export const AppProvider = ({ children }) => {
       }
     } catch (err) {
       setLoading(false);
-      showToast("রেমিটেন্স সাবমিট করতে সমস্যা হয়েছে।", "error");
+      showToast("মানি ট্রান্সফার সাবমিট করতে সমস্যা হয়েছে।", "error");
       return { success: false, message: err.message };
     }
   };

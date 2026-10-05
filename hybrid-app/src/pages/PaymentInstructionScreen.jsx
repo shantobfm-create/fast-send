@@ -55,7 +55,7 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
     // Bank info
     bankName: foundAccount?.bankName || 'Emirates NBD',
     secondaryBank: foundAccount?.secondaryBankName || 'Mashreq Bank / Abu Dhabi Islamic Bank (ADIB)',
-    accountName: foundAccount?.accountName || 'Fast Send Global Remittance LLC',
+    accountName: foundAccount?.accountName || 'Fast Send Global Services LLC',
     accountNumber: foundAccount?.accountNumber || foundAccount?.iban || 'AE25 0260 0012 3456 7890 123',
     iban: foundAccount?.iban || foundAccount?.accountNumber || 'AE25 0260 0012 3456 7890 123',
     // Mobile Wallet info
@@ -147,8 +147,8 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-[#F4F7F6] flex flex-col justify-between w-full">
       <div>
-        {/* Top Header - Secondary Brand Ocean Blue */}
-        <div className="bg-gradient-to-r from-[#1F6391] to-[#2980B9] text-white px-5 pt-5 pb-5 flex items-center justify-between shadow-md">
+        {/* Top Header - #2677AD */}
+        <div className="bg-[#2677AD] text-white px-5 pt-5 pb-5 flex items-center justify-between shadow-md">
           <button
             onClick={() => onNavigate('select-recipient')}
             className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm"

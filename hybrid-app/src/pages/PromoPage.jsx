@@ -25,9 +25,9 @@ export const PromoPage = ({ onNavigate }) => {
     },
     {
       id: 'promo-3',
-      title: 'রেমিটেন্স বোনাস ২.৫%',
-      code: 'REMIT25',
-      description: 'বিদেশ থেকে পাঠানো প্রতি রেমিটেন্সে সরকারি প্রণোদনা সহ অতিরিক্ত ২.৫% বিশেষ বোনাস।',
+      title: 'মানি ট্রান্সফার বোনাস ২.৫%',
+      code: 'BONUS25',
+      description: 'বিদেশ থেকে টাকা পাঠালে সরকারি প্রণোদনা সহ অতিরিক্ত ২.৫% বিশেষ বোনাস।',
       badge: 'স্পেশাল',
       color: 'from-amber-500 to-orange-600'
     }

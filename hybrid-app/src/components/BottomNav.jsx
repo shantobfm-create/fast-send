@@ -19,7 +19,7 @@ export const BottomNav = ({ currentScreen, onNavigate }) => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40">
-      <div className="bg-slate-950 border-t border-slate-800 px-4 py-2.5 flex items-center justify-around shadow-2xl shadow-black sm:rounded-b-[2.5rem]">
+      <div className="bg-[#2677AD] border-t border-white/10 px-4 py-2.5 flex items-center justify-around shadow-2xl sm:rounded-b-[2.5rem]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = 
@@ -34,18 +34,18 @@ export const BottomNav = ({ currentScreen, onNavigate }) => {
               onClick={() => handleTabClick(tab.id)}
               className={`flex flex-col items-center justify-center relative py-1 px-3 rounded-xl transition-all cursor-pointer ${
                 isActive 
-                  ? 'text-emerald-400 font-extrabold' 
-                  : 'text-slate-400 hover:text-slate-200 font-medium'
+                  ? 'text-white font-extrabold' 
+                  : 'text-white/70 hover:text-white font-medium'
               }`}
             >
               <div className="relative">
-                <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 stroke-[2.5] text-emerald-400' : 'stroke-[1.8] text-slate-400'}`} />
+                <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 stroke-[2.5] text-white' : 'stroke-[1.8] text-white/75'}`} />
               </div>
-              <span className={`text-[10px] mt-1 tracking-tight ${isActive ? 'font-bold text-emerald-400' : 'text-slate-400'}`}>
+              <span className={`text-[10px] mt-1 tracking-tight ${isActive ? 'font-bold text-white' : 'text-white/75'}`}>
                 {tab.name}
               </span>
               {isActive && (
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-0.5"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-white mt-0.5"></div>
               )}
             </button>
           );

@@ -3,7 +3,7 @@ import { ArrowLeft, MessageCircle } from 'lucide-react';
 
 export const StandardHeader = ({ title, onBack, rightAction }) => {
   return (
-    <div className="bg-gradient-to-r from-[#1F6391] to-[#2980B9] text-white px-5 py-4 flex items-center justify-between sticky top-0 z-40 select-none shadow-md">
+    <div className="bg-[#2677AD] text-white px-5 py-4 flex items-center justify-between sticky top-0 z-40 select-none shadow-md">
       <button 
         onClick={onBack} 
         className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm tap-effect cursor-pointer"

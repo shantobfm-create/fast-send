@@ -16,7 +16,7 @@ const defaultDb = {
   settings: {
     appName: "Fast Send",
     tagline: "❤️ এই ট্রান্সফারে কোনো ট্রান্সফার ফি নেই",
-    noticeText: "যেকোনো প্রয়োজনে এই WhatsApp নাম্বারে মেসেজ করুন: +8801754150019 | Fast Send এ দ্রুত ও নিরাপদ রেমিটেন্স সেবা চালু আছে!",
+    noticeText: "যেকোনো প্রয়োজনে এই WhatsApp নাম্বারে মেসেজ করুন: +8801754150019 | Fast Send এ দ্রুত ও নিরাপদ মানি ট্রান্সফার সেবা চালু আছে!",
     whatsappNumber: "+8801754150019",
     minTransferLimit: 500,
     maxTransferLimit: 30000,
@@ -81,7 +81,7 @@ const defaultDb = {
         // Local Bank Account (Emirates NBD, Mashreq, ADIB)
         bankName: "Emirates NBD",
         secondaryBankName: "Mashreq Bank / Abu Dhabi Islamic Bank (ADIB)",
-        accountName: "Fast Send Global Remittance LLC",
+        accountName: "Fast Send Global Services LLC",
         accountNumber: "AE25 0260 0012 3456 7890 123",
         iban: "AE25 0260 0012 3456 7890 123",
         // Local Mobile Wallet / P2P (Careem Pay, Botim Pay, Al Ansari Exchange)
@@ -264,7 +264,7 @@ app.post('/api/auth/register', (req, res) => {
   if (isBd || cleanPhone.startsWith('+880') || cleanPhone.startsWith('880') || country === 'Bangladesh') {
     return res.status(400).json({
       success: false,
-      message: "বাংলাদেশ থেকে অ্যাকাউন্ট তৈরি বন্ধ রয়েছে। শুধুমাত্র মালয়েশিয়া (🇲🇾), সৌদি আরব (🇸🇦) ও দুবাই (🇦🇪) থেকে রেমিটেন্স পাঠানো চালু আছে।"
+      message: "বাংলাদেশ থেকে অ্যাকাউন্ট তৈরি বন্ধ রয়েছে। শুধুমাত্র মালয়েশিয়া (🇲🇾), সৌদি আরব (🇸🇦) ও দুবাই (🇦🇪) থেকে টাকা পাঠানো চালু আছে।"
     });
   }
 
@@ -610,7 +610,7 @@ app.post('/api/transactions/remittance', (req, res) => {
     receiverPhone: recipient.phone || recipient.accountNumber || "",
     receiverName: recipient.name || "প্রাপক",
     method: recipient.provider || recipient.channel || "remittance",
-    methodName: `রেমিটেন্স (${finalCurrency} ➔ BDT)`,
+    methodName: `মানি ট্রান্সফার (${finalCurrency} ➔ BDT)`,
     paymentChannel: paymentChannel || "Local Bank Account",
     depositAccount: depositAccount || null,
     trxId: finalTrxId,
@@ -636,7 +636,7 @@ app.post('/api/transactions/remittance', (req, res) => {
 
   return res.json({
     success: true,
-    message: "রেমিটেন্স অর্ডার সফলভাবে জমা হয়েছে!",
+    message: "মানি ট্রান্সফার অর্ডার সফলভাবে জমা হয়েছে!",
     transaction: newTx
   });
 });

@@ -147,7 +147,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
     if (countryCode === '+880' || countryCode === 'Bangladesh') {
       return { 
         valid: false, 
-        message: 'বাংলাদেশ থেকে অ্যাকাউন্ট তৈরি বা টাকা পাঠানো বন্ধ রয়েছে। শুধুমাত্র মালয়েশিয়া (🇲🇾), সৌদি আরব (🇸🇦) ও দুবাই (🇦🇪) থেকে রেমিটেন্স পাঠানো চালু আছে।' 
+        message: 'বাংলাদেশ থেকে অ্যাকাউন্ট তৈরি বা টাকা পাঠানো বন্ধ রয়েছে। শুধুমাত্র মালয়েশিয়া (🇲🇾), সৌদি আরব (🇸🇦) ও দুবাই (🇦🇪) থেকে টাকা পাঠানো চালু আছে।' 
       };
     }
 
@@ -583,7 +583,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-slate-900 text-sm">পার্সোনাল অ্যাকাউন্ট</h3>
-                        <p className="text-xs text-slate-500 font-normal">টাকা পাঠানো, অ্যাড-মানি ও রেমিটেন্স সেবা</p>
+                        <p className="text-xs text-slate-500 font-normal">টাকা পাঠানো, অ্যাড-মানি ও মানি ট্রান্সফার সেবা</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
@@ -616,7 +616,7 @@ export const FrontAuthPage = ({ onNavigate, externalTab, onTabChange }) => {
                 <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200 text-xs text-emerald-950 font-normal flex items-start gap-2.5">
                   <ShieldCheck className="w-5 h-5 text-[#00823B] shrink-0 mt-0.5" />
                   <span>
-                    রেমিটেন্স প্রেরণের জন্য শুধুমাত্র <b>মালয়েশিয়া (🇲🇾)</b>, <b>সৌদি আরব (🇸🇦)</b> এবং <b>দুবাই (🇦🇪)</b> থেকে অ্যাকাউন্ট তৈরি করা যাবে। বাংলাদেশ শুধু টাকা গ্রহণকারী দেশ হিসেবে কার্যকর।
+                    টাকা পাঠানোর জন্য শুধুমাত্র <b>মালয়েশিয়া (🇲🇾)</b>, <b>সৌদি আরব (🇸🇦)</b> এবং <b>দুবাই (🇦🇪)</b> থেকে অ্যাকাউন্ট তৈরি করা যাবে। বাংলাদেশ শুধু টাকা গ্রহণকারী দেশ হিসেবে কার্যকর।
                   </span>
                 </div>
               </div>

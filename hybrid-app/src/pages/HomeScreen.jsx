@@ -98,8 +98,8 @@ export const HomeScreen = ({ onNavigate }) => {
 
   return (
     <div className="min-h-screen bg-[#F4F7F6] pb-20 w-full">
-      {/* Top App Header with Primary Emerald Gradient & Brand Identity */}
-      <div className="bg-gradient-to-br from-[#1F6391] via-[#2980B9] to-[#25CC71] text-white px-5 pt-6 pb-8 shadow-md">
+      {/* Top App Header with #2677AD & Brand Identity */}
+      <div className="bg-[#2677AD] text-white px-5 pt-6 pb-8 shadow-md">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center font-black text-white shadow-sm text-base">

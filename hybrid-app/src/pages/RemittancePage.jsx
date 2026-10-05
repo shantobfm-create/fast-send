@@ -215,7 +215,7 @@ export const RemittancePage = ({ onNavigate, initialChannel = 'bkash' }) => {
           <button onClick={() => onNavigate('home')} className="p-1 cursor-pointer text-black hover:opacity-70">
             <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
           </button>
-          <h1 className="font-bold text-sm tracking-tight text-black">রেমিটেন্স আবেদন গৃহীত</h1>
+          <h1 className="font-bold text-sm tracking-tight text-black">মানি ট্রান্সফার আবেদন গৃহীত</h1>
           <div className="w-5" />
         </div>
 
@@ -303,7 +303,7 @@ export const RemittancePage = ({ onNavigate, initialChannel = 'bkash' }) => {
               টাকা পাঠান (Send Money)
             </h1>
             <p className="text-[11px] text-neutral-500 font-medium">
-              প্রবাসী রেমিটেন্স সেবা
+              প্রবাসী মানি ট্রান্সফার সেবা
             </p>
           </div>
 

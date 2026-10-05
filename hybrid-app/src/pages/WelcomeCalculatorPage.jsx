@@ -102,7 +102,7 @@ export const WelcomeCalculatorPage = ({ onNavigate }) => {
         {/* Security / Trust note */}
         <div className="my-4 flex items-center justify-center gap-1.5 text-xs text-slate-500 text-center">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>নিরাপদ ও তাৎক্ষণিক রেমিটেন্স ডেলিভারি</span>
+          <span>নিরাপদ ও তাৎক্ষণিক মানি ট্রান্সফার ডেলিভারি</span>
         </div>
 
         {/* Action Buttons: Login & Registration */}

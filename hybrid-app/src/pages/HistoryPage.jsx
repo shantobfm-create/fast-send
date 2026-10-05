@@ -50,8 +50,8 @@ export const HistoryPage = ({ onNavigate, currentScreen }) => {
   const notifications = [
     {
       id: 'notif-1',
-      title: 'রেমিটেন্স সফল ও অনুমোদিত',
-      message: 'আপনার পাঠানো রেমিটেন্স যাচাই করে বাংলাদেশে প্রাপকের একাউন্টে টাকা সফলভাবে পাঠিয়ে দেওয়া হয়েছে।',
+      title: 'মানি ট্রান্সফার সফল ও অনুমোদিত',
+      message: 'আপনার পাঠানো টাকা যাচাই করে বাংলাদেশে প্রাপকের একাউন্টে সফলভাবে পাঠিয়ে দেওয়া হয়েছে।',
       time: 'আজ ০২:১৫ PM',
       type: 'success',
       unread: true
@@ -120,7 +120,7 @@ export const HistoryPage = ({ onNavigate, currentScreen }) => {
 
     if (isRemittance) {
       return {
-        title: 'রেমিটেন্স প্রেরণ',
+        title: 'টাকা পাঠানো (সেন্ড মানি)',
         colorBg: 'bg-purple-100 text-purple-700',
         initial: (tx.recipient?.name?.[0] || 'R').toUpperCase(),
         isOutgoing: true,
@@ -251,11 +251,11 @@ export const HistoryPage = ({ onNavigate, currentScreen }) => {
                   আপনার এখনো কোনো লেনদেন নেই অথবা সার্চের সাথে কোনো ফলাফল মেলেনি।
                 </p>
                 <button
-                  onClick={() => onNavigate('remittance')}
-                  className="bg-[#00823B] text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5"
+                  onClick={() => onNavigate('select-recipient')}
+                  className="bg-[#25CC71] hover:bg-[#1EA85D] text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>রেমিটেন্স পাঠান</span>
+                  <span>টাকা পাঠান</span>
                 </button>
               </div>
             ) : (
@@ -446,7 +446,7 @@ export const HistoryPage = ({ onNavigate, currentScreen }) => {
                 <span className="text-slate-500">লেনদেনের ধরন:</span>
                 <span className="font-bold text-slate-900">
                   {selectedTx.type === 'remittance' 
-                    ? `প্রবাসী রেমিটেন্স (${selectedTx.senderCurrency || 'MYR'} ➔ BDT)` 
+                    ? `মানি ট্রান্সফার (${selectedTx.senderCurrency || 'MYR'} ➔ BDT)` 
                     : (selectedTx.methodName || selectedTx.method || 'ট্রান্সফার')}
                 </span>
               </div>
@@ -594,7 +594,7 @@ export const HistoryPage = ({ onNavigate, currentScreen }) => {
             <div className="space-y-1.5">
               {[
                 { id: 'all', label: 'সকল লেনদেন' },
-                { id: 'remittance', label: 'প্রবাসী রেমিটেন্স' },
+                { id: 'remittance', label: 'মানি ট্রান্সফার' },
                 { id: 'add_money', label: 'অ্যাড-মানি' },
                 { id: 'transfer', label: 'অভ্যন্তরীণ ট্রান্সফার' }
               ].map((f) => (

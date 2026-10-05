@@ -25,7 +25,7 @@ export const HomePage = ({ onNavigate, currentScreen }) => {
       {/* 3. WhatsApp Notice Bar */}
       <NoticeMarquee />
 
-      {/* 3. Row 1: Top 4 Green Actions (অ্যাড-মানি, নোটিশ, রেমিটেন্স, বিল-পে) */}
+      {/* 3. Row 1: Top 4 Green Actions (অ্যাড-মানি, নোটিশ, সেন্ড মানি, বিল-পে) */}
       <QuickActions onNavigate={onNavigate} />
 
       {/* 4. Promo Banner */}

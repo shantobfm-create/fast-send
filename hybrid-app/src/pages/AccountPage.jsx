@@ -115,22 +115,22 @@ export const AccountPage = ({ onNavigate }) => {
     <div className="bg-white flex flex-col max-w-md mx-auto relative select-none w-full min-h-screen font-sans pb-24">
       
       {/* Top Header & Profile Banner */}
-      <div className="pt-6 px-6 pb-4 border-b border-slate-100">
+      <div className="bg-[#2677AD] text-white pt-6 px-6 pb-6 shadow-md">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-xl font-bold text-white tracking-tight">
               {user?.name || "Hasibul Hasan Santo"}
             </h1>
-            <p className="text-xs font-mono font-medium text-slate-400 mt-0.5">
+            <p className="text-xs font-mono font-medium text-white/80 mt-0.5">
               {user?.phone || "+880 1754-150019"}
             </p>
           </div>
 
-          <div className="w-12 h-12 rounded-full bg-emerald-50 border-2 border-[#00823B] overflow-hidden flex items-center justify-center shadow-xs shrink-0">
+          <div className="w-12 h-12 rounded-full bg-white/20 border-2 border-white/40 overflow-hidden flex items-center justify-center shadow-xs shrink-0">
             {user?.photo ? (
               <img src={user.photo} alt={user.name} className="w-full h-full object-cover" />
             ) : (
-              <span className="font-bold text-[#00823B] text-base">
+              <span className="font-bold text-white text-base">
                 {user?.name?.[0] || 'H'}
               </span>
             )}
@@ -139,11 +139,11 @@ export const AccountPage = ({ onNavigate }) => {
 
         {/* User Badges */}
         <div className="flex items-center gap-2 mt-3">
-          <span className="text-[11px] bg-emerald-50 text-[#00823B] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" />
+          <span className="text-[11px] bg-white/20 text-white font-bold px-2.5 py-0.5 rounded-full border border-white/30 flex items-center gap-1">
+            <CheckCircle2 className="w-3 h-3 text-emerald-300" />
             <span>ভেরিফাইড অ্যাকাউন্ট</span>
           </span>
-          <span className="text-[11px] bg-slate-100 text-slate-600 font-bold px-2.5 py-0.5 rounded-full border border-slate-200">
+          <span className="text-[11px] bg-white/15 text-white/90 font-bold px-2.5 py-0.5 rounded-full border border-white/20">
             {user?.country === 'Saudi Arabia' ? '🇸🇦 সৌদি আরব' : (user?.country === 'UAE' ? '🇦🇪 দুবাই' : '🇲🇾 মালয়েশিয়া')}
           </span>
         </div>
@@ -258,7 +258,7 @@ export const AccountPage = ({ onNavigate }) => {
               <button
                 onClick={() => {
                   setActiveModal(null);
-                  onNavigate('remittance');
+                  onNavigate('select-recipient');
                 }}
                 className="w-full bg-emerald-50 text-[#00823B] border border-emerald-300 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5"
               >
@@ -379,7 +379,7 @@ export const AccountPage = ({ onNavigate }) => {
             <div className="space-y-2 text-xs text-slate-600 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 leading-relaxed">
               <p><b>কোম্পানি:</b> Fast Send Payments Co.</p>
               <p><b>নিবন্ধন:</b> FinCEN MSB Licensed & Bank Negara Malaysia compliance partner.</p>
-              <p><b>এনক্রিপশন:</b> All international remittance transactions are encrypted with 256-bit SSL technology.</p>
+              <p><b>এনক্রিপশন:</b> All international money transfer transactions are encrypted with 256-bit SSL technology.</p>
             </div>
 
             <button

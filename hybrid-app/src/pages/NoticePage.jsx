@@ -26,7 +26,7 @@ export const NoticePage = ({ onNavigate }) => {
           </div>
           
           <p className="text-xs text-slate-700 leading-relaxed">
-            {settings.noticeText || "সম্মানিত গ্রাহকবৃন্দ, Fast Send সিস্টেমে আপনাকে স্বাগতম। যেকোনো ধরনের রেমিটেন্স, অ্যাড মানি বা বিল পরিশোধ সেবা পেতে আমাদের ২৪/৭ সাপোর্ট সক্রিয় রয়েছে।"}
+            {settings.noticeText || "সম্মানিত গ্রাহকবৃন্দ, Fast Send সিস্টেমে আপনাকে স্বাগতম। যেকোনো ধরনের টাকা পাঠানো, অ্যাড মানি বা বিল পরিশোধ সেবা পেতে আমাদের ২৪/৭ সাপোর্ট সক্রিয় রয়েছে।"}
           </p>
 
           <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 text-[11px] text-emerald-950 space-y-0.5">

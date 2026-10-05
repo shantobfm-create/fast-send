@@ -35,8 +35,8 @@ export const QuickActions = ({ onNavigate }) => {
       action: () => onNavigate('notice')
     },
     {
-      id: 'remittance',
-      name: 'রেমিটেন্স',
+      id: 'send-money',
+      name: 'সেন্ড মানি',
       icon: (
         <svg viewBox="0 0 50 50" className="w-10 h-10">
           {/* 3D Mobile with Dollar / Cash */}
@@ -47,7 +47,7 @@ export const QuickActions = ({ onNavigate }) => {
           <text x="25" y="28.5" textAnchor="middle" fill="#047857" fontSize="10" fontWeight="bold">৳</text>
         </svg>
       ),
-      action: () => onNavigate('remittance')
+      action: () => onNavigate('select-recipient')
     },
     {
       id: 'bill-pay',

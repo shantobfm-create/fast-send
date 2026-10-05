@@ -6,7 +6,7 @@ const translations = {
   en: {
     // General
     appName: "Fast Send",
-    tagline: "Cross-Border Manual Remittance",
+    tagline: "Cross-Border Money Transfer",
     getStarted: "Get Started",
     continue: "Continue",
     back: "Back",
@@ -24,7 +24,7 @@ const translations = {
 
     // Screen 1: Onboarding
     welcomeHeading: "Send Money Home, Safely & Fast",
-    welcomeSub: "Direct remittance from Malaysia & UAE to Bangladeshi Mobile Wallets and Banks.",
+    welcomeSub: "Direct money transfer from Malaysia & UAE to Bangladeshi Mobile Wallets and Banks.",
     selectCountryTitle: "Where are you sending from?",
     countryMalaysia: "Malaysia",
     countryUae: "United Arab Emirates",
@@ -53,7 +53,7 @@ const translations = {
     quickSendTitle: "Quick Send",
     recentActivity: "Recent Activity",
     viewAll: "View All",
-    noTransactions: "No remittance orders yet.",
+    noTransactions: "No transfer orders yet.",
     statusSubmitted: "Submitted",
     statusReviewing: "Under Review",
     statusProcessing: "Processing Payout",
@@ -125,7 +125,7 @@ const translations = {
   bn: {
     // General
     appName: "ফাস্ট সেন্ড",
-    tagline: "প্রবাসী রেমিটেন্স প্ল্যাটফর্ম",
+    tagline: "প্রবাসী মানি ট্রান্সফার প্ল্যাটফর্ম",
     getStarted: "শুরু করুন",
     continue: "এগিয়ে যান",
     back: "পেছনে যান",
@@ -143,7 +143,7 @@ const translations = {
 
     // Screen 1: Onboarding
     welcomeHeading: "নিরাপদে ও দ্রুত দেশে টাকা পাঠান",
-    welcomeSub: "মালয়েশিয়া ও দুবাই থেকে বাংলাদেশের যেকোনো বিকাশ, নগদ, রকেট ও ব্যাংক অ্যাকাউন্টে সরাসরি রেমিটেন্স।",
+    welcomeSub: "মালয়েশিয়া ও দুবাই থেকে বাংলাদেশের যেকোনো বিকাশ, নগদ, রকেট ও ব্যাংক অ্যাকাউন্টে সরাসরি টাকা পাঠান।",
     selectCountryTitle: "আপনি কোন দেশ থেকে টাকা পাঠাচ্ছেন?",
     countryMalaysia: "মালয়েশিয়া",
     countryUae: "সংযুক্ত আরব আমিরাত (দুবাই)",
@@ -172,7 +172,7 @@ const translations = {
     quickSendTitle: "কুইক সেন্ড (সংরক্ষিত প্রাপক)",
     recentActivity: "সাম্প্রতিক লেনদেন",
     viewAll: "সবগুলো দেখুন",
-    noTransactions: "এখনো কোনো রেমিটেন্স অর্ডার নেই।",
+    noTransactions: "এখনো কোনো ট্রান্সফার অর্ডার নেই।",
     statusSubmitted: "জমা পড়েছে",
     statusReviewing: "যাচাই চলছে",
     statusProcessing: "টাকা পাঠানো হচ্ছে",
