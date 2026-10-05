@@ -40,11 +40,12 @@ const defaultDb = {
         flag: "🇲🇾",
         rateToBdt: 27.50,
         bankName: "Maybank (Malayan Banking Berhad)",
-        accountName: "Fast Send Global MY",
-        accountNumber: "514012345678",
+        accountName: "QuickRemit Services / Fast Send Global",
+        accountNumber: "1642 9840 2201",
         duitNowId: "+60123456789",
+        duitNowQr: "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DuitNow-164298402201-FastSend",
         active: true,
-        instructions: "Maybank2u অথবা যেকোনো মালয়েশিয়ান ব্যাংক থেকে DuitNow / ব্যাংক ট্রান্সফার করে পেমেন্টের স্ক্রিনশট আপলোড করুন।"
+        instructions: "Maybank2u অথবা যেকোনো মালয়েশিয়ান ব্যাংক থেকে DuitNow QR বা ব্যাংক ট্রান্সফার করে পেমেন্টের স্ক্রিনশট আপলোড করুন।"
       },
       {
         id: "SA",
@@ -461,6 +462,49 @@ app.delete('/api/recipients/:id', (req, res) => {
   return res.json({ success: true, message: "প্রাপক মুছে ফেলা হয়েছে!" });
 });
 
+app.post('/api/auth/otp-login', (req, res) => {
+  const { phone, otp, country = "Malaysia" } = req.body;
+  if (!phone) return res.status(400).json({ success: false, message: "ফোন নম্বর আবশ্যক।" });
+
+  const cleanPhone = phone.trim().replace(/[\s\-\(\)]/g, '');
+  const isMY = cleanPhone.startsWith('+60') || cleanPhone.startsWith('60') || country === 'Malaysia';
+  const isAE = cleanPhone.startsWith('+971') || cleanPhone.startsWith('971') || country === 'UAE';
+
+  if (!isMY && !isAE) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "শুধুমাত্র মালয়েশিয়া (+60) এবং দুবাই/ইউএই (+971) এর নম্বর দিয়ে লগইন করা সম্ভব।" 
+    });
+  }
+
+  const db = loadDb();
+  let user = db.users.find(u => (u.phone || '').trim().replace(/[\s\-\(\)]/g, '') === cleanPhone);
+
+  if (!user) {
+    // Auto register for seamless international onboarding
+    user = {
+      id: "u-" + Math.floor(1000 + Math.random() * 9000),
+      name: isAE ? "দুবাই প্রবাসী গ্রাহক" : "মালয়েশিয়া প্রবাসী গ্রাহক",
+      phone: cleanPhone,
+      country: isAE ? "UAE" : "Malaysia",
+      currency: isAE ? "AED" : "MYR",
+      userType: "পার্সোনাল",
+      pin: "123456",
+      balance: 0,
+      status: "active",
+      createdAt: new Date().toISOString()
+    };
+    db.users.push(user);
+    saveDb(db);
+  }
+
+  return res.json({ 
+    success: true, 
+    message: "ওটিপি যাচাই সফল হয়েছে!", 
+    user 
+  });
+});
+
 // ==================== REMITTANCE MANUAL FLOW ====================
 app.post('/api/transactions/remittance', (req, res) => {
   const {
@@ -495,16 +539,21 @@ app.post('/api/transactions/remittance', (req, res) => {
     return res.status(400).json({ success: false, message: "পেমেন্টের স্ক্রিনশট / রসিদ আপলোড করা আবশ্যক!" });
   }
 
-  const txId = "FS-REM-" + Math.floor(100000 + Math.random() * 900000);
+  // Unique PRD Order Tracking ID: #MYBD-XXXXX or #AEBD-XXXXX
+  const prefix = (senderCurrency === 'AED' || senderCountry === 'UAE') ? '#AEBD-' : '#MYBD-';
+  const orderId = prefix + Math.floor(10000 + Math.random() * 90000);
   const numRate = Number(exchangeRate) || 1;
   const numReceive = Number(receiveAmount) || Math.round(numSend * numRate);
+  const nowIso = new Date().toISOString();
+  const timeFormatted = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const newTx = {
-    id: txId,
+    id: orderId,
+    trackingId: orderId,
     type: "remittance",
     senderPhone: cleanSenderPhone,
     senderName: senderName || (user ? user.name : "প্রবাসী গ্রাহক"),
-    senderCountry: senderCountry || "Malaysia",
+    senderCountry: senderCountry || (senderCurrency === 'AED' ? "UAE" : "Malaysia"),
     senderCurrency: senderCurrency || "MYR",
     sendAmount: numSend,
     exchangeRate: numRate,
@@ -532,7 +581,14 @@ app.post('/api/transactions/remittance', (req, res) => {
     proofImage: proofImage,
     senderNote: senderNote || "",
     status: "pending",
-    requestedAt: new Date().toISOString(),
+    timelineStatus: "reviewing",
+    timelineSteps: [
+      { key: "submitted", title: "Order Placed", titleBn: "অর্ডার জমা পড়েছে", time: timeFormatted, done: true },
+      { key: "reviewing", title: "Admin Verification in Progress", titleBn: "এডমিন যাচাই প্রক্রিয়াধীন", desc: "Verifying deposit slip (10-30 mins)", descBn: "আপনার রসিদ যাচাই করা হচ্ছে (১০-৩০ মিনিট)", done: false, active: true },
+      { key: "processing", title: "Sending to Recipient", titleBn: "বাংলাদেশে টাকা পাঠানো হচ্ছে", desc: "Transferring BDT to recipient", descBn: "প্রাপকের বিকাশ/ব্যাংকে ট্রান্সফার প্রক্রিয়াধীন", done: false },
+      { key: "completed", title: "Completed", titleBn: "সফলভাবে ডেলিভারড", desc: "Successfully delivered", descBn: "প্রাপকের অ্যাকাউন্টে টাকা পৌঁছে গেছে", done: false }
+    ],
+    requestedAt: nowIso,
     adminProcessedAt: null,
     adminNote: "এডমিন স্ক্রিনশট ও পেমেন্ট যাচাই করে বাংলাদেশে টাকা পাঠিয়ে দিবেন।",
     payoutTrxId: null
@@ -543,7 +599,7 @@ app.post('/api/transactions/remittance', (req, res) => {
 
   return res.json({
     success: true,
-    message: "রেমিটেন্স রিকোয়েস্ট সফলভাবে জমা হয়েছে! এডমিন যাচাই করে প্রাপকের নম্বরে টাকা পাঠিয়ে দিবেন।",
+    message: "রেমিটেন্স অর্ডার সফলভাবে জমা হয়েছে!",
     transaction: newTx
   });
 });
@@ -799,7 +855,7 @@ app.post('/api/admin/users/update-status', (req, res) => {
 
 app.post('/api/admin/transactions/:id/status', (req, res) => {
   const { id } = req.params;
-  const { status, adminNote, payoutTrxId } = req.body;
+  const { status, adminNote, payoutTrxId, timelineStatus, rejectReason } = req.body;
   const db = loadDb();
   const tx = db.transactions.find(t => t.id === id);
   if (!tx) return res.status(404).json({ success: false, message: "ট্রানজেকশন পাওয়া যায়নি।" });
@@ -809,6 +865,31 @@ app.post('/api/admin/transactions/:id/status', (req, res) => {
   tx.adminProcessedAt = new Date().toISOString();
   if (adminNote) tx.adminNote = adminNote;
   if (payoutTrxId) tx.payoutTrxId = payoutTrxId;
+  if (rejectReason) tx.rejectReason = rejectReason;
+
+  // Timeline Step Status Mapping
+  if (status === 'approved' || status === 'completed') {
+    tx.timelineStatus = 'completed';
+    tx.status = 'approved';
+    if (tx.timelineSteps) {
+      tx.timelineSteps.forEach(s => { s.done = true; s.active = false; });
+      const comp = tx.timelineSteps.find(s => s.key === 'completed');
+      if (comp) comp.time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+  } else if (status === 'rejected') {
+    tx.timelineStatus = 'rejected';
+    tx.status = 'rejected';
+  } else if (timelineStatus) {
+    tx.timelineStatus = timelineStatus;
+    if (timelineStatus === 'processing' && tx.timelineSteps) {
+      const step1 = tx.timelineSteps.find(s => s.key === 'submitted');
+      const step2 = tx.timelineSteps.find(s => s.key === 'reviewing');
+      const step3 = tx.timelineSteps.find(s => s.key === 'processing');
+      if (step1) step1.done = true;
+      if (step2) { step2.done = true; step2.active = false; }
+      if (step3) { step3.active = true; step3.done = false; }
+    }
+  }
 
   const sender = db.users.find(u => u.phone === tx.senderPhone);
   if (tx.type === 'add_money' && status === 'approved' && old !== 'approved') {
@@ -819,7 +900,7 @@ app.post('/api/admin/transactions/:id/status', (req, res) => {
   }
 
   saveDb(db);
-  return res.json({ success: true, message: `ট্রানজেকশন ${status === 'approved' ? 'অনুমোদন' : 'বাতিল'} হয়েছে!`, transaction: tx });
+  return res.json({ success: true, message: `ট্রানজেকশন ${status === 'approved' ? 'অনুমোদন' : 'আপডেট'} হয়েছে!`, transaction: tx });
 });
 
 app.post('/api/admin/settings', (req, res) => {

@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { useApp } from './context/AppContext';
 import { Toast } from './components/Toast';
 
+// PRD Dedicated Screens
+import { OnboardingScreen } from './pages/OnboardingScreen';
+import { AuthScreen } from './pages/AuthScreen';
+import { HomeScreen } from './pages/HomeScreen';
+import { SelectRecipientScreen } from './pages/SelectRecipientScreen';
+import { AddRecipientScreen } from './pages/AddRecipientScreen';
+import { PaymentInstructionScreen } from './pages/PaymentInstructionScreen';
+import { OrderTrackerScreen } from './pages/OrderTrackerScreen';
+
 // Pages
 import { FrontAuthPage } from './pages/FrontAuthPage';
 import { WelcomeCalculatorPage } from './pages/WelcomeCalculatorPage';
@@ -42,73 +51,49 @@ export default function App() {
 
   const renderScreen = () => {
     if (!user) {
-      return (
-        <FrontAuthPage 
-          onNavigate={navigate} 
-          externalTab={authTab}
-          onTabChange={setAuthTab}
-        />
-      );
+      if (currentScreen === 'onboarding') {
+        return <OnboardingScreen onNavigate={navigate} />;
+      }
+      if (currentScreen === 'auth') {
+        return <AuthScreen onNavigate={navigate} />;
+      }
+      return <OnboardingScreen onNavigate={navigate} />;
     }
 
     switch (currentScreen) {
-      case 'calculator':
-        return <WelcomeCalculatorPage onNavigate={navigate} />;
-      case 'remittance':
-        return <RemittancePage onNavigate={navigate} />;
-      case 'login':
-        return <LoginPage onNavigate={navigate} />;
-      case 'register':
-        return <RegisterPage onNavigate={navigate} />;
+      case 'onboarding':
+        return <OnboardingScreen onNavigate={navigate} />;
+      case 'auth':
+        return <AuthScreen onNavigate={navigate} />;
       case 'home':
-        return <HomePage onNavigate={navigate} currentScreen={currentScreen} />;
-      case 'add-money':
-        return <AddMoneyPage onNavigate={navigate} initialMfs={pageParams.selectedMfs} />;
-      case 'add-money-mobile':
-        return <AddMoneyMobilePage onNavigate={navigate} />;
-      case 'add-money-wallet':
-        return <AddMoneyWalletDetailPage onNavigate={navigate} selectedWalletId={pageParams.selectedWalletId} />;
-      case 'add-money-bank':
-        return <AddMoneyBankPage onNavigate={navigate} />;
-      case 'add-money-card':
-        return <AddMoneyCardPage onNavigate={navigate} />;
-      case 'add-money-cash':
-        return <AddMoneyCashPage onNavigate={navigate} />;
+        return <HomeScreen onNavigate={navigate} />;
+      case 'select-recipient':
+        return <SelectRecipientScreen onNavigate={navigate} />;
+      case 'add-recipient':
+        return <AddRecipientScreen onNavigate={navigate} />;
+      case 'payment-instruction':
+      case 'payment':
+        return <PaymentInstructionScreen onNavigate={navigate} />;
+      case 'order-tracker':
       case 'receipt':
-        return <ReceiptPage onNavigate={navigate} txData={pageParams.txData} />;
-      case 'transfer':
-        return <RemittancePage onNavigate={navigate} initialChannel={pageParams.selectedWallet || 'bkash'} />;
-      case 'bank-transfer':
-        return <RemittancePage onNavigate={navigate} initialChannel="bank" />;
-      case 'promo':
-        return <PromoPage onNavigate={navigate} />;
-      case 'bill-pay':
-        return <PayBillPage onNavigate={navigate} />;
+        return <OrderTrackerScreen onNavigate={navigate} />;
       case 'history':
       case 'statement':
         return <HistoryPage onNavigate={navigate} currentScreen={currentScreen} />;
       case 'account':
       case 'profile':
         return <AccountPage onNavigate={navigate} />;
-      case 'regulatory':
-      case 'about':
-        return <RegulatoryPage onNavigate={navigate} />;
-      case 'notice':
-      case 'notice-modal':
-        return <NoticePage onNavigate={navigate} />;
-      case 'loan':
-        return <LoanPage onNavigate={navigate} />;
       case 'support':
       case 'help':
         return <SupportPage onNavigate={navigate} />;
       default:
-        return <HomePage onNavigate={navigate} currentScreen={currentScreen} />;
+        return <HomeScreen onNavigate={navigate} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-neutral-100 text-black flex justify-center items-start sm:py-4">
-      <div className={`w-full max-w-md bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-xl border border-neutral-200 relative flex flex-col font-sans ${user ? 'pb-20' : ''}`}>
+    <div className="min-h-screen bg-slate-100 text-slate-900 flex justify-center items-start sm:py-4">
+      <div className={`w-full max-w-md bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-xl border border-slate-200 relative flex flex-col font-sans ${user ? 'pb-20' : ''}`}>
         {renderScreen()}
         
         {/* Fixed Global Bottom Navigation only for logged-in users */}

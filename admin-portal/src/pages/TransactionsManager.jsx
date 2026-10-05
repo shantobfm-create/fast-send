@@ -363,7 +363,31 @@ export const TransactionsManager = () => {
               <div className="space-y-3 pt-2">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    বিডি পেমেন্ট TrxID / রেফারেন্স (প্রাপককে টাকা পাঠানোর পর TrxID লিখুন):
+                    স্ট্যাটাস / প্রগ্রেস আপডেট করুন:
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                    <button
+                      type="button"
+                      onClick={() => handleAction('reviewing')}
+                      disabled={loading}
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1"
+                    >
+                      <span>🔍 স্লিপ রিভিউ হচ্ছে (Reviewing)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAction('processing')}
+                      disabled={loading}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1"
+                    >
+                      <span>⚡ টাকা পাঠানো হচ্ছে (Processing)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 pt-3">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    বিডি পেমেন্ট TrxID (প্রাপককে টাকা পাঠানোর পর TrxID লিখুন):
                   </label>
                   <input
                     type="text"
@@ -376,15 +400,20 @@ export const TransactionsManager = () => {
 
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1">
-                    এডমিন নোট (ঐচ্ছিক):
+                    বাতিল করার কারণ অথবা এডমিন নোট:
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={adminNote}
                     onChange={(e) => setAdminNote(e.target.value)}
-                    placeholder="যেমন: টাকা প্রাপকের বিকাশে সফলভাবে পাঠানো হয়েছে।"
-                    className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#00823B]"
-                  />
+                    className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#00823B] mb-2"
+                  >
+                    <option value="">-- নোট বা বাতিলের কারণ নির্বাচন করুন --</option>
+                    <option value="টাকা একাউন্টে জমা হয়নি (Payment not received)">টাকা একাউন্টে জমা হয়নি (Payment not received)</option>
+                    <option value="প্রাপকের মোবাইল / একাউন্ট নম্বর ভুল (Invalid recipient number)">প্রাপকের মোবাইল / একাউন্ট নম্বর ভুল (Invalid recipient number)</option>
+                    <option value="ভুল বা নকল স্লিপ দেওয়া হয়েছে (Fake slip / Ineligible)">ভুল বা নকল স্লিপ দেওয়া হয়েছে (Fake slip / Ineligible)</option>
+                    <option value="প্রাপকের সীমা অতিক্রান্ত (Recipient limit exceeded)">প্রাপকের সীমা অতিক্রান্ত (Recipient limit exceeded)</option>
+                    <option value="সফলভাবে সম্পন্ন হয়েছে (Transfer complete)">সফলভাবে সম্পন্ন হয়েছে (Transfer complete)</option>
+                  </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
@@ -401,7 +430,7 @@ export const TransactionsManager = () => {
                     className="bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3 rounded-xl text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>টাকা পাঠানো হয়েছে ও অনুমোদন করুন</span>
+                    <span>টাকা পেইড ও কমপ্লিট করুন</span>
                   </button>
                 </div>
               </div>

@@ -39,6 +39,26 @@ export const AppProvider = ({ children }) => {
     banners: []
   });
 
+  const [selectedCountry, setSelectedCountry] = useState(() => {
+    return localStorage.getItem('fastsend_country') || 'MY'; // 'MY' or 'AE'
+  });
+
+  const [transferDraft, setTransferDraft] = useState({
+    sourceAmount: 1000,
+    sourceCurrency: 'MYR',
+    targetAmount: 27500,
+    targetCurrency: 'BDT',
+    recipient: null,
+    paymentMethod: null
+  });
+
+  const [activeOrder, setActiveOrder] = useState(null);
+
+  const setCountry = (country) => {
+    setSelectedCountry(country);
+    localStorage.setItem('fastsend_country', country);
+  };
+
   const [transactions, setTransactions] = useState([]);
   const [recipients, setRecipients] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -127,6 +147,34 @@ export const AppProvider = ({ children }) => {
       if (eventSource) eventSource.close();
     };
   }, []);
+
+  const otpLogin = async (phone, otp, country = selectedCountry) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/otp-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp, country })
+      });
+      const data = await res.json();
+      setLoading(false);
+
+      if (data.success && data.user) {
+        setUser(data.user);
+        localStorage.setItem('fastsend_user', JSON.stringify(data.user));
+        showToast(data.message || "লগইন সফল হয়েছে!", "success");
+        fetchUserData(data.user.phone);
+        return { success: true };
+      } else {
+        showToast(data.message || "ওটিপি ভেরিফিকেশন ব্যর্থ হয়েছে।", "error");
+        return { success: false, message: data.message };
+      }
+    } catch (err) {
+      setLoading(false);
+      showToast("সার্ভারে সংযোগ করা সম্ভব হয়নি।", "error");
+      return { success: false, message: err.message };
+    }
+  };
 
   const login = async (phone, pin) => {
     setLoading(true);
@@ -456,11 +504,18 @@ export const AppProvider = ({ children }) => {
       value={{
         user,
         settings,
+        selectedCountry,
+        setCountry,
+        transferDraft,
+        setTransferDraft,
+        activeOrder,
+        setActiveOrder,
         transactions,
         recipients,
         loading,
         toast,
         showToast,
+        otpLogin,
         login,
         register,
         resetPin,
