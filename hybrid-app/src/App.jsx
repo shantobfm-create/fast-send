@@ -54,8 +54,8 @@ export default function App() {
       if (currentScreen === 'onboarding') {
         return <OnboardingScreen onNavigate={navigate} />;
       }
-      if (currentScreen === 'auth') {
-        return <AuthScreen onNavigate={navigate} />;
+      if (currentScreen === 'auth' || currentScreen === 'login' || currentScreen === 'register') {
+        return <AuthScreen onNavigate={navigate} defaultTab={pageParams.defaultTab || (currentScreen === 'register' ? 'register' : 'login')} />;
       }
       return <OnboardingScreen onNavigate={navigate} />;
     }

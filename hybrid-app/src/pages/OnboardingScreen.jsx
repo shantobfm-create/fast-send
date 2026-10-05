@@ -171,16 +171,20 @@ export const OnboardingScreen = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* CTA Button */}
-      <div className="pt-6 pb-2">
+      {/* CTA Buttons: Get Started / Register vs Login */}
+      <div className="pt-6 pb-2 space-y-2.5">
         <button
-          onClick={handleStart}
+          onClick={() => onNavigate('auth', { defaultTab: 'register' })}
           className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center space-x-2 transition-all text-base"
         >
-          <span>{t('getStarted')}</span>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
+          <span>{language === 'bn' ? 'নতুন রেজিস্ট্রেশন করুন ➔' : 'Register Now ➔'}</span>
+        </button>
+
+        <button
+          onClick={() => onNavigate('auth', { defaultTab: 'login' })}
+          className="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white font-semibold rounded-2xl border border-slate-800 flex items-center justify-center space-x-2 transition-all text-sm shadow-md"
+        >
+          <span>{language === 'bn' ? 'লগইন করুন (Log In)' : 'Log In to Account'}</span>
         </button>
       </div>
     </div>
