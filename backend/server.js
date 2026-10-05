@@ -596,7 +596,21 @@ app.post('/api/transactions/add-money', (req, res) => {
 });
 
 app.post('/api/transactions/transfer', (req, res) => {
-  const { senderPhone, receiverNid, receiverName, receiverPhone, amount, pin, method } = req.body;
+  const { 
+    senderPhone, 
+    receiverNid, 
+    receiverName, 
+    receiverPhone, 
+    amount, 
+    pin, 
+    method, 
+    actionType = "send_money", 
+    addCashOutCharge = false, 
+    charge = 0, 
+    greetingCard = "Send Money", 
+    isPriyo = false 
+  } = req.body;
+
   const db = loadDb();
   const sender = db.users.find(u => u.phone === (senderPhone || '').trim());
   if (!sender) return res.status(404).json({ success: false, message: "ব্যবহারকারী পাওয়া যায়নি।" });
@@ -606,42 +620,56 @@ app.post('/api/transactions/transfer', (req, res) => {
   }
 
   const numAmount = Number(amount);
-  const minLimit = 500;
-  const maxLimit = 30000;
+  const minLimit = 10;
+  const maxLimit = 50000;
   if (numAmount < minLimit) {
-    return res.status(400).json({ success: false, message: `মোবাইল ওয়ালেটে সর্বনিম্ন ট্রান্সফার লিমিট ৳${minLimit}/= টাকা!` });
+    return res.status(400).json({ success: false, message: `সর্বনিম্ন পরিমাণ ৳${minLimit}/= টাকা!` });
   }
   if (numAmount > maxLimit) {
-    return res.status(400).json({ success: false, message: `মোবাইল ওয়ালেটে প্রতি লেনদেনে সর্বোচ্চ লিমিট ৳${maxLimit}/= টাকা!` });
+    return res.status(400).json({ success: false, message: `প্রতি লেনদেনে সর্বোচ্চ লিমিট ৳${maxLimit}/= টাকা!` });
   }
 
-  if (sender.balance < numAmount) {
+  const numCharge = addCashOutCharge ? Number(charge || Math.round(numAmount * 0.015)) : 0;
+  const totalDeduct = numAmount + numCharge;
+
+  if (sender.balance < totalDeduct) {
     return res.status(400).json({ success: false, message: `পর্যাপ্ত ব্যালেন্স নেই! বর্তমান ব্যালেন্স: ৳${sender.balance}` });
   }
 
-  sender.balance -= numAmount;
+  sender.balance -= totalDeduct;
 
+  const actionLabel = actionType === 'cash_out' ? 'ক্যাশ আউট' : 'সেন্ড মানি';
   const newTx = {
     id: "TRX-" + Math.floor(100000 + Math.random() * 900000),
     type: "transfer",
-    method: method || "direct",
-    methodName: method ? method.toUpperCase() : "পিন ট্রান্সফার",
+    actionType: actionType,
+    method: method || "mobile_wallet",
+    methodName: `${method || 'বিকাশ'} (${actionLabel})`,
     amount: numAmount,
+    charge: numCharge,
+    totalDeduct: totalDeduct,
+    greetingCard: greetingCard,
+    isPriyo: Boolean(isPriyo),
     senderPhone: sender.phone,
     senderName: sender.name,
     receiverPhone: (receiverPhone || '').trim(),
-    receiverName: receiverName || "প্রাপক",
+    receiverName: receiverName || (actionType === 'cash_out' ? "এজেন্ট পয়েন্ট" : "প্রাপক গ্রাহক"),
     receiverNid: receiverNid || "",
-    status: "pending",
+    status: "approved",
     requestedAt: new Date().toISOString(),
-    adminProcessedAt: null,
-    adminNote: "এডমিন ডেলিভারির জন্য প্রক্রিয়াধীন।"
+    adminProcessedAt: new Date().toISOString(),
+    adminNote: `${actionLabel} সফলভাবে সম্পন্ন হয়েছে।`
   };
 
   db.transactions.unshift(newTx);
   saveDb(db);
 
-  return res.json({ success: true, message: "টাকা ট্রান্সফার রিকোয়েস্ট সফল হয়েছে!", transaction: newTx, newBalance: sender.balance });
+  return res.json({ 
+    success: true, 
+    message: `${actionLabel} সফল হয়েছে!`, 
+    transaction: newTx, 
+    newBalance: sender.balance 
+  });
 });
 
 app.post('/api/transactions/pay-bill', (req, res) => {
