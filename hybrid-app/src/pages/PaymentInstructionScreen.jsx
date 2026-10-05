@@ -117,15 +117,21 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
     setLoading(true);
 
     const payload = {
-      sourceAmount: transferDraft.sourceAmount,
+      sendAmount: Number(transferDraft.sourceAmount),
+      sourceAmount: Number(transferDraft.sourceAmount),
+      senderCurrency: transferDraft.sourceCurrency,
       sourceCurrency: transferDraft.sourceCurrency,
       exchangeRate: transferDraft.exchangeRate,
-      targetAmount: transferDraft.targetAmount,
+      receiveAmount: Number(transferDraft.targetAmount),
+      targetAmount: Number(transferDraft.targetAmount),
+      receiveCurrency: 'BDT',
       targetCurrency: 'BDT',
       recipient: transferDraft.recipient,
       senderCountry: selectedCountry,
       paymentChannel: payChannel === 'bank' ? 'Local Bank Account' : 'Local Mobile Wallet',
+      proofImage: screenshotBase64,
       bankTransferProof: screenshotBase64,
+      trxId: referenceNumber.trim(),
       referenceNumber: referenceNumber.trim()
     };
 
@@ -139,23 +145,25 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between p-5 max-w-md mx-auto">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between max-w-md mx-auto">
       <div>
-        {/* Top Header */}
-        <div className="flex items-center justify-between pt-3 pb-4">
+        {/* Top Header - Black Theme */}
+        <div className="bg-slate-950 text-white px-5 pt-4 pb-4 border-b border-slate-800 flex items-center justify-between shadow-md">
           <button
             onClick={() => onNavigate('select-recipient')}
-            className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 shadow-sm"
+            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-800 transition-all shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-base font-bold text-white tracking-wide">
             {t('paymentTitle')}
           </h2>
           <div className="w-10" />
         </div>
+
+        <div className="p-5 space-y-4">
 
         {/* Amount to Deposit Banner */}
         <div className="bg-slate-900 text-white rounded-2xl p-4 mb-4 shadow-md">
@@ -437,6 +445,7 @@ export const PaymentInstructionScreen = ({ onNavigate }) => {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

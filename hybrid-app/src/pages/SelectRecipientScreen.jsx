@@ -46,23 +46,25 @@ export const SelectRecipientScreen = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between p-5 max-w-md mx-auto">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between max-w-md mx-auto">
       <div>
-        {/* Top Header */}
-        <div className="flex items-center justify-between pt-3 pb-4">
+        {/* Top Header - Black Theme */}
+        <div className="bg-slate-950 text-white px-5 pt-4 pb-4 border-b border-slate-800 flex items-center justify-between shadow-md">
           <button
             onClick={() => onNavigate('home')}
-            className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 shadow-sm"
+            className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-800 transition-all shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-base font-bold text-white tracking-wide">
             {t('recipientTitle')}
           </h2>
           <div className="w-10" />
         </div>
+
+        <div className="p-5 space-y-4">
 
         {/* Transfer amount reminder summary */}
         <div className="bg-white rounded-2xl p-3 border border-slate-200 mb-4 flex items-center justify-between">
@@ -167,6 +169,7 @@ export const SelectRecipientScreen = ({ onNavigate }) => {
             </p>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

@@ -530,13 +530,20 @@ app.post('/api/transactions/remittance', (req, res) => {
     senderName,
     senderCountry,
     senderCurrency,
+    sourceCurrency,
     sendAmount,
+    sourceAmount,
     exchangeRate,
     receiveAmount,
+    targetAmount,
+    targetCurrency,
     recipient,
     depositAccount,
     trxId,
+    referenceNumber,
     proofImage,
+    bankTransferProof,
+    paymentChannel,
     senderNote
   } = req.body;
 
@@ -544,8 +551,8 @@ app.post('/api/transactions/remittance', (req, res) => {
   const cleanSenderPhone = (senderPhone || '').trim().replace(/[\s\-\(\)]/g, '');
   const user = db.users.find(u => (u.phone || '').trim().replace(/[\s\-\(\)]/g, '') === cleanSenderPhone);
 
-  const numSend = Number(sendAmount);
-  if (!numSend || numSend <= 0) {
+  const numSend = Number(sendAmount !== undefined ? sendAmount : sourceAmount);
+  if (!numSend || isNaN(numSend) || numSend <= 0) {
     return res.status(400).json({ success: false, message: "টাকার সঠিক পরিমাণ দিন।" });
   }
 
@@ -553,9 +560,13 @@ app.post('/api/transactions/remittance', (req, res) => {
     return res.status(400).json({ success: false, message: "প্রাপকের সঠিক তথ্য প্রদান করুন।" });
   }
 
-  if (!proofImage) {
+  const finalProofImage = proofImage || bankTransferProof;
+  if (!finalProofImage) {
     return res.status(400).json({ success: false, message: "পেমেন্টের স্ক্রিনশট / রসিদ আপলোড করা আবশ্যক!" });
   }
+
+  const finalCurrency = senderCurrency || sourceCurrency || "MYR";
+  const finalTrxId = trxId || referenceNumber || ("DEP-" + Math.floor(100000 + Math.random() * 900000));
 
   // Unique PRD Order Tracking ID: #MYBD-XXXXX or #AEBD-XXXXX
   const prefix = (senderCurrency === 'AED' || senderCountry === 'UAE') ? '#AEBD-' : '#MYBD-';
@@ -567,36 +578,44 @@ app.post('/api/transactions/remittance', (req, res) => {
 
   const newTx = {
     id: orderId,
+    orderId: orderId,
     trackingId: orderId,
     type: "remittance",
     senderPhone: cleanSenderPhone,
     senderName: senderName || (user ? user.name : "প্রবাসী গ্রাহক"),
-    senderCountry: senderCountry || (senderCurrency === 'AED' ? "UAE" : "Malaysia"),
-    senderCurrency: senderCurrency || "MYR",
+    senderCountry: senderCountry || (finalCurrency === 'AED' ? "UAE" : "Malaysia"),
+    senderCurrency: finalCurrency,
     sendAmount: numSend,
+    sourceAmount: numSend,
     exchangeRate: numRate,
     amount: numReceive, // in BDT
     receiveAmount: numReceive,
+    targetAmount: numReceive,
     receiveCurrency: "BDT",
     recipient: {
       name: recipient.name || "",
       phone: recipient.phone || "",
-      channel: recipient.channel || "bkash",
-      channelName: recipient.channelName || (recipient.channel === 'bank' ? 'ব্যাংক ট্রান্সফার' : (recipient.channel === 'cash' ? 'ক্যাশ পিকআপ' : (recipient.channel || 'বিকাশ').toUpperCase())),
+      channel: recipient.channel || recipient.type || "bkash",
+      provider: recipient.provider || recipient.channel || "bkash",
+      type: recipient.type || recipient.channel || "wallet",
+      accountType: recipient.accountType || "Personal",
+      channelName: recipient.channelName || (recipient.channel === 'bank' || recipient.type === 'bank' ? 'ব্যাংক ট্রান্সফার' : (recipient.provider || recipient.channel || 'বিকাশ').toUpperCase()),
       bankName: recipient.bankName || "",
-      accountNumber: recipient.accountNumber || "",
-      branch: recipient.branch || "",
+      accountNumber: recipient.accountNumber || recipient.phone || "",
+      branch: recipient.branch || recipient.branchName || "",
       accountHolder: recipient.accountHolder || recipient.name || "",
       district: recipient.district || "",
       relationship: recipient.relationship || "পরিবার"
     },
     receiverPhone: recipient.phone || recipient.accountNumber || "",
     receiverName: recipient.name || "প্রাপক",
-    method: recipient.channel || "remittance",
-    methodName: `রেমিটেন্স (${senderCurrency || 'MYR'} ➔ BDT)`,
+    method: recipient.provider || recipient.channel || "remittance",
+    methodName: `রেমিটেন্স (${finalCurrency} ➔ BDT)`,
+    paymentChannel: paymentChannel || "Local Bank Account",
     depositAccount: depositAccount || null,
-    trxId: trxId || ("DEP-" + Math.floor(100000 + Math.random() * 900000)),
-    proofImage: proofImage,
+    trxId: finalTrxId,
+    referenceNumber: finalTrxId,
+    proofImage: finalProofImage,
     senderNote: senderNote || "",
     status: "pending",
     timelineStatus: "reviewing",

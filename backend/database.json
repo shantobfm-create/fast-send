@@ -315,6 +315,88 @@
   ],
   "transactions": [
     {
+      "id": "#MYBD-84660",
+      "orderId": "#MYBD-84660",
+      "trackingId": "#MYBD-84660",
+      "type": "remittance",
+      "senderPhone": "+60123456789",
+      "senderName": "প্রবাসী গ্রাহক",
+      "senderCountry": "MY",
+      "senderCurrency": "MYR",
+      "sendAmount": 1000,
+      "sourceAmount": 1000,
+      "exchangeRate": 27.5,
+      "amount": 27500,
+      "receiveAmount": 27500,
+      "targetAmount": 27500,
+      "receiveCurrency": "BDT",
+      "recipient": {
+        "name": "Rahim Test",
+        "phone": "01712345678",
+        "channel": "bkash",
+        "provider": "bkash",
+        "type": "wallet",
+        "accountType": "Personal",
+        "channelName": "BKASH",
+        "bankName": "",
+        "accountNumber": "01712345678",
+        "branch": "",
+        "accountHolder": "Rahim Test",
+        "district": "",
+        "relationship": "পরিবার"
+      },
+      "receiverPhone": "01712345678",
+      "receiverName": "Rahim Test",
+      "method": "bkash",
+      "methodName": "রেমিটেন্স (MYR ➔ BDT)",
+      "paymentChannel": "Local Bank Account",
+      "depositAccount": null,
+      "trxId": "22234d",
+      "referenceNumber": "22234d",
+      "proofImage": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "senderNote": "",
+      "status": "pending",
+      "timelineStatus": "reviewing",
+      "timelineSteps": [
+        {
+          "key": "submitted",
+          "title": "Order Placed",
+          "titleBn": "অর্ডার জমা পড়েছে",
+          "time": "09:08 PM",
+          "done": true
+        },
+        {
+          "key": "reviewing",
+          "title": "Admin Verification in Progress",
+          "titleBn": "এডমিন যাচাই প্রক্রিয়াধীন",
+          "desc": "Verifying deposit slip (10-30 mins)",
+          "descBn": "আপনার রসিদ যাচাই করা হচ্ছে (১০-৩০ মিনিট)",
+          "done": false,
+          "active": true
+        },
+        {
+          "key": "processing",
+          "title": "Sending to Recipient",
+          "titleBn": "বাংলাদেশে টাকা পাঠানো হচ্ছে",
+          "desc": "Transferring BDT to recipient",
+          "descBn": "প্রাপকের বিকাশ/ব্যাংকে ট্রান্সফার প্রক্রিয়াধীন",
+          "done": false
+        },
+        {
+          "key": "completed",
+          "title": "Completed",
+          "titleBn": "সফলভাবে ডেলিভারড",
+          "desc": "Successfully delivered",
+          "descBn": "প্রাপকের অ্যাকাউন্টে টাকা পৌঁছে গেছে",
+          "done": false
+        }
+      ],
+      "requestedAt": "2026-10-05T15:08:37.330Z",
+      "adminProcessedAt": null,
+      "adminNote": "এডমিন স্ক্রিনশট ও পেমেন্ট যাচাই করে বাংলাদেশে টাকা পাঠিয়ে দিবেন।",
+      "payoutTrxId": null
+    },
+    {
       "id": "FS-REM-763567",
       "type": "remittance",
       "senderPhone": "0123457411",
