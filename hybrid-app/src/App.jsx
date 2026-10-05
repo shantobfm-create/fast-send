@@ -77,9 +77,9 @@ export default function App() {
       case 'receipt':
         return <ReceiptPage onNavigate={navigate} txData={pageParams.txData} />;
       case 'transfer':
-        return <TransferPage onNavigate={navigate} selectedWallet={pageParams.selectedWallet} />;
+        return <RemittancePage onNavigate={navigate} initialChannel={pageParams.selectedWallet || 'bkash'} />;
       case 'bank-transfer':
-        return <BankTransferPage onNavigate={navigate} />;
+        return <RemittancePage onNavigate={navigate} initialChannel="bank" />;
       case 'promo':
         return <PromoPage onNavigate={navigate} />;
       case 'bill-pay':

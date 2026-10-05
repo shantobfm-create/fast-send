@@ -1,33 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { StandardHeader } from '../components/StandardHeader';
 import { 
-  Globe, 
+  ArrowLeft, 
+  ArrowRight, 
+  Check, 
+  Copy, 
+  Plus, 
   Building2, 
   Smartphone, 
-  ShieldCheck, 
-  CheckCircle2, 
-  User, 
-  Plus, 
-  Trash2, 
-  Copy, 
-  Check, 
   Upload, 
   Image as ImageIcon, 
-  ArrowRight, 
-  ArrowLeft, 
-  AlertCircle, 
-  RefreshCw, 
-  ChevronRight, 
-  X,
-  CreditCard,
-  MapPin,
-  HelpCircle,
-  Clock
+  Clock, 
+  CheckCircle2, 
+  X, 
+  Trash2, 
+  ChevronRight,
+  Globe,
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import confetti from 'canvas-confetti';
 
-export const RemittancePage = ({ onNavigate }) => {
+export const RemittancePage = ({ onNavigate, initialChannel = 'bkash' }) => {
   const { 
     user, 
     settings, 
@@ -40,81 +34,56 @@ export const RemittancePage = ({ onNavigate }) => {
     loading 
   } = useApp();
 
-  // Selected Recipient
-  const [selectedRecipientId, setSelectedRecipientId] = useState('');
-  const [showAddRecipientModal, setShowAddRecipientModal] = useState(false);
+  // SENDER COUNTRY / CURRENCY
+  // Supported sender countries: Malaysia (MYR), Saudi Arabia (SAR), UAE/Dubai (AED)
+  const defaultCurr = user?.country === 'Saudi Arabia' ? 'SAR' : (user?.country === 'UAE' ? 'AED' : 'MYR');
+  const [senderCurrency, setSenderCurrency] = useState(defaultCurr);
 
-  // New Recipient Form State
-  const [recipientForm, setRecipientForm] = useState({
+  const senderOptions = [
+    { code: 'MYR', country: 'Malaysia', countryBn: 'মালয়েশিয়া', flag: '🇲🇾', label: 'MYR (রিঙ্গিত)' },
+    { code: 'SAR', country: 'Saudi Arabia', countryBn: 'সৌদি আরব', flag: '🇸🇦', label: 'SAR (রিয়াল)' },
+    { code: 'AED', country: 'UAE', countryBn: 'দুবাই / ইউএই', flag: '🇦🇪', label: 'AED (দিরহাম)' }
+  ];
+
+  // RECIPIENT IN BANGLADESH
+  const [selectedRecipientId, setSelectedRecipientId] = useState('');
+  const [showRecipientModal, setShowRecipientModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  // New Recipient Form
+  const [newRecipient, setNewRecipient] = useState({
     name: '',
     phone: '',
-    channel: 'bkash', // 'bkash' | 'nagad' | 'rocket' | 'upay' | 'bank' | 'cash'
+    channel: initialChannel || 'bkash', // 'bkash' | 'nagad' | 'rocket' | 'upay' | 'bank'
     bankName: 'ইসলামী ব্যাংক বাংলাদেশ পিএলসি',
     accountNumber: '',
-    accountHolder: '',
     branch: '',
-    district: '',
     relationship: 'পরিবার'
   });
 
-  // Sender Currency & Amount State
-  // Default based on user's country: SA -> SAR, AE -> AED, otherwise MYR
-  const defaultCurr = user?.country === 'Saudi Arabia' ? 'SAR' : (user?.country === 'UAE' ? 'AED' : 'MYR');
-  const [senderCurrency, setSenderCurrency] = useState(defaultCurr);
+  // AMOUNT
   const [sendAmount, setSendAmount] = useState('500');
 
-  // Payment Proof & Trx State
+  // DEPOSIT PROOF & TRX
   const [proofImage, setProofImage] = useState(null);
   const [depositTrxId, setDepositTrxId] = useState('');
-  const [senderBankName, setSenderBankName] = useState('');
   const [senderNote, setSenderNote] = useState('');
   const [copiedField, setCopiedField] = useState('');
 
-  // Submission Result State
+  // SUCCESS SUBMISSION STATE
   const [submittedTx, setSubmittedTx] = useState(null);
 
-  // Available Sender Countries / Currencies
-  const senderOptions = [
-    { code: 'MYR', country: 'Malaysia', countryBn: 'মালয়েশিয়া', flag: '🇲🇾', name: 'মালয়েশিয়ান রিঙ্গিত' },
-    { code: 'SAR', country: 'Saudi Arabia', countryBn: 'সৌদি আরব', flag: '🇸🇦', name: 'সৌদি রিয়াল' },
-    { code: 'AED', country: 'UAE', countryBn: 'দুবাই / ইউএই', flag: '🇦🇪', name: 'ইউএই দিরহাম' }
-  ];
-
-  // BD Banks List
-  const bdBanksList = [
-    "ইসলামী ব্যাংক বাংলাদেশ পিএলসি",
-    "ব্র্যাক ব্যাংক পিএলসি",
-    "ডাচ্-বাংলা ব্যাংক পিএলসি",
-    "সিটি ব্যাংক পিএলসি",
-    "সোনালী ব্যাংক পিএলসি",
-    "ইস্টার্ন ব্যাংক পিএলসি",
-    "পূবালী ব্যাংক পিএলসি",
-    "মিউচুয়াল ট্রাস্ট ব্যাংক পিএলসি",
-    "ইউনাইটেড কমার্শিয়াল ব্যাংক (ইউসিবি)",
-    "প্রাইম ব্যাংক পিএলসি",
-    "অগ্রণী ব্যাংক পিএলসি",
-    "জনতা ব্যাংক পিএলসি"
-  ];
-
-  // Quick Amount presets per currency
-  const quickAmountsMap = {
-    MYR: [200, 500, 1000, 2000, 5000],
-    SAR: [300, 500, 1000, 2500, 5000],
-    AED: [300, 500, 1000, 2500, 5000]
-  };
-
-  // Get live rate for the selected currency
+  // Live Exchange Rate
   const exchangeRates = settings?.exchangeRates || [];
   const currentRateObj = exchangeRates.find(r => r.code === senderCurrency) || {
     rateToBdt: senderCurrency === 'SAR' ? 32.80 : (senderCurrency === 'AED' ? 33.50 : 27.50)
   };
   const rateToBdt = currentRateObj?.rateToBdt || (senderCurrency === 'SAR' ? 32.80 : (senderCurrency === 'AED' ? 33.50 : 27.50));
-  
-  // Calculated BDT receive amount
-  const parsedSendAmount = parseFloat(sendAmount) || 0;
-  const receiveBdtAmount = Math.round(parsedSendAmount * rateToBdt);
 
-  // Admin Deposit Account for the selected currency
+  const parsedAmount = parseFloat(sendAmount) || 0;
+  const receiveBdtAmount = Math.round(parsedAmount * rateToBdt);
+
+  // Admin Deposit Account for selected country
   const senderAccounts = settings?.senderAccounts || [];
   const currentDepositAccount = senderAccounts.find(a => a.currency === senderCurrency) || {
     bankName: senderCurrency === 'SAR' ? 'Al Rajhi Bank' : (senderCurrency === 'AED' ? 'Emirates NBD' : 'Maybank'),
@@ -122,8 +91,13 @@ export const RemittancePage = ({ onNavigate }) => {
     accountNumber: senderCurrency === 'SAR' ? 'SA4480000123456789012345' : (senderCurrency === 'AED' ? 'AE250260001234567890123' : '514012345678'),
     duitNowId: senderCurrency === 'MYR' ? '+60123456789' : '',
     stcPay: senderCurrency === 'SAR' ? '+966501234567' : '',
-    payByPhone: senderCurrency === 'AED' ? '+971501234567' : '',
-    instructions: 'উপরের ব্যাংক অ্যাকাউন্টে টাকা পাঠিয়ে ট্রানজেকশনের স্ক্রিনশট ও রেফারেন্স নম্বর দিন।'
+    payByPhone: senderCurrency === 'AED' ? '+971501234567' : ''
+  };
+
+  const quickAmountsMap = {
+    MYR: [200, 500, 1000, 2000, 5000],
+    SAR: [300, 500, 1000, 2500, 5000],
+    AED: [300, 500, 1000, 2500, 5000]
   };
 
   useEffect(() => {
@@ -132,7 +106,7 @@ export const RemittancePage = ({ onNavigate }) => {
     }
   }, [user]);
 
-  // Set default recipient if list exists
+  // Set default recipient if list is loaded
   useEffect(() => {
     if (recipients && recipients.length > 0 && !selectedRecipientId) {
       setSelectedRecipientId(recipients[0].id);
@@ -141,7 +115,7 @@ export const RemittancePage = ({ onNavigate }) => {
 
   const selectedRecipient = (recipients || []).find(r => r.id === selectedRecipientId);
 
-  // Copy to clipboard helper
+  // 1-tap Copy Helper
   const handleCopy = (text, fieldName) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
@@ -150,20 +124,20 @@ export const RemittancePage = ({ onNavigate }) => {
     setTimeout(() => setCopiedField(''), 2500);
   };
 
-  // Handle Screenshot Upload
+  // Proof Image Upload Handler
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 8 * 1024 * 1024) {
-      showToast("ছবির সাইজ সর্বোচ্চ ৮ মেগাবাইট হতে পারবে।", "error");
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("ছবির সাইজ সর্বোচ্চ ১০ মেগাবাইট হতে পারবে।", "error");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
       setProofImage(event.target.result);
-      showToast("পেমেন্ট স্ক্রিনশট যুক্ত হয়েছে!", "success");
+      showToast("পেমেন্ট স্লিপ সফলভাবে যুক্ত হয়েছে!", "success");
     };
     reader.readAsDataURL(file);
   };
@@ -171,64 +145,62 @@ export const RemittancePage = ({ onNavigate }) => {
   // Handle Save New Recipient
   const handleSaveRecipient = async (e) => {
     e.preventDefault();
-    if (!recipientForm.name.trim()) {
-      showToast("প্রাপকের নাম প্রদান করুন।", "error");
+    if (!newRecipient.name.trim()) {
+      showToast("প্রাপকের নাম লিখুন।", "error");
       return;
     }
 
-    if (recipientForm.channel === 'bank') {
-      if (!recipientForm.accountNumber.trim()) {
-        showToast("ব্যাংক অ্যাকাউন্ট নম্বর প্রদান করুন।", "error");
+    if (newRecipient.channel === 'bank') {
+      if (!newRecipient.accountNumber.trim()) {
+        showToast("ব্যাংক অ্যাকাউন্ট নম্বর লিখুন।", "error");
         return;
       }
     } else {
-      if (!recipientForm.phone || recipientForm.phone.length < 11) {
+      if (!newRecipient.phone || newRecipient.phone.length < 11) {
         showToast("সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।", "error");
         return;
       }
     }
 
-    const res = await addRecipient(recipientForm);
+    const res = await addRecipient(newRecipient);
     if (res.success && res.recipient) {
       setSelectedRecipientId(res.recipient.id);
-      setShowAddRecipientModal(false);
-      setRecipientForm({
+      setShowAddModal(false);
+      setShowRecipientModal(false);
+      setNewRecipient({
         name: '',
         phone: '',
         channel: 'bkash',
         bankName: 'ইসলামী ব্যাংক বাংলাদেশ পিএলসি',
         accountNumber: '',
-        accountHolder: '',
         branch: '',
-        district: '',
         relationship: 'পরিবার'
       });
     }
   };
 
-  // Handle Remittance Submit
-  const handleRemittanceSubmit = async (e) => {
-    e.preventDefault();
-
+  // Handle Submit Remittance
+  const handleRemittanceSubmit = async () => {
     if (!selectedRecipient) {
-      showToast("দয়া করে টাকা গ্রহণকারী প্রাপক নির্বাচন করুন অথবা নতুন প্রাপক যোগ করুন।", "error");
+      showToast("দয়া করে বাংলাদেশে টাকা গ্রহণকারী প্রাপক নির্বাচন করুন।", "error");
+      setShowRecipientModal(true);
       return;
     }
 
-    if (!parsedSendAmount || parsedSendAmount <= 0) {
+    if (!parsedAmount || parsedAmount <= 0) {
       showToast("টাকার সঠিক পরিমাণ লিখুন।", "error");
       return;
     }
 
     if (!proofImage) {
-      showToast("দয়া করে পেমেন্টের স্ক্রিনশট / রসিদের ছবি আপলোড করুন।", "error");
+      showToast("দয়া করে টাকা ডিপোজিটের স্ক্রিনশট বা স্লিপ আপলোড করুন।", "error");
       return;
     }
 
     const payload = {
       senderCountry: senderOptions.find(o => o.code === senderCurrency)?.country || 'Malaysia',
       senderCurrency,
-      sendAmount: parsedSendAmount,
+      sendAmount: parsedAmount,
       exchangeRate: rateToBdt,
       receiveAmount: receiveBdtAmount,
       recipient: selectedRecipient,
@@ -241,55 +213,59 @@ export const RemittancePage = ({ onNavigate }) => {
     const res = await submitRemittance(payload);
     if (res.success && res.transaction) {
       setSubmittedTx(res.transaction);
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
   };
 
-  // SUCCESS CONFIRMATION SCREEN
+  // ================= SUCCESS RECEIPT SCREEN =================
   if (submittedTx) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col max-w-md mx-auto">
-        <StandardHeader title="রেমিটেন্স আবেদন গৃহীত" onBack={() => onNavigate('home')} />
+      <div className="bg-slate-50 flex flex-col max-w-md mx-auto relative select-none w-full min-h-screen font-sans pb-20">
+        <div className="bg-[#00823B] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-30">
+          <button onClick={() => onNavigate('home')} className="p-1 cursor-pointer">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="font-bold text-base">রেমিটেন্স আবেদন গৃহীত</h1>
+          <div className="w-5" />
+        </div>
 
-        <div className="p-4 space-y-4 animate-fade-in flex-1">
-          <div className="bg-white rounded-3xl p-6 text-center border border-slate-200 shadow-md space-y-4">
-            <div className="w-16 h-16 bg-emerald-100 text-[#00823B] rounded-full flex items-center justify-center mx-auto shadow-inner">
+        <div className="p-5 space-y-4">
+          <div className="bg-white rounded-3xl p-6 text-center border border-slate-200 shadow-sm space-y-4">
+            <div className="w-16 h-16 bg-emerald-100 text-[#00823B] rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-10 h-10" />
             </div>
 
             <div>
-              <span className="text-[11px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 mb-2">
-                <Clock className="w-3.5 h-3.5 animate-spin" /> অপেক্ষমান (পেমেন্ট পর্যালোচনাধীন)
+              <span className="text-[11px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-3 py-1 rounded-full uppercase inline-flex items-center gap-1.5 mb-2">
+                <Clock className="w-3.5 h-3.5 animate-spin" /> এডমিন যাচাই প্রক্রিয়াধীন
               </span>
-              <h2 className="text-xl font-black text-slate-900">রেমিটেন্স সফলভাবে জমা হয়েছে!</h2>
-              <p className="text-xs text-slate-500 mt-1 font-medium">
-                অ্যাডমিন আপনার পেমেন্ট স্ক্রিনশট যাচাই করে সরাসরি বাংলাদেশে প্রাপকের নম্বরে/অ্যাকাউন্টে টাকা পাঠিয়ে দিবেন।
+              <h2 className="text-xl font-black text-slate-900">রিকোয়েস্ট সফলভাবে জমা হয়েছে!</h2>
+              <p className="text-xs text-slate-500 mt-1">
+                এডমিন পেমেন্ট স্ক্রিনশট যাচাই করে বাংলাদেশে প্রাপকের একাউন্টে টাকা পাঠিয়ে দিবেন।
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2.5 text-xs">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-200">
-                <span className="text-slate-500 font-medium">ট্রানজেকশন আইডি:</span>
+            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2 text-xs">
+              <div className="flex justify-between pb-1.5 border-b border-slate-200">
+                <span className="text-slate-500">ট্রানজেকশন আইডি:</span>
                 <span className="font-mono font-bold text-slate-900">{submittedTx.id}</span>
               </div>
-              <div className="flex justify-between items-center pb-2 border-b border-slate-200">
-                <span className="text-slate-500 font-medium">প্রেরিত পরিমাণ:</span>
-                <span className="font-bold text-slate-900 font-mono text-sm">{submittedTx.sendAmount} {submittedTx.senderCurrency}</span>
+              <div className="flex justify-between pb-1.5 border-b border-slate-200">
+                <span className="text-slate-500">প্রেরিত পরিমাণ:</span>
+                <span className="font-mono font-bold text-slate-900">{submittedTx.sendAmount} {submittedTx.senderCurrency}</span>
               </div>
-              <div className="flex justify-between items-center pb-2 border-b border-slate-200">
-                <span className="text-slate-500 font-medium">এক্সচেঞ্জ রেট:</span>
-                <span className="font-bold text-slate-700 font-mono">১ {submittedTx.senderCurrency} = {submittedTx.exchangeRate} ৳</span>
+              <div className="flex justify-between pb-1.5 border-b border-slate-200">
+                <span className="text-slate-500">এক্সচেঞ্জ রেট:</span>
+                <span className="font-mono font-bold text-slate-700">১ {submittedTx.senderCurrency} = {submittedTx.exchangeRate} ৳</span>
               </div>
-              <div className="flex justify-between items-center pb-2 border-b border-slate-200 bg-emerald-50/70 p-2 rounded-xl">
-                <span className="text-emerald-900 font-bold">বাংলাদেশে প্রাপক পাবে:</span>
-                <span className="font-black text-[#00823B] font-mono text-base">৳ {Number(submittedTx.receiveAmount).toLocaleString('bn-BD')}/=</span>
+              <div className="flex justify-between pb-1.5 border-b border-slate-200 bg-emerald-50/70 p-2 rounded-xl">
+                <span className="text-emerald-900 font-bold">বাংলাদেশে প্রাপক পাবেন:</span>
+                <span className="font-mono font-black text-[#00823B] text-base">
+                  ৳ {Number(submittedTx.receiveAmount).toLocaleString('bn-BD')}/=
+                </span>
               </div>
-              <div className="flex justify-between items-center pt-1">
-                <span className="text-slate-500 font-medium">প্রাপক:</span>
+              <div className="flex justify-between pt-1">
+                <span className="text-slate-500">প্রাপক:</span>
                 <span className="font-bold text-slate-900 text-right">
                   {submittedTx.recipient?.name} ({submittedTx.recipient?.phone || submittedTx.recipient?.accountNumber})
                 </span>
@@ -299,9 +275,9 @@ export const RemittancePage = ({ onNavigate }) => {
             <div className="space-y-2 pt-2">
               <button
                 onClick={() => onNavigate('history')}
-                className="w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3.5 rounded-2xl text-xs shadow-md transition-all cursor-pointer"
               >
-                <span>লেনদেন হিস্ট্রি দেখুন ➔</span>
+                লেনদেন হিস্ট্রি দেখুন ➔
               </button>
               <button
                 onClick={() => onNavigate('home')}
@@ -316,590 +292,527 @@ export const RemittancePage = ({ onNavigate }) => {
     );
   }
 
+  // ================= MAIN REMITTANCE / SEND MONEY FORM =================
+  const isFormValid = Boolean(selectedRecipient && parsedAmount > 0 && proofImage);
+
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col max-w-md mx-auto pb-10">
-      <StandardHeader title="প্রবাসী রেমিটেন্স সেবা" onBack={() => onNavigate('home')} />
-
-      {/* Top Route Banner */}
-      <div className="bg-gradient-to-r from-[#00823B] to-[#005a28] text-white px-5 py-4 shadow-sm">
+    <div className="bg-white flex flex-col max-w-md mx-auto relative select-none w-full min-h-screen font-sans pb-32">
+      
+      {/* ================= 1. TOP HEADER (BRAND COLOR & ROUTE) ================= */}
+      <div className="bg-[#00823B] text-white px-4 pt-4 pb-3 sticky top-0 z-30 shadow-xs">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🇲🇾 🇸🇦 🇦🇪</span>
-            <ArrowRight className="w-4 h-4 text-emerald-200" />
-            <span className="text-xl">🇧🇩</span>
-          </div>
-          <span className="bg-white/20 backdrop-blur-xs text-[11px] font-bold px-2.5 py-1 rounded-full border border-white/30">
-            ❤️ চার্জ ৳০ (ফ্রি ট্রান্সফার)
-          </span>
-        </div>
-        <p className="text-xs text-emerald-100 mt-2 font-medium">
-          মালয়েশিয়া, সৌদি আরব ও দুবাই থেকে বাংলাদেশে দ্রুত, নিরাপদ ও লাইভ রেটে টাকা পাঠান
-        </p>
-      </div>
+          <button 
+            onClick={() => onNavigate('home')} 
+            className="p-1 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white"
+          >
+            <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
+          </button>
 
-      <form onSubmit={handleRemittanceSubmit} className="p-4 space-y-4">
-        
-        {/* ================= SECTION 1: RECIPIENT SELECTION ================= */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <User className="w-5 h-5 text-[#00823B]" />
-              <h3 className="font-black text-slate-900 text-sm">১. বাংলাদেশে প্রাপক নির্বাচন করুন</h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowAddRecipientModal(true)}
-              className="bg-emerald-50 hover:bg-emerald-100 text-[#00823B] border border-emerald-300 font-bold text-[11px] px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition-all cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>নতুন প্রাপক</span>
-            </button>
+          <div className="text-center">
+            <h1 className="text-base font-bold tracking-tight text-white">
+              টাকা পাঠান (Send Money)
+            </h1>
+            <p className="text-[11px] text-emerald-100 font-medium">
+              বিদেশ থেকে বাংলাদেশে রেমিটেন্স
+            </p>
           </div>
 
-          {/* Recipients List */}
-          {recipients && recipients.length > 0 ? (
-            <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-              {recipients.map((rec) => {
-                const isSelected = rec.id === selectedRecipientId;
-                return (
-                  <div
-                    key={rec.id}
-                    onClick={() => setSelectedRecipientId(rec.id)}
-                    className={`p-3.5 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between group ${
-                      isSelected
-                        ? 'border-[#00823B] bg-emerald-50/60 shadow-xs'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                        rec.channel === 'bank' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : (rec.channel === 'cash' ? 'bg-amber-100 text-amber-800' : 'bg-pink-100 text-[#E2136E]')
-                      }`}>
-                        {rec.channel === 'bank' ? <Building2 className="w-5 h-5" /> : (rec.channel === 'cash' ? <MapPin className="w-5 h-5" /> : <Smartphone className="w-5 h-5" />)}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-slate-900 text-xs">{rec.name}</h4>
-                          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
-                            {rec.relationship || 'পরিবার'}
-                          </span>
-                        </div>
-                        <p className="text-[11px] font-mono text-slate-500 mt-0.5">
-                          {rec.channel === 'bank' 
-                            ? `${rec.bankName || 'ব্যাংক'} • ${rec.accountNumber}`
-                            : `${(rec.channel || 'বিকাশ').toUpperCase()}: ${rec.phone}`}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {isSelected ? (
-                        <div className="w-6 h-6 rounded-full bg-[#00823B] text-white flex items-center justify-center">
-                          <Check className="w-3.5 h-3.5" />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full border-2 border-slate-300 group-hover:border-[#00823B]" />
-                      )}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (confirm(`আপনি কি "${rec.name}" প্রাপক তালিকা থেকে মুছে ফেলতে চান?`)) {
-                            deleteRecipient(rec.id);
-                          }
-                        }}
-                        className="text-slate-300 hover:text-rose-500 p-1 transition-colors"
-                        title="মুছে ফেলুন"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-2xl p-4 bg-slate-50/50 space-y-2">
-              <User className="w-8 h-8 text-slate-300 mx-auto" />
-              <p className="text-xs text-slate-600 font-medium">আপনার কোনো সংরক্ষিত প্রাপক নেই</p>
-              <button
-                type="button"
-                onClick={() => setShowAddRecipientModal(true)}
-                className="bg-[#00823B] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>প্রথম প্রাপক যোগ করুন</span>
-              </button>
-            </div>
-          )}
+          <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center font-bold text-xs">
+            🇧🇩
+          </div>
         </div>
 
-        {/* ================= SECTION 2: AMOUNT & CURRENCY CALCULATOR ================= */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <Globe className="w-5 h-5 text-[#00823B]" />
-            <h3 className="font-black text-slate-900 text-sm">২. পাঠানোর পরিমাণ ও লাইভ রেট</h3>
-          </div>
-
-          {/* Country / Currency Selection (Malaysia, Saudi Arabia, Dubai) */}
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1.5">
-              প্রেরক দেশ ও কারেন্সি নির্বাচন করুন:
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {senderOptions.map((opt) => {
-                const isSelected = senderCurrency === opt.code;
-                return (
-                  <button
-                    key={opt.code}
-                    type="button"
-                    onClick={() => setSenderCurrency(opt.code)}
-                    className={`py-2.5 px-2 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
-                      isSelected
-                        ? 'border-[#00823B] bg-emerald-50 text-[#00823B] shadow-xs font-bold'
-                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                    }`}
-                  >
-                    <span className="text-lg">{opt.flag}</span>
-                    <span className="text-xs font-black">{opt.code}</span>
-                    <span className="text-[10px] text-slate-500 font-normal truncate w-full">{opt.countryBn}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Send Amount Input */}
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">
-              আপনি পাঠাবেন ({senderCurrency}):
-            </label>
-            <div className="relative flex items-center bg-slate-50 rounded-2xl border-2 border-slate-300 focus-within:border-[#00823B] focus-within:bg-white shadow-xs">
-              <span className="pl-4 font-bold text-slate-500 text-sm font-mono">{senderCurrency}</span>
-              <input
-                type="number"
-                value={sendAmount}
-                onChange={(e) => setSendAmount(e.target.value)}
-                placeholder="পরিমাণ লিখুন"
-                className="w-full bg-transparent py-3.5 pl-3 pr-4 text-xl font-bold font-mono text-slate-900 focus:outline-none"
-              />
-            </div>
-
-            {/* Quick Amounts */}
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {(quickAmountsMap[senderCurrency] || [200, 500, 1000, 2000]).map((q) => (
+        {/* Sender Country / Currency Switcher (Malaysia, Saudi Arabia, Dubai) */}
+        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-white/20">
+          <span className="text-[11px] text-emerald-100 font-medium shrink-0">প্রেরক দেশ:</span>
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar flex-1">
+            {senderOptions.map((opt) => {
+              const isSelected = senderCurrency === opt.code;
+              return (
                 <button
-                  key={q}
+                  key={opt.code}
                   type="button"
-                  onClick={() => setSendAmount(String(q))}
-                  className={`text-[11px] font-mono px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
-                    sendAmount === String(q)
-                      ? 'bg-[#00823B] text-white border-[#00823B] font-bold'
-                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  onClick={() => setSenderCurrency(opt.code)}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                    isSelected 
+                      ? 'bg-white text-[#00823B] shadow-sm' 
+                      : 'bg-white/20 text-white hover:bg-white/30'
                   }`}
                 >
-                  +{q}
+                  <span>{opt.flag}</span>
+                  <span>{opt.code}</span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
+        </div>
+      </div>
 
-          {/* Live Rate & Receive BDT Card */}
-          <div className="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-200 space-y-2">
-            <div className="flex items-center justify-between text-xs text-emerald-900 font-medium">
-              <span>লাইভ এক্সচেঞ্জ রেট:</span>
-              <span className="font-mono font-bold bg-white px-2 py-0.5 rounded-full border border-emerald-200">
-                ১ {senderCurrency} = {rateToBdt} ৳
-              </span>
+      {/* ================= 2. RECIPIENT CARD (MATCHING USER SCREENSHOT) ================= */}
+      <div className="px-5 pt-4 pb-2">
+        <div className="flex justify-between items-center mb-2">
+          <label className="text-xs font-medium text-slate-500 tracking-wide">
+            Recipient (বাংলাদেশে প্রাপক)
+          </label>
+          <button 
+            type="button"
+            onClick={() => setShowRecipientModal(true)}
+            className="text-[11px] font-bold text-[#00823B] hover:text-[#006837] cursor-pointer flex items-center gap-1"
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>প্রাপক পরিবর্তন</span>
+          </button>
+        </div>
+
+        {selectedRecipient ? (
+          <div 
+            onClick={() => setShowRecipientModal(true)}
+            className="border border-slate-200 rounded-2xl p-3 flex items-center gap-3.5 bg-white hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
+          >
+            {/* Lavender Avatar Circle with initial */}
+            <div className="w-11 h-11 rounded-full bg-[#E9D5FF] text-[#7E22CE] font-bold text-base flex items-center justify-center shrink-0">
+              {selectedRecipient.name?.[0]?.toUpperCase() || selectedRecipient.phone?.[0] || '0'}
             </div>
 
-            <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60">
-              <span className="text-xs font-bold text-slate-800">বাংলাদেশে প্রাপক পাবে:</span>
-              <span className="text-xl font-black text-[#00823B] font-mono">
-                ৳ {Number(receiveBdtAmount).toLocaleString('bn-BD')}/=
-              </span>
+            {/* Recipient Details */}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 text-sm tracking-tight truncate">
+                  {selectedRecipient.name}
+                </h3>
+                <span className="text-[10px] bg-emerald-50 text-[#00823B] border border-emerald-200 px-2 py-0.2 rounded-full font-bold">
+                  {selectedRecipient.channel === 'bank' ? 'ব্যাংক' : (selectedRecipient.channel || 'বিকাশ').toUpperCase()}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-mono mt-0.5 truncate">
+                {selectedRecipient.channel === 'bank' 
+                  ? `${selectedRecipient.bankName} • ${selectedRecipient.accountNumber}`
+                  : selectedRecipient.phone}
+              </p>
             </div>
+
+            <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="w-full border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-4 text-center cursor-pointer hover:bg-emerald-50 transition-all flex items-center justify-center gap-2 text-xs font-bold text-[#00823B]"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ প্রাপক যুক্ত করুন (বিকাশ, নগদ, রকেট বা ব্যাংক)</span>
+          </button>
+        )}
+      </div>
+
+      <div className="h-px bg-slate-100 mx-5 my-2" />
+
+      {/* ================= 3. AMOUNT SECTION (CLEAN CENTERED INPUT & LIVE RATE) ================= */}
+      <div className="px-5 py-3 text-center">
+        <label className="text-xs font-medium text-slate-500 block text-left mb-1">
+          Amount (প্রেরিত পরিমাণ)
+        </label>
+
+        {/* Big Centered Currency Input */}
+        <div className="relative py-2 flex items-center justify-center">
+          <div className="flex items-center justify-center text-4xl sm:text-5xl font-light text-slate-400 font-mono tracking-tight">
+            <span className="text-slate-400 text-2xl font-bold mr-2">{senderCurrency}</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={sendAmount}
+              onChange={(e) => setSendAmount(e.target.value)}
+              placeholder="0"
+              className="w-44 bg-transparent text-center font-normal text-slate-800 placeholder:text-slate-300 focus:outline-none"
+            />
           </div>
         </div>
 
-        {/* ================= SECTION 3: ADMIN DEPOSIT ACCOUNT DETAILS ================= */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-[#00823B]" />
-              <h3 className="font-black text-slate-900 text-sm">৩. পেমেন্ট পাঠানোর অ্যাকাউন্ট ({senderCurrency})</h3>
-            </div>
-            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-              অফিশিয়াল ডিপোজিট
+        {/* Live Exchange Rate & BDT Conversion Box */}
+        <div className="mt-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 flex items-center justify-between">
+          <div className="text-left">
+            <span className="text-[11px] text-slate-500 block font-medium">লাইভ এক্সচেঞ্জ রেট</span>
+            <span className="text-xs font-mono font-bold text-slate-800">
+              ১ {senderCurrency} = {rateToBdt} ৳
             </span>
           </div>
 
-          <p className="text-xs text-slate-600 font-normal">
-            আপনার লোকাল ব্যাংক বা ওয়ালেট অ্যাপ থেকে নিচের অ্যাকাউন্টে <b>{sendAmount} {senderCurrency}</b> পাঠিয়ে দিন:
-          </p>
+          <div className="text-right">
+            <span className="text-[11px] text-slate-500 block font-medium">বাংলাদেশে পাবেন</span>
+            <span className="text-lg font-mono font-black text-[#00823B]">
+              ৳ {receiveBdtAmount.toLocaleString('bn-BD')}
+            </span>
+          </div>
+        </div>
 
-          <div className="bg-slate-900 text-white rounded-2xl p-4 space-y-3 font-mono text-xs">
-            {/* Bank Name & Account Name */}
+        {/* Quick Amount Suggestion Chips */}
+        <div className="flex justify-center gap-2 mt-3 overflow-x-auto no-scrollbar">
+          {(quickAmountsMap[senderCurrency] || [200, 500, 1000, 2000]).map((q) => (
+            <button
+              key={q}
+              type="button"
+              onClick={() => setSendAmount(String(q))}
+              className={`px-3 py-1 font-mono font-bold text-xs rounded-full transition-all cursor-pointer ${
+                sendAmount === String(q)
+                  ? 'bg-[#00823B] text-white shadow-xs'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+              }`}
+            >
+              +{q} {senderCurrency}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="h-px bg-slate-100 mx-5 my-2" />
+
+      {/* ================= 4. ADMIN LOCAL DEPOSIT ACCOUNT (WHERE SENDER TRANSFERS) ================= */}
+      <div className="px-5 py-3">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-bold text-slate-800 tracking-wide">
+            {senderOptions.find(o => o.code === senderCurrency)?.countryBn}-তে টাকা জমা দেওয়ার একাউন্ট
+          </label>
+          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
+            অফিসিয়াল একাউন্ট
+          </span>
+        </div>
+
+        {/* Deposit Account Card */}
+        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-2.5 text-xs">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500 font-medium">ব্যাংকের নাম:</span>
+            <span className="font-bold text-slate-900">{currentDepositAccount.bankName}</span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500 font-medium">হিসাবের নাম:</span>
+            <span className="font-bold text-slate-900">{currentDepositAccount.accountName}</span>
+          </div>
+
+          <div className="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200/80">
             <div>
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-sans">ব্যাংক ও হিসাবধারী:</span>
-              <span className="font-bold text-emerald-400 block text-sm font-sans">{currentDepositAccount.bankName}</span>
-              <span className="text-slate-300 text-xs font-sans">{currentDepositAccount.accountName}</span>
+              <span className="text-[11px] text-slate-500 block">হিসাব নম্বর (Account Number):</span>
+              <span className="font-mono font-bold text-slate-900 text-sm select-all">
+                {currentDepositAccount.accountNumber}
+              </span>
             </div>
 
-            {/* Account / IBAN Number */}
-            <div className="bg-slate-800/90 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-sans">অ্যাকাউন্ট / IBAN:</span>
-                <span className="text-white font-bold text-sm select-all">{currentDepositAccount.accountNumber}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleCopy(currentDepositAccount.accountNumber, "অ্যাকাউন্ট নম্বর")}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-xl transition-all cursor-pointer shrink-0 ml-2"
-                title="কপি করুন"
-              >
-                {copiedField === "অ্যাকাউন্ট নম্বর" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </button>
+            <button
+              type="button"
+              onClick={() => handleCopy(currentDepositAccount.accountNumber, "অ্যাকাউন্ট নম্বর")}
+              className="px-3 py-1.5 bg-[#00823B] text-white rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-[#006837]"
+            >
+              {copiedField === "অ্যাকাউন্ট নম্বর" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedField === "অ্যাকাউন্ট নম্বর" ? "কপি হয়েছে" : "কপি"}</span>
+            </button>
+          </div>
+
+          {currentDepositAccount.duitNowId && (
+            <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
+              <span className="text-slate-500">DuitNow ID / মোবাইল:</span>
+              <span className="font-mono font-bold text-slate-800">{currentDepositAccount.duitNowId}</span>
             </div>
-
-            {/* DuitNow / STC Pay / PayBy if applicable */}
-            {(currentDepositAccount.duitNowId || currentDepositAccount.stcPay || currentDepositAccount.payByPhone) && (
-              <div className="bg-slate-800/90 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-sans">
-                    {senderCurrency === 'MYR' ? 'DuitNow ID / Phone:' : (senderCurrency === 'SAR' ? 'STC Pay ID:' : 'PayBy Phone:')}
-                  </span>
-                  <span className="text-white font-bold text-sm select-all">
-                    {currentDepositAccount.duitNowId || currentDepositAccount.stcPay || currentDepositAccount.payByPhone}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleCopy(
-                    currentDepositAccount.duitNowId || currentDepositAccount.stcPay || currentDepositAccount.payByPhone,
-                    "মোবাইল / আইডি"
-                  )}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-xl transition-all cursor-pointer shrink-0 ml-2"
-                  title="কপি করুন"
-                >
-                  {copiedField === "মোবাইল / আইডি" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ================= SECTION 4: PAYMENT PROOF & SCREENSHOT ================= */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <Upload className="w-5 h-5 text-[#00823B]" />
-            <h3 className="font-black text-slate-900 text-sm">৪. পেমেন্ট স্ক্রিনশট ও তথ্য জমা দিন</h3>
-          </div>
-
-          {/* Screenshot Upload Box */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-800 mb-1.5 flex items-center justify-between">
-              <span>পেমেন্টের স্ক্রিনশট / রসিদ <span className="text-rose-500">* (আবশ্যক)</span></span>
-              {proofImage && <span className="text-[11px] text-emerald-600 font-bold">✓ ছবি নির্বাচিত</span>}
-            </label>
-
-            {proofImage ? (
-              <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500 bg-slate-900 group">
-                <img src={proofImage} alt="Payment Proof" className="w-full max-h-60 object-contain mx-auto" />
-                <button
-                  type="button"
-                  onClick={() => setProofImage(null)}
-                  className="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white p-2 rounded-full shadow-lg transition-all cursor-pointer"
-                  title="ছবি মুছুন"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <label className="border-2 border-dashed border-emerald-400 hover:border-emerald-600 bg-emerald-50/40 hover:bg-emerald-50/80 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all space-y-2">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#00823B] shadow-xs">
-                  <ImageIcon className="w-6 h-6" />
-                </div>
-                <div className="text-center">
-                  <span className="text-xs font-bold text-slate-900 block">গ্যালারি বা ক্যামেরা থেকে স্ক্রিনশট আপলোড করুন</span>
-                  <span className="text-[11px] text-slate-500">JPG, PNG বা WEBP (সর্বোচ্চ ৮ মেগাবাইট)</span>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
-            )}
-          </div>
-
-          {/* Deposit TrxID / Ref */}
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
-              ট্রানজেকশন আইডি / রেফারেন্স নম্বর (ব্যাংক রসিদের TrxID):
-            </label>
-            <input
-              type="text"
-              value={depositTrxId}
-              onChange={(e) => setDepositTrxId(e.target.value)}
-              placeholder="যেমন: MBB12345678 বা Ref Number"
-              className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#00823B]"
-            />
-          </div>
-
-          {/* Sender Bank / Wallet */}
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
-              আপনার ব্যাংক বা অ্যাপের নাম (ঐচ্ছিক):
-            </label>
-            <input
-              type="text"
-              value={senderBankName}
-              onChange={(e) => setSenderBankName(e.target.value)}
-              placeholder="যেমন: Maybank2u, Al Rajhi App, STC Pay..."
-              className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#00823B]"
-            />
-          </div>
-
-          {/* Sender Note */}
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
-              অ্যাডমিনের জন্য কোনো বিশেষ নোট (ঐচ্ছিক):
-            </label>
-            <input
-              type="text"
-              value={senderNote}
-              onChange={(e) => setSenderNote(e.target.value)}
-              placeholder="যেমন: জরুরি রেমিটেন্স..."
-              className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-3 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#00823B]"
-            />
-          </div>
-        </div>
-
-        {/* SUBMIT BUTTON */}
-        <button
-          type="submit"
-          disabled={loading || !selectedRecipient}
-          className="w-full bg-[#00823B] hover:bg-[#006837] text-white font-black py-4 rounded-2xl text-sm shadow-lg shadow-emerald-700/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-        >
-          {loading ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>রেমিটেন্স সাবমিট হচ্ছে...</span>
-            </>
-          ) : (
-            <>
-              <span>রেমিটেন্স আবেদন সাবমিট করুন ({sendAmount} {senderCurrency})</span>
-              <ArrowRight className="w-4 h-4" />
-            </>
           )}
-        </button>
-      </form>
 
-      {/* ================= MODAL: ADD NEW RECIPIENT ================= */}
-      {showAddRecipientModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl w-full max-w-md p-5 shadow-2xl space-y-4 my-8">
+          {currentDepositAccount.stcPay && (
+            <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
+              <span className="text-slate-500">stc pay নম্বর:</span>
+              <span className="font-mono font-bold text-slate-800">{currentDepositAccount.stcPay}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="h-px bg-slate-100 mx-5 my-2" />
+
+      {/* ================= 5. PAYMENT PROOF & SCREENSHOT UPLOAD ================= */}
+      <div className="px-5 py-3 space-y-3">
+        <label className="text-xs font-bold text-slate-800 block">
+          পেমেন্ট স্লিপ / স্ক্রিনশট আপলোড করুন <span className="text-rose-500">*</span>
+        </label>
+
+        {proofImage ? (
+          <div className="relative border-2 border-emerald-400 rounded-2xl overflow-hidden bg-emerald-50/30 p-2">
+            <img 
+              src={proofImage} 
+              alt="Payment Slip Proof" 
+              className="w-full max-h-52 object-contain rounded-xl mx-auto" 
+            />
+            <button
+              type="button"
+              onClick={() => setProofImage(null)}
+              className="absolute top-4 right-4 bg-rose-600 text-white p-1.5 rounded-full shadow-md cursor-pointer hover:bg-rose-700"
+              title="মুছে ফেলুন"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <p className="text-center text-[11px] font-bold text-[#00823B] mt-2">
+              ✓ স্ক্রিনশট যুক্ত হয়েছে (পরিবর্তন করতে ক্রস চাপুন)
+            </p>
+          </div>
+        ) : (
+          <label className="border-2 border-dashed border-slate-300 hover:border-[#00823B] bg-slate-50 hover:bg-emerald-50/30 rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2">
+            <div className="w-12 h-12 rounded-full bg-white shadow-2xs flex items-center justify-center text-slate-400 group-hover:text-[#00823B]">
+              <Upload className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-800">পেমেন্ট স্ক্রিনশটের ছবি নির্বাচন করুন</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">গ্যালারি বা ক্যামেরা থেকে ছবি যুক্ত করুন</p>
+            </div>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageChange} 
+              className="hidden" 
+            />
+          </label>
+        )}
+
+        {/* TrxID / Reference Input */}
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">
+            ট্রানজেকশন আইডি / রেফারেন্স নম্বর (ঐচ্ছিক):
+          </label>
+          <input
+            type="text"
+            value={depositTrxId}
+            onChange={(e) => setDepositTrxId(e.target.value)}
+            placeholder="যেমন: MB12345678 বা স্লিপ রেফারেন্স"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#00823B] focus:bg-white"
+          />
+        </div>
+      </div>
+
+      {/* ================= 6. FIXED BOTTOM PROCEED BUTTON ================= */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white/95 backdrop-blur-xs border-t border-slate-100 z-40">
+        <button
+          type="button"
+          disabled={!isFormValid || loading}
+          onClick={handleRemittanceSubmit}
+          className={`w-full py-3.5 px-5 rounded-2xl font-bold text-sm text-white flex items-center justify-between transition-all shadow-md cursor-pointer disabled:cursor-not-allowed ${
+            isFormValid && !loading
+              ? 'bg-[#00823B] hover:bg-[#006837] active:scale-[0.99] shadow-emerald-200'
+              : 'bg-[#9CA3AF] opacity-90'
+          }`}
+        >
+          <span>{loading ? "জমা হচ্ছে..." : "Proceed (রেমিটেন্স নিশ্চিত করুন)"}</span>
+          <ArrowRight className="w-5 h-5 stroke-[2.5]" />
+        </button>
+      </div>
+
+      {/* ================= RECIPIENT SELECTION MODAL ================= */}
+      {showRecipientModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[85vh] overflow-y-auto p-5 space-y-4 shadow-2xl">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <User className="w-5 h-5 text-[#00823B]" />
-                <h3 className="font-black text-slate-900 text-sm">বাংলাদেশে নতুন প্রাপক যোগ করুন</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowAddRecipientModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1"
+              <h3 className="font-bold text-slate-900 text-sm">বাংলাদেশে প্রাপক নির্বাচন করুন</h3>
+              <button 
+                onClick={() => setShowRecipientModal(false)}
+                className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveRecipient} className="space-y-3.5">
-              {/* Channel Selector */}
+            {/* Add New Recipient Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowRecipientModal(false);
+                setShowAddModal(true);
+              }}
+              className="w-full bg-emerald-50 hover:bg-emerald-100 text-[#00823B] border border-emerald-300 font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ নতুন প্রাপক যোগ করুন</span>
+            </button>
+
+            {/* Existing List */}
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {(recipients || []).length === 0 ? (
+                <p className="text-xs text-slate-400 py-6 text-center">আপনার কোনো সংরক্ষিত প্রাপক নেই</p>
+              ) : (
+                recipients.map((rec) => (
+                  <div
+                    key={rec.id}
+                    onClick={() => {
+                      setSelectedRecipientId(rec.id);
+                      setShowRecipientModal(false);
+                    }}
+                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                      rec.id === selectedRecipientId
+                        ? 'border-[#00823B] bg-emerald-50/50'
+                        : 'border-slate-200 bg-white hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#E9D5FF] text-[#7E22CE] font-bold text-xs flex items-center justify-center">
+                        {rec.name?.[0]?.toUpperCase() || 'R'}
+                      </div>
+                      <div>
+                        <p className="font-bold text-xs text-slate-900">{rec.name}</p>
+                        <p className="text-[11px] font-mono text-slate-500">
+                          {rec.channel === 'bank' ? `${rec.bankName} • ${rec.accountNumber}` : `${(rec.channel || 'বিকাশ').toUpperCase()}: ${rec.phone}`}
+                        </p>
+                      </div>
+                    </div>
+                    {rec.id === selectedRecipientId && (
+                      <Check className="w-4 h-4 text-[#00823B]" />
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= ADD NEW RECIPIENT MODAL ================= */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto p-5 space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+              <h3 className="font-bold text-slate-900 text-sm">নতুন বাংলাদেশি প্রাপক যুক্ত করুন</h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveRecipient} className="space-y-3">
+              {/* Channel Selector (বিকাশ, নগদ, রকেট, উপায়, ব্যাংক) */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  টাকা পাওয়ার মাধ্যম (Payout Channel):
+                <label className="text-xs font-medium text-slate-600 block mb-1">
+                  টাকা গ্রহণের মাধ্যম:
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-5 gap-1.5">
                   {[
-                    { id: 'bkash', name: 'বিকাশ', icon: '📱' },
-                    { id: 'nagad', name: 'নগদ', icon: '📱' },
-                    { id: 'rocket', name: 'রকেট', icon: '📱' },
-                    { id: 'upay', name: 'উপায়', icon: '📱' },
-                    { id: 'bank', name: 'ব্যাংক একাউন্ট', icon: '🏦' },
-                    { id: 'cash', name: 'ক্যাশ পিকআপ', icon: '🏢' }
+                    { id: 'bkash', name: 'বিকাশ' },
+                    { id: 'nagad', name: 'নগদ' },
+                    { id: 'rocket', name: 'রকেট' },
+                    { id: 'upay', name: 'উপায়' },
+                    { id: 'bank', name: 'ব্যাংক' }
                   ].map((ch) => (
                     <button
                       key={ch.id}
                       type="button"
-                      onClick={() => setRecipientForm({ ...recipientForm, channel: ch.id })}
-                      className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                        recipientForm.channel === ch.id
-                          ? 'border-[#00823B] bg-emerald-50 text-[#00823B] shadow-2xs'
-                          : 'border-slate-200 bg-slate-50 text-slate-700'
+                      onClick={() => setNewRecipient({ ...newRecipient, channel: ch.id })}
+                      className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
+                        newRecipient.channel === ch.id
+                          ? 'bg-[#00823B] text-white border-[#00823B]'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      <span>{ch.icon}</span>
-                      <span>{ch.name}</span>
+                      {ch.name}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Recipient Full Name */}
+              {/* Recipient Name */}
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  প্রাপকের পূর্ণ নাম (এনআইডি অনুযায়ী) <span className="text-rose-500">*</span>
+                <label className="text-xs font-medium text-slate-600 block mb-1">
+                  প্রাপকের নাম:
                 </label>
                 <input
                   type="text"
                   required
-                  value={recipientForm.name}
-                  onChange={(e) => setRecipientForm({ ...recipientForm, name: e.target.value })}
-                  placeholder="যেমন: মোসাঃ ফাতেমা বেগম"
-                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-2.5 px-3 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#00823B]"
+                  value={newRecipient.name}
+                  onChange={(e) => setNewRecipient({ ...newRecipient, name: e.target.value })}
+                  placeholder="যেমন: মোঃ শামীম আহমেদ"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00823B]"
                 />
               </div>
 
-              {/* Mobile Number for MFS & Cash */}
-              {recipientForm.channel !== 'bank' && (
+              {/* Phone if Mobile Wallet */}
+              {newRecipient.channel !== 'bank' ? (
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    ১১ ডিজিটের মোবাইল নম্বর <span className="text-rose-500">*</span>
+                  <label className="text-xs font-medium text-slate-600 block mb-1">
+                    প্রাপকের {newRecipient.channel.toUpperCase()} মোবাইল নম্বর:
                   </label>
                   <input
                     type="tel"
                     required
-                    value={recipientForm.phone}
-                    onChange={(e) => setRecipientForm({ ...recipientForm, phone: e.target.value })}
-                    placeholder="017XXXXXXXX"
-                    className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-2.5 px-3 text-xs font-mono font-medium text-slate-900 focus:outline-none focus:border-[#00823B]"
+                    value={newRecipient.phone}
+                    onChange={(e) => setNewRecipient({ ...newRecipient, phone: e.target.value })}
+                    placeholder="01XXXXXXXXX"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#00823B]"
                   />
                 </div>
-              )}
-
-              {/* Bank Specific Fields */}
-              {recipientForm.channel === 'bank' && (
-                <div className="space-y-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+              ) : (
+                <>
                   <div>
-                    <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                      ব্যাংক নির্বাচন করুন <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      value={recipientForm.bankName}
-                      onChange={(e) => setRecipientForm({ ...recipientForm, bankName: e.target.value })}
-                      className="w-full bg-white border-2 border-slate-300 rounded-xl py-2 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00823B]"
-                    >
-                      {bdBanksList.map((b) => (
-                        <option key={b} value={b}>{b}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                      ব্যাংক অ্যাকাউন্ট নম্বর <span className="text-rose-500">*</span>
+                    <label className="text-xs font-medium text-slate-600 block mb-1">
+                      ব্যাংকের নাম:
                     </label>
                     <input
                       type="text"
                       required
-                      value={recipientForm.accountNumber}
-                      onChange={(e) => setRecipientForm({ ...recipientForm, accountNumber: e.target.value })}
-                      placeholder="যেমন: 2050345678901234"
-                      className="w-full bg-white border-2 border-slate-300 rounded-xl py-2 px-3 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#00823B]"
+                      value={newRecipient.bankName}
+                      onChange={(e) => setNewRecipient({ ...newRecipient, bankName: e.target.value })}
+                      placeholder="যেমন: ইসলামী ব্যাংক বাংলাদেশ"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00823B]"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                        শাখার নাম (Branch)
-                      </label>
-                      <input
-                        type="text"
-                        value={recipientForm.branch}
-                        onChange={(e) => setRecipientForm({ ...recipientForm, branch: e.target.value })}
-                        placeholder="যেমন: মতিঝিল শাখা"
-                        className="w-full bg-white border-2 border-slate-300 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#00823B]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                        নোটিফিকেশন মোবাইল
-                      </label>
-                      <input
-                        type="tel"
-                        value={recipientForm.phone}
-                        onChange={(e) => setRecipientForm({ ...recipientForm, phone: e.target.value })}
-                        placeholder="017XXXXXXXX"
-                        className="w-full bg-white border-2 border-slate-300 rounded-xl py-2 px-3 text-xs font-mono text-slate-900 focus:outline-none focus:border-[#00823B]"
-                      />
-                    </div>
+                  <div>
+                    <label className="text-xs font-medium text-slate-600 block mb-1">
+                      অ্যাকাউন্ট নম্বর:
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newRecipient.accountNumber}
+                      onChange={(e) => setNewRecipient({ ...newRecipient, accountNumber: e.target.value })}
+                      placeholder="যেমন: ২০৫০১২৩৪৫৬৭৮৯"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#00823B]"
+                    />
                   </div>
-                </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-slate-600 block mb-1">
+                      শাখা (Branch):
+                    </label>
+                    <input
+                      type="text"
+                      value={newRecipient.branch}
+                      onChange={(e) => setNewRecipient({ ...newRecipient, branch: e.target.value })}
+                      placeholder="যেমন: মতিঝিল শাখা"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#00823B]"
+                    />
+                  </div>
+                </>
               )}
 
-              {/* Relationship with Recipient */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    সম্পর্ক:
-                  </label>
-                  <select
-                    value={recipientForm.relationship}
-                    onChange={(e) => setRecipientForm({ ...recipientForm, relationship: e.target.value })}
-                    className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-2.5 px-3 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#00823B]"
-                  >
-                    <option value="মা">মা</option>
-                    <option value="বাবা">বাবা</option>
-                    <option value="স্ত্রী">স্ত্রী</option>
-                    <option value="স্বামী">স্বামী</option>
-                    <option value="ভাই">ভাই</option>
-                    <option value="বোন">বোন</option>
-                    <option value="সন্তান">সন্তান</option>
-                    <option value="বন্ধু">বন্ধু</option>
-                    <option value="অন্যান্য">অন্যান্য</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    জেলা (ঐচ্ছিক):
-                  </label>
-                  <input
-                    type="text"
-                    value={recipientForm.district}
-                    onChange={(e) => setRecipientForm({ ...recipientForm, district: e.target.value })}
-                    placeholder="যেমন: ঢাকা / কুমিল্লা"
-                    className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-2.5 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#00823B]"
-                  />
-                </div>
+              {/* Relationship */}
+              <div>
+                <label className="text-xs font-medium text-slate-600 block mb-1">সম্পর্ক:</label>
+                <select
+                  value={newRecipient.relationship}
+                  onChange={(e) => setNewRecipient({ ...newRecipient, relationship: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none"
+                >
+                  <option value="পরিবার">পরিবার</option>
+                  <option value="আত্মীয়">আত্মীয়</option>
+                  <option value="বন্ধু">বন্ধু</option>
+                  <option value="অন্যান্য">অন্যান্য</option>
+                </select>
               </div>
 
-              {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddRecipientModal(false)}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition-all cursor-pointer"
-                >
-                  বাতিল
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3 rounded-xl text-xs shadow-md transition-all cursor-pointer"
-                >
-                  {loading ? "সংরক্ষণ হচ্ছে..." : "প্রাপক সংরক্ষণ করুন"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#00823B] hover:bg-[#006837] text-white font-bold py-3 rounded-xl text-xs transition-all cursor-pointer mt-2"
+              >
+                সংরক্ষণ ও নির্বাচন করুন
+              </button>
             </form>
           </div>
         </div>
       )}
+
     </div>
   );
 };
